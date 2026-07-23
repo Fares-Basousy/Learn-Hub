@@ -1,18 +1,7 @@
 // Placeholder news items shown when the DB isn't wired yet.
 // The `/news/edit` page (behind login) can create/update/delete real items.
 
-export type NewsItem = {
-  id: string;
-  title: string;
-  title_ar?: string | null;
-  body?: string | null;
-  body_ar?: string | null;
-  image_url?: string | null;
-  link_url?: string | null;
-  link_label?: string | null;
-  link_label_ar?: string | null;
-  published_at: string; // ISO
-};
+import { NewsItem } from "../lib/types";
 
 export const newsItems: NewsItem[] = [
   {

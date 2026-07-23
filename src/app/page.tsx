@@ -16,18 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { getTimetableEntries } from "../lib/actions/api/timetable/timetable-actions";
-type TimetableEntry = {
-  id: string;
-  classroom: string;
-  day_of_week: number;
-  session_index: number;
-  start_time: string;
-  end_time: string;
-  grade: string;
-  course: string;
-  teacher_name: string;
-  teacher_school: string;
-};
+import { TimetableEntry } from "../lib/types";
 
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const CLASSROOMS = ["Classroom 1", "Classroom 2", "Classroom 3"];
@@ -76,12 +65,11 @@ const PLACEHOLDER: TimetableEntry[] = CLASSROOMS.flatMap((c, ci) =>
 export default function Home() {
   const [selectedDay, setSelectedDay] = useState(1);
   const { lang, t, tm } = useLang();
-  const [timetables,setTimetables] = useState([])
+  const [timetables,setTimetables] = useState<TimetableEntry[]>([])
   useEffect(()=>{
     const intialLoad = async ()=>{
     const  data  = await getTimetableEntries()
-    const parsedData = await data.json() 
-    const entries = parsedData?.entries?.length ? parsedData.entries : PLACEHOLDER;
+    const entries = data?.entries?.length ? data.entries : PLACEHOLDER;
     setTimetables(entries)
     }
     intialLoad()

@@ -1,10 +1,6 @@
-// Signed, httpOnly session cookie helpers. Server only.
+// lib/session.ts
 import { createHmac, timingSafeEqual } from "node:crypto";
-import {
-  getCookie,
-  setCookie,
-  deleteCookie,
-} from "@tanstack/react-start/server";
+import { cookies } from "next/headers";
 
 const COOKIE_NAME = "app_session";
 const MAX_AGE = 60 * 60 * 24 * 7; // 7 days
@@ -12,16 +8,23 @@ const MAX_AGE = 60 * 60 * 24 * 7; // 7 days
 export type SessionPayload = {
   userId: string;
   username: string;
-  iat: number; // issued-at (seconds)
+  iat: number;
 };
 
 function b64urlEncode(buf: Buffer): string {
-  return buf.toString("base64").replace(/=+$/, "").replace(/\+/g, "-").replace(/\//g, "_");
+  return buf
+    .toString("base64")
+    .replace(/=+$/, "")
+    .replace(/\+/g, "-")
+    .replace(/\//g, "_");
 }
 
 function b64urlDecode(s: string): Buffer {
   const pad = 4 - (s.length % 4 || 4);
-  const b64 = s.replace(/-/g, "+").replace(/_/g, "/") + "=".repeat(pad === 4 ? 0 : pad);
+  const b64 =
+    s.replace(/-/g, "+").replace(/_/g, "/") +
+    "=".repeat(pad === 4 ? 0 : pad);
+
   return Buffer.from(b64, "base64");
 }
 
@@ -32,60 +35,92 @@ function secret(): string {
 }
 
 function sign(data: string): string {
-  return b64urlEncode(createHmac("sha256", secret()).update(data).digest());
+  return b64urlEncode(
+    createHmac("sha256", secret()).update(data).digest()
+  );
 }
 
 export function encodeSession(payload: SessionPayload): string {
-  const body = b64urlEncode(Buffer.from(JSON.stringify(payload), "utf8"));
+  const body = b64urlEncode(
+    Buffer.from(JSON.stringify(payload), "utf8")
+  );
+
   return `${body}.${sign(body)}`;
 }
 
-export function decodeSession(token: string | undefined): SessionPayload | null {
+export function decodeSession(
+  token?: string
+): SessionPayload | null {
   if (!token) return null;
+
   const [body, sig] = token.split(".");
   if (!body || !sig) return null;
+
   const expected = sign(body);
+
   const a = Buffer.from(sig);
   const b = Buffer.from(expected);
-  if (a.length !== b.length || !timingSafeEqual(a, b)) return null;
+
+  if (a.length !== b.length || !timingSafeEqual(a, b)) {
+    return null;
+  }
+
   try {
-    const parsed = JSON.parse(b64urlDecode(body).toString("utf8")) as SessionPayload;
-    if (!parsed || typeof parsed.userId !== "string") return null;
-    // Expire after MAX_AGE
-    if (Date.now() / 1000 - parsed.iat > MAX_AGE) return null;
+    const parsed = JSON.parse(
+      b64urlDecode(body).toString("utf8")
+    ) as SessionPayload;
+
+    if (typeof parsed.userId !== "string") {
+      return null;
+    }
+
+    if (Date.now() / 1000 - parsed.iat > MAX_AGE) {
+      return null;
+    }
+
     return parsed;
   } catch {
     return null;
   }
 }
 
-export function setSessionCookie(payload: Omit<SessionPayload, "iat">) {
-  const token = encodeSession({ ...payload, iat: Math.floor(Date.now() / 1000) });
-  setCookie(COOKIE_NAME, token, {
+export async function setSessionCookie(
+  payload: Omit<SessionPayload, "iat">
+) {
+  const cookieStore = await cookies();
+
+  const token = encodeSession({
+    ...payload,
+    iat: Math.floor(Date.now() / 1000),
+  });
+
+  cookieStore.set(COOKIE_NAME, token, {
     httpOnly: true,
-    secure: true,
+    secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
     path: "/",
     maxAge: MAX_AGE,
   });
 }
 
-export function clearSessionCookie() {
-  deleteCookie(COOKIE_NAME, { path: "/" });
+export async function clearSessionCookie() {
+  const cookieStore = await cookies();
+
+  cookieStore.delete(COOKIE_NAME);
 }
 
-export function readSession(): SessionPayload | null {
-  return decodeSession(getCookie(COOKIE_NAME));
+export async function readSession(): Promise<SessionPayload | null> {
+  const cookieStore = await cookies();
+
+  return decodeSession(cookieStore.get(COOKIE_NAME)?.value);
 }
 
-/** Throws a 401 Response when there is no valid session. */
-export function requireSession(): SessionPayload {
-  const s = readSession();
-  if (!s) {
-    throw new Response(JSON.stringify({ error: "Unauthorized" }), {
-      status: 401,
-      headers: { "content-type": "application/json" },
-    });
+export async function //requiresession(): Promise<SessionPayload> {
+  const session = await readSession();
+
+  if (!session) {
+    throw new Error("Unauthorized");
   }
-  return s;
+
+  return session;
 }

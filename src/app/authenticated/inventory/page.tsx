@@ -1,19 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { api } from "@/lib/api";
 import { adjustInventory, getOrganizationsAdmin } from "@/src/lib/actions/api/organizations/organizations-actions";
+import { Organization } from "@/src/lib/types";
 
 
-type Org = {
-  id: string;
-  name: string;
-  books_count: number;
-  codes_count: number;
-};
+
 
 export default function InventoryPage() {
-  const [organizations, setOrganization] = useState<Org[]>([])
+  const [organizations, setOrganization] = useState<Organization[]>([])
   const [error, setError] = useState<Error>()
   const [refresh, setRefresh] = useState(false)
   const [pageIndex, setPageIndex] = useState(0)
@@ -21,10 +15,10 @@ export default function InventoryPage() {
     useEffect(()=>{
           const Load = async ()=>{
               try{
-                const  data  = await getOrganizationsAdmin(pageIndex)
-                const parsedData = await data.json() 
-                const entries : Org[] = parsedData?.entries?.length ? parsedData.entries : [];
-                setOrganization((prev : Org[])=>[...prev,...entries])
+                const  data  = await getOrganizationsAdmin()
+                const parsedData = await data.organizations
+                const entries : Organization[] = parsedData?.length ? parsedData : [];
+                setOrganization((prev : Organization[])=>[...prev,...entries])
               }
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               catch(e : any){
@@ -64,7 +58,7 @@ export default function InventoryPage() {
   );
 }
 
-function OrgRow({ org, onSaved }: { org: Org; onSaved: () => void }) {
+function OrgRow({ org, onSaved }: { org: Organization; onSaved: () => void }) {
   const [books, setBooks] = useState(0);
   const [codes, setCodes] = useState(0);
   const [pending, setPending] = useState(false)

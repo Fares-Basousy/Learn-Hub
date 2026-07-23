@@ -1,18 +1,25 @@
-import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, Megaphone } from "lucide-react";
-import { newsItems as placeholder, type NewsItem } from "@/content/news";
-import { api } from "@/lib/api";
+import { type NewsItem } from "../lib/types";
+import { newsItems as placeholder } from "@/content/news";
 import { useLang } from "@/components/lang-provider";
+import { useEffect, useState } from "react";
+import { getPosts } from "../lib/actions/api/news/news-actions";
+
 
 export function NewsSection() {
+  const [news, setNews] = useState<NewsItem[]>([])
   const { lang, t } = useLang();
   const locale = lang === "ar" ? "ar-EG" : "en-US";
-  // const { data } = useQuery({
-  //   queryKey: ["news-public"],
-  //   queryFn: () => api<{ items: NewsItem[] }>("/api/news"),
-  //   retry: false,
-  // });
-  // const items = data?.items?.length ? data.items : placeholder;
+  useEffect(()=>{
+      const intialLoad = async ()=>{
+      const  data : {items : NewsItem[], warning? : string} = await getPosts()
+      const entries = data.items?.length ? data.items : placeholder;
+      setNews(entries)
+      }
+      intialLoad()
+    
+    
+    },[])
 
   return (
     <section id="news" className="relative border-b bg-background">
@@ -22,7 +29,7 @@ export function NewsSection() {
           <h2 className="text-lg font-semibold">{t("news")}</h2>
         </div>
         <div className="space-y-6">
-          {/* {items.map((n) => {
+          {news.map((n) => {
             const title = lang === "ar" ? n.title_ar ?? n.title : n.title;
             const body = lang === "ar" ? n.body_ar ?? n.body : n.body;
             const linkLabel =
@@ -90,7 +97,7 @@ export function NewsSection() {
                 )}
               </article>
             );
-          })} */}
+          })}
         </div>
       </div>
     </section>

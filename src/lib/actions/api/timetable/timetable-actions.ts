@@ -2,7 +2,8 @@
 import { z } from "zod";
 import { query } from "@/lib/db.server";
 import { handle, json, parseJson } from "@/lib/http";
-import { requireSession } from "@/lib/session.server";
+import { TimetableEntry } from "@/src/lib/types";
+//import { requireSession } from "@/lib/session.server";
 
 const PatchSchema = z.object({
   classroom: z.string().min(1).max(50).optional(),
@@ -24,11 +25,11 @@ const EntrySchema = z.object({
 });
 export async function createTimeTable(formData: FormData) {
   
-  requireSession();
+  //requiresession();
   const entries = Object.fromEntries(formData.entries());
   const data = EntrySchema.safeParse(entries);
   // TODO: INSERT INTO timetable_entries (...) VALUES (...) RETURNING *
-  const rows = await query(
+  const rows : TimetableEntry[] = await query(
     "INSERT INTO timetable_entries (classroom, day_of_week, session_index, grade, course, teacher_name, teacher_school) VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *",
     [
       data.data?.classroom,
@@ -40,15 +41,15 @@ export async function createTimeTable(formData: FormData) {
       data.data?.teacher_school,
     ],
   );
-  return json({ entry: rows[0] }, { status: 201 });
+  return { entry: rows[0] };
       }
 export async function updateTimeTable(formData: FormData, id : number) {
   
-   requireSession();
+   //requiresession();
    const entries = Object.fromEntries(formData.entries());
    const data = PatchSchema.safeParse(entries);
         // TODO: UPDATE timetable_entries SET <fields> WHERE id = $1 RETURNING *
-        const rows = await query(
+        const rows : TimetableEntry[] = await query(
           "UPDATE timetable_entries SET classroom = COALESCE($2, classroom), day_of_week = COALESCE($3, day_of_week), session_index = COALESCE($4, session_index), grade = COALESCE($5, grade), course = COALESCE($6, course), teacher_name = COALESCE($7, teacher_name), teacher_school = COALESCE($8, teacher_school) WHERE id = $1 RETURNING *",
           [
             id,
@@ -61,29 +62,29 @@ export async function updateTimeTable(formData: FormData, id : number) {
             data.data?.teacher_school ?? null,
           ],
         );
-        return json({ entry: rows[0] });
+        return { entry: rows[0] };
       }
 
 export async function deleteTimeTable(id : number) {
   
-   requireSession();
-   requireSession();
+   //requiresession();
+   //requiresession();
         // TODO: DELETE FROM timetable_entries WHERE id = $1
         await query("DELETE FROM timetable_entries WHERE id = $1", [id]);
-        return json({ ok: true });
+        return { ok: true };
       }
 export async function getTimetableEntries() {
   
-   requireSession();
+   //requiresession();
   try {
           // TODO: SELECT * FROM timetable_entries ORDER BY classroom, day_of_week, session_index
-          const rows = await query(
+          const rows : TimetableEntry[] = await query(
             "SELECT id, classroom, day_of_week, session_index, grade, course, teacher_name, teacher_school FROM timetable_entries ORDER BY classroom, day_of_week, session_index",
           );
-          return json({ entries: rows });
+          return { entries: rows };
         } catch (e) {
           // Empty when DB isn't wired yet — landing page still renders.
-          return json({ entries: [], warning: (e as Error).message });
+          return { entries: [], warning: (e as Error).message };
         }
       }
   

@@ -2,21 +2,7 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { api } from "@/lib/api";
 
-
-type NewsItem = {
-  id: string;
-  title: string;
-  title_ar?: string | null;
-  body?: string | null;
-  body_ar?: string | null;
-  image_url?: string | null;
-  link_url?: string | null;
-  link_label?: string | null;
-  link_label_ar?: string | null;
-  published_at: string;
-};
-
-type Form = {
+export type Form = {
   title: string;
   title_ar: string;
   body: string;

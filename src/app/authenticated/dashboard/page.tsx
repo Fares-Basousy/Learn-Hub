@@ -1,33 +1,46 @@
+"use client"
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
+import { useEffect, useState } from "react";
+import { getOrganizationsAdmin } from "@/src/lib/actions/api/organizations/organizations-actions";
+import { getSales } from "@/src/lib/actions/api/sales/sales-actions";
 
 
 type Org = { id: string; name: string; books_count: number; codes_count: number };
 type Sale = { id: string; org_id: string; items: unknown; sold_at: string };
 
 export default function DashboardPage() {
-  const orgs = useQuery({
-    queryKey: ["organizations"],
-    queryFn: () => api<{ organizations: Org[] }>("/api/organizations"),
-    retry: false,
-  });
-  const sales = useQuery({
-    queryKey: ["sales"],
-    queryFn: () => api<{ sales: Sale[] }>("/api/sales"),
-    retry: false,
-  });
+  const [orgs, setOrgs] = useState<Org[]>([])
+  const [salesPageIndex, setSalesOrgPageIndex] = useState(0)
+  const [sales, setSales] = useState<Sale[]>([])
+  const [error, setError] = useState<Error>()
+   useEffect(()=>{
+        const intialLoad = async ()=>{
+            try{
+              const  orgData  = await getOrganizationsAdmin()
+              const  saleData =await getSales(salesPageIndex)
+              setOrgs(orgData?.organizations?.length ? orgData.organizations : [])
+              setSales(saleData?.sales?.length ? saleData.sales : [])
+            }
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            catch(e : any){
+              setError(e)
+            }
+            }
+            intialLoad()
+      },[])
 
   const totalBooks =
-    orgs.data?.organizations?.reduce((a, b) => a + (b.books_count ?? 0), 0) ?? 0;
+    orgs?.reduce((a, b) => a + (b.books_count ?? 0), 0) ?? 0;
   const totalCodes =
-    orgs.data?.organizations?.reduce((a, b) => a + (b.codes_count ?? 0), 0) ?? 0;
+    orgs?.reduce((a, b) => a + (b.codes_count ?? 0), 0) ?? 0;
 
   return (
     <div className="mx-auto max-w-5xl">
       <h1 className="text-2xl font-bold">Dashboard</h1>
       <p className="text-sm text-muted-foreground">Overview of inventory and activity.</p>
 
-      {(orgs.error || sales.error) && (
+      {(error || error) && (
         <div className="mt-4 rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
           Data endpoints returned errors. Wire up{" "}
           <code>src/lib/db.server.ts</code> to connect to your Postgres.
@@ -35,7 +48,7 @@ export default function DashboardPage() {
       )}
 
       <div className="mt-6 grid gap-4 sm:grid-cols-3">
-        <Stat label="Organizations" value={orgs.data?.organizations?.length ?? 0} />
+        <Stat label="Organizations" value={orgs?.length ?? 0} />
         <Stat label="Total books" value={totalBooks} />
         <Stat label="Total codes" value={totalCodes} />
       </div>
@@ -52,14 +65,14 @@ export default function DashboardPage() {
               </tr>
             </thead>
             <tbody>
-              {(sales.data?.sales ?? []).slice(0, 10).map((s) => (
+              {(sales ?? []).slice(0, 10).map((s) => (
                 <tr key={s.id} className="border-t">
                   <td className="p-2 font-mono text-xs">{s.id.slice(0, 8)}</td>
                   <td className="p-2">{s.org_id.slice(0, 8)}</td>
                   <td className="p-2">{new Date(s.sold_at).toLocaleString()}</td>
                 </tr>
               ))}
-              {(!sales.data?.sales || sales.data.sales.length === 0) && (
+              {(!sales || sales.length === 0) && (
                 <tr>
                   <td colSpan={3} className="p-4 text-center text-muted-foreground">
                     No sales yet.

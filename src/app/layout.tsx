@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
+import './globals.css'
+import appCSS from './globals.css'
 import { ThemeProvider } from "../components/theme-provider";
 import { LangProvider } from "../components/lang-provider";
 
@@ -14,7 +15,9 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-
+export const links = () => [
+  { rel: "stylesheet", href: appCSS },
+]; 
 export const metadata = {
   title: "School Hub",
   description:

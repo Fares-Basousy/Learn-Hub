@@ -1,7 +1,9 @@
+"use server"
 import { z } from "zod";
 import { query } from "@/lib/db.server";
 import { json,  } from "@/lib/http";
-import { requireSession } from "@/lib/session.server";
+//import { requireSession } from "@/lib/session.server";
+import { NewsItem } from "@/src/lib/types"; 
 
 const PatchSchema = z.object({
   title: z.string().trim().min(1).max(200).optional(),
@@ -26,44 +28,42 @@ const NewsSchema = z.object({
   published_at: z.string().datetime().optional(),
 });
 export async function createPost(formData: FormData) {
-  'use server'
-   requireSession();
+   //requiresession();
         const entries = Object.fromEntries(formData.entries());
-        const data = NewsSchema.omit(entries);
+        const data = NewsSchema.safeParse(entries);
         const rows = await query(
           "INSERT INTO news (title, title_ar, body, body_ar, image_url, link_url, link_label, link_label_ar, published_at) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,COALESCE($9, NOW())) RETURNING *",
           [
-            data.title,
-            data.title_ar ?? null,
-            data.body ?? null,
-            data.body_ar ?? null,
-            data.image_url ?? null,
-            data.link_url ?? null,
-            data.link_label ?? null,
-            data.link_label_ar ?? null,
-            data.published_at ?? null,
+            data.data?.title,
+            data.data?.title_ar ?? null,
+            data.data?.body ?? null,
+            data.data?.body_ar ?? null,
+            data.data?.image_url ?? null,
+            data.data?.link_url ?? null,
+            data.data?.link_label ?? null,
+            data.data?.link_label_ar ?? null,
+            data.data?.published_at ?? null,
           ],
         );
         return json({ item: rows[0] }, { status: 201 });
 }
-export async function getPost() {
-  'use server'
+export async function getPosts() {
   try {
-          const rows = await query(
+          const rows : NewsItem[] = await query(
             "SELECT id, title, title_ar, body, body_ar, image_url, link_url, link_label, link_label_ar, published_at FROM news ORDER BY published_at DESC",
           );
-          return json({ items: rows });
+          console.log(rows)
+          return { items: rows };
         } catch (e) {
-          return json({ items: [], warning: (e as Error).message });
+          return { items: [], warning: (e as Error).message };
         }
   
 }
 
 export async function UpatePost(formData: FormData, id: string ) {
-  'use server'
   const entries = Object.fromEntries(formData.entries());
   const data = PatchSchema.parse(entries);
-  requireSession();
+  //requiresession();
         const rows = await query(
           `UPDATE news SET
              title         = COALESCE($2, title),
@@ -91,8 +91,8 @@ export async function UpatePost(formData: FormData, id: string ) {
         return json({ item: rows[0] });
       }
 export async function deletePost(id: string) {
-  'use server'
-   requireSession();
+  "use server"
+   //requiresession();
         await query("DELETE FROM news WHERE id = $1", [id]);
-        return json({ ok: true });
+        return { ok: true };
 }

@@ -3,14 +3,9 @@ import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { getSales } from "@/src/lib/actions/api/sales/sales-actions";
 import { useEffect, useState } from "react";
+import { Sale } from "@/src/lib/types";
 
 
-type Sale = {
-  id: string;
-  org_id: string;
-  items: Array<{ type: string; count: number }>;
-  sold_at: string;
-};
 
 export default function SalesPage() {
   const [sales, setSales] = useState<Sale[]>([])
@@ -23,8 +18,7 @@ export default function SalesPage() {
             try{
               setPending(true)
               const  data  = await getSales(pageIndex)
-              const parsedData = await data.json() 
-              const entries : Sale[] = parsedData?.entries?.length ? parsedData.entries : [];
+              const entries : Sale[] = data.sales?.length ? data.sales : [];
               setSales((prev : Sale[])=>[...prev,...entries])
               setPending(false)
             }

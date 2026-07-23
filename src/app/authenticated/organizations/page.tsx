@@ -1,23 +1,18 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+'use client'
 import { useEffect, useState } from "react";
 import { createOrganization, deleteOrganization, getOrganizationsAdmin } from "@/src/lib/actions/api/organizations/organizations-actions";
+import { Organization } from "@/src/lib/types";
 
  
-type Org = {
-  id: string;
-  name: string;
-  subject: string;
-  books_count: number;
-  codes_count: number;
-};
+
 
 export default function OrganizationsPage() {
-  const [organizations,setOrganization] = useState<Org[]>([])
+  const [organizations,setOrganization] = useState<Organization[]>([])
   const [error, setError] = useState<Error>()
   const [pending, setPending] = useState(false)
   const [loading, setLoading] = useState(true)
-  const [pageIndex, setPageIndex] = useState(0)
-  const [form, setForm] = useState<Org>({
+  const [form, setForm] = useState<Organization>({
     id:'',
     name: '',
     subject: '',
@@ -28,9 +23,8 @@ export default function OrganizationsPage() {
   useEffect(()=>{
       const intialLoad = async ()=>{
           try{
-            const  data  = await getOrganizationsAdmin(pageIndex)
-            const parsedData = await data.json() 
-            const entries = parsedData?.entries?.length ? parsedData.entries : [];
+            const  data  = await getOrganizationsAdmin()
+            const entries = data.organizations ;
             setOrganization(entries)
             setLoading(false)
           }
@@ -155,13 +149,13 @@ export default function OrganizationsPage() {
                 </td>
               </tr>
             ))}
-            <button
+            {/* <button
             onClick={() => setPageIndex((prev)=> prev+1)}
             className="w-full rounded-md px-3 py-2 text-left text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
           >
             Next
-          </button>
-            {organizations?.length === 0 && (
+          </button> */}
+            {organizations?.length === 0 && !loading && (
               <tr>
                 <td colSpan={5} className="p-4 text-center text-muted-foreground">
                   No organizations yet.

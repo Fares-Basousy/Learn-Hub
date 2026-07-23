@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { query } from "@/lib/db.server";
 import { handle, json, parseJson } from "@/lib/http";
-import { requireSession } from "@/lib/session.server";
+//import { requireSession } from "@/lib/session.server";
 
 const PatchSchema = z.object({
   name: z.string().min(1).max(200).optional(),
@@ -20,40 +20,40 @@ const CreateSchema = z.object({
 
 export async function createStudent(formData: FormData) {
   'use server'
-   requireSession();
+   //requiresession();
         const entries = Object.fromEntries(formData.entries());
         const data = CreateSchema.safeParse(entries);
-           requireSession();
+           //requiresession();
         // TODO: INSERT INTO students (org_id, name, student_number, grade, school) VALUES ... RETURNING *
         const rows = await query(
           "INSERT INTO students (org_id, name, student_number, grade, school) VALUES ($1,$2,$3,$4,$5) RETURNING *",
           [data.data?.org_id, data.data?.name, data.data?.student_number, data.data?.grade, data.data?.school],
         );
-        return json({ student: rows[0] }, { status: 201 });
+        return { student: rows[0] };
 
 }
 export async function getStudents(pageindex : number) {
   'use server'
-   requireSession();
+   //requiresession();
     // TODO: add pagination SELECT id, org_id, name, student_number, grade, school FROM students ORDER BY name
     const rows = await query("SELECT id, org_id, name, student_number, grade, school FROM students ORDER BY name",);
-  return json({ students: rows });
+  return { students: rows };
 
 }
 export async function getStudentById(id : number) {
   'use server'
-   requireSession();
+   //requiresession();
    // TODO: SELECT ... FROM students WHERE id = $1
    const rows = await query("SELECT id, org_id, name, student_number, grade, school FROM students WHERE id = $1", [id]);
-   return json({ student: rows[0] ?? null });
+   return { student: rows[0] ?? null };
 
 }
 export async function updateStudent(id: number, formData: FormData) {
   'use server'
-   requireSession();
+   //requiresession();
         const entries = Object.fromEntries(formData.entries());
         const data = PatchSchema.safeParse(entries);
-           requireSession();
+           //requiresession();
         // TODO: INSERT INTO students (org_id, name, student_number, grade, school) VALUES ... RETURNING *
         // TODO: UPDATE students SET <fields> WHERE id = $1 RETURNING *
         const rows = await query(
@@ -67,6 +67,6 @@ export async function updateStudent(id: number, formData: FormData) {
             data.data?.org_id ?? null,
           ],
         );
-        return json({ student: rows[0] });
+        return { student: rows[0] };
 
 }
