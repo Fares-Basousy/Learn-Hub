@@ -1,6 +1,5 @@
 "use client"
-import { useQuery } from "@tanstack/react-query";
-import { api } from "@/lib/api";
+
 import { useEffect, useState } from "react";
 import { getOrganizationsAdmin } from "@/src/lib/actions/api/organizations/organizations-actions";
 import { getSales } from "@/src/lib/actions/api/sales/sales-actions";

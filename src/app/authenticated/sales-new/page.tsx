@@ -1,8 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useRouter } from "next/router";
-import { useMutation, useQuery } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
-import { api } from "@/lib/api";
 import { createSale } from "@/src/lib/actions/api/sales/sales-actions";
 import { createStudent } from "@/src/lib/actions/api/students/student-actions";
 import { getOrganizationsAdmin } from "@/src/lib/actions/api/organizations/organizations-actions";
@@ -30,8 +28,7 @@ export default function NewSalePage() {
         const intialLoad = async ()=>{
             try{
               const  data  = await getOrganizationsAdmin()
-              const parsedData = await data.json() 
-              const entries = parsedData?.entries?.length ? parsedData.entries : [];
+              const entries = data.organizations?.length ? data.organizations : [];
               setOrgs(entries)
             }
             catch(e : any){

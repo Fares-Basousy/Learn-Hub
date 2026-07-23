@@ -60,7 +60,7 @@ export async function getPosts() {
   
 }
 
-export async function UpatePost(formData: FormData, id: string ) {
+export async function updatePost(formData: FormData, id: string ) {
   const entries = Object.fromEntries(formData.entries());
   const data = PatchSchema.parse(entries);
   //requiresession();

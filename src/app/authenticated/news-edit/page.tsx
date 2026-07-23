@@ -1,7 +1,7 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
-import { api } from "@/lib/api";
-
+'use client'
+import { useEffect, useState } from "react";
+import { NewsItem } from "@/src/lib/types";
+import { createPost, deletePost, getPosts, updatePost } from "@/src/lib/actions/api/news/news-actions";
 export type Form = {
   title: string;
   title_ar: string;
@@ -45,13 +45,50 @@ export default function NewsEditPage() {
   //   queryFn: () => api<{ items: NewsItem[] }>("/api/news"),
   //   retry: false,
   // });
-
+  const [news, setNews] = useState<NewsItem[]>([])
   const [form, setForm] = useState<Form>(emptyForm);
   const [editingId, setEditingId] = useState<string | null>(null);
-
-  // const create = useMutation({
+  const [error, setError] = useState<Error>()
+  const [pending, setPending] = useState(false)
+  const [refresh, setRefresh] = useState(false)
+useEffect(()=>{
+          const Load = async ()=>{
+              try{
+                const  data  = await getPosts()
+                const entries : NewsItem[] = data?.items.length ? data.items : [];
+                setNews((prev : NewsItem[])=>[...prev,...entries])
+              }
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+              catch(e : any){
+                setError(e)
+              }
+              }
+              Load()
+        },[refresh]) 
+  const create =  async () =>{
+      try{
+          setPending(true)
+          const formData = new FormData();
+          Object.entries(toBody(form)).forEach(([key, value]) => {
+            if(key != 'id')
+              formData.append(key, String(value));
+            });
+          await createPost(formData).then(async ()=>{
+            setPending(false)
+            setForm(emptyForm)
+            setRefresh(!refresh)
+          })
+        }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      catch(error : any){
+              setPending(false)
+              setError(error)
+              console.log(error)      
+          }
+    }
+  // useMutation({
   //   mutationFn: () =>
-  //     api("/api/news", { method: "POST", body: JSON.stringify(toBody(form)) }),
+  //     api("/api/news", { method: "POST", body: JSON.stringify(toBody(toBody(form))) }),
   //   onSuccess: () => {
   //     qc.invalidateQueries({ queryKey: ["news"] });
   //     qc.invalidateQueries({ queryKey: ["news-public"] });
@@ -59,24 +96,45 @@ export default function NewsEditPage() {
   //   },
   // });
 
-  // const update = useMutation({
-  //   mutationFn: (id: string) =>
-  //     api(`/api/news/${id}`, { method: "PATCH", body: JSON.stringify(toBody(form)) }),
-  //   onSuccess: () => {
-  //     qc.invalidateQueries({ queryKey: ["news"] });
-  //     qc.invalidateQueries({ queryKey: ["news-public"] });
-  //     setEditingId(null);
-  //     setForm(emptyForm);
-  //   },
-  // });
+  const update =  async (id : string) =>{
+      try{
+          setPending(true)
+          const formData = new FormData();
+          Object.entries(toBody(form)).forEach(([key, value]) => {
+            
+            formData.append(key, String(value));
+            });
+          await updatePost(formData,id).then(async ()=>{
+            setPending(false)
+            setForm(emptyForm)
+            setRefresh(!refresh)
+          })
+        }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      catch(error : any){
+              setPending(false)
+              setError(error)
+              console.log(error)      
+          }
+    }
 
-  // const remove = useMutation({
-  //   mutationFn: (id: string) => api(`/api/news/${id}`, { method: "DELETE" }),
-  //   onSuccess: () => {
-  //     qc.invalidateQueries({ queryKey: ["news"] });
-  //     qc.invalidateQueries({ queryKey: ["news-public"] });
-  //   },
-  // });
+  const remove =  async (id : string) =>{
+      try{
+          setPending(true)
+          setPending(false)
+
+          await deletePost(id).then(async ()=>{
+            setPending(false)
+            setRefresh(!refresh)
+          })
+        }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      catch(error : any){
+              setError(error)
+              setPending(false)
+              console.log(error)      
+          }
+    }
 
   function startEdit(n: NewsItem) {
     setEditingId(n.id);
@@ -104,8 +162,10 @@ export default function NewsEditPage() {
       <form
         onSubmit={(e) => {
           e.preventDefault();
-  //        if (editingId) update.mutate(editingId);
-//          else create.mutate();
+         if (editingId) 
+          update(editingId);
+         else
+          create()
         }}
         className="mt-6 grid gap-3 rounded-lg border bg-card p-4 sm:grid-cols-2">
         <label className="text-xs font-medium sm:col-span-2">
@@ -190,6 +250,7 @@ export default function NewsEditPage() {
           {editingId && (
             <button
               type="button"
+              disabled={pending}
               onClick={() => {
                 setEditingId(null);
                 setForm(emptyForm);
@@ -202,17 +263,15 @@ export default function NewsEditPage() {
         </div>
       </form>
 
-      {/* {(error || create.error || update.error || remove.error) && (
+      {(error) && (
         <p className="mt-2 text-sm text-destructive">
           {(error as Error)?.message ??
-            (create.error as Error)?.message ??
-            (update.error as Error)?.message ??
-            (remove.error as Error)?.message}
+          (error as Error)?.message}
         </p>
-      )} */}
+      )}
 
       <div className="mt-6 space-y-3">
-        {/* {(data?.items ?? []).map((n) => (
+        {(news ?? []).map((n) => (
           <div key={n.id} className="flex gap-3 rounded-lg border bg-card p-3">
             {n.image_url && (
               <img
@@ -220,10 +279,10 @@ export default function NewsEditPage() {
                 alt=""
                 className="h-16 w-24 shrink-0 rounded object-cover"
               />
-            )} */}
+            )}
             <div className="min-w-0 flex-1">
-              <div className="truncate font-semibold">{/*n.title*/}</div>
-               {/* {n.link_url && (
+              <div className="truncate font-semibold">{n.title}</div>
+               {n.link_url && (
                 <a
                   href={n.link_url}
                   target="_blank"
@@ -232,17 +291,17 @@ export default function NewsEditPage() {
                 >
                   {n.link_url}
                 </a>
-               )}  */}
+               )} 
              </div>
              <div className="flex shrink-0 items-start gap-2">
                <button
-                 // onClick={() => startEdit(n)}
+                 onClick={() => startEdit(n)}
                  className="text-xs text-primary hover:underline"
                >
                  Edit
                </button>
                <button
-                 // onClick={() => remove.mutate(n.id)}
+                 onClick={() => remove(n.id)}
                  className="text-xs text-destructive hover:underline"
                >
                  Delete
@@ -250,12 +309,14 @@ export default function NewsEditPage() {
              </div>
            </div>
          ))}
-        {/* {data && data.items?.length === 0 && (
+        {news && news?.length === 0 && (
           <div className="rounded-lg border bg-card p-6 text-center text-sm text-muted-foreground">
             No news items yet.
           </div>
-        )} */}
+        )}
       </div>
     </div>
   );
 }
+
+
