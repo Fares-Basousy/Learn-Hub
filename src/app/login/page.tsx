@@ -6,18 +6,18 @@ import { api } from "@/lib/api";
 import { SiteHeader } from "@/components/site-header";
 
 
-export const metadata = {
- title: "Sign in — School Hub",
-  name: "description", content: "Sign in to manage inventory, sales, and timetable.",
-  twitter: {
-   title: "Sign in — School Hub",
-    name: "description", content: "Sign in to manage inventory, sales, and timetable.",
-  },
-  openopenGraph: {
-   title: "Sign in — School Hub",
-    name: "description", content: "Sign in to manage inventory, sales, and timetable.",
-  }
-};
+// export const metadata = {
+//  title: "Sign in — School Hub",
+//   name: "description", content: "Sign in to manage inventory, sales, and timetable.",
+//   twitter: {
+//    title: "Sign in — School Hub",
+//     name: "description", content: "Sign in to manage inventory, sales, and timetable.",
+//   },
+//   openopenGraph: {
+//    title: "Sign in — School Hub",
+//     name: "description", content: "Sign in to manage inventory, sales, and timetable.",
+//   }
+// };
 export default function LoginPage() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
@@ -40,6 +40,7 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-background">
+      <title>Sign in</title>
       <SiteHeader />
       <main className="mx-auto flex max-w-md flex-col px-4 py-16">
         <h1 className="text-2xl font-bold">Sign in</h1>
