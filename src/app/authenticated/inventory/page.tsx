@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+"use client"
 import { useEffect, useState } from "react";
 import { adjustInventory, getOrganizationsAdmin } from "@/src/lib/actions/api/organizations/organizations-actions";
 import { Organization } from "@/src/lib/types";

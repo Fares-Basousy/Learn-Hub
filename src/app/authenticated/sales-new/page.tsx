@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+"use client"
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import { createSale } from "@/src/lib/actions/api/sales/sales-actions";

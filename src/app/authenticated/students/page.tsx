@@ -1,18 +1,10 @@
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+"use client"
+import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
+import { createStudent, deleteStudent, getStudents } from "@/src/lib/actions/api/students/student-actions";
+import { getOrganizationsAdmin } from "@/src/lib/actions/api/organizations/organizations-actions";
+import { Organization, Student } from "@/src/lib/types";
 
-
-
-type Student = {
-  id: string;
-  org_id: string;
-  name: string;
-  student_number: string;
-  grade: string;
-  school: string;
-};
-type Org = { id: string; name: string };
 
 export default function StudentsPage() {
   // const qc = useQueryClient();
@@ -26,7 +18,11 @@ export default function StudentsPage() {
   //   queryFn: () => api<{ organizations: Org[] }>("/api/organizations"),
   //   retry: false,
   // });
-
+  const [students, setStudents] = useState<Student[]>([])
+  const [organizations, setOrganizations] = useState<Organization[]>([])
+  const [pageIndex, setPageIndex] = useState(0)
+  const [pending, setPending] = useState(false)
+  const [error, setError] = useState<Error>()
   const [form, setForm] = useState({
     org_id: "",
     name: "",
@@ -34,21 +30,75 @@ export default function StudentsPage() {
     grade: "",
     school: "",
   });
+ useEffect(()=>{
+      const intialLoad = async ()=>{
+          try{
+            const  studentsData  = await getStudents(pageIndex)
+            const  organizationsData  = await getOrganizationsAdmin()
 
-  // const create = useMutation({
-  //   mutationFn: () =>
-  //     api("/api/students", { method: "POST", body: JSON.stringify(form) }),
-  //   onSuccess: () => {
-  //     setForm({ org_id: "", name: "", student_number: "", grade: "", school: "" });
-  //     qc.invalidateQueries({ queryKey: ["students"] });
-  //   },
-  // });
+            setOrganizations(organizationsData.organizations)
+            setStudents(studentsData.students)
+          }
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          catch(e : any){
+            setError(e)
+          }
+          }
+      const loadMore = async ()=>{
+          try{
+            const  studentsData  = await getStudents(pageIndex)
+            setStudents((prev)=>[...prev,...studentsData.students])
+          }
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          catch(e : any){
+            setError(e)
+          }
+          }
+          if(pageIndex == 0)
+          intialLoad()
+          else
+            loadMore()
+    },[pageIndex])
 
-  // const remove = useMutation({
-  //   mutationFn: (id: string) => api(`/api/students/${id}`, { method: "DELETE" }),
-  //   onSuccess: () => qc.invalidateQueries({ queryKey: ["students"] }),
-  // });
+  const create = async ()=>{
+      try{
+        setPending(true)
+        const formData = new FormData();
+        Object.entries(form).forEach(([key, value]) => {
+        if(key != 'id')
+          formData.append(key, String(value));
+        });
+        await createStudent(formData).then(()=>{
+          setForm({ org_id: "", name: "", student_number: "", grade: "", school: "" })
+          setPending(false)
+          //give notification
+          })
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      catch(error : any){
+        console.log(error)
+        setError(error.message)
+  
+    }
+  }
+  const remove = async (id : string)=>{
+      try{
+        setPending(true)
+        
+        await deleteStudent(id).then(()=>{
+          setPending(false)
+          //give notification
+          })
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      catch(error : any){
+        console.log(error)
+        setError(error.message)
+  
+    }
+  }
 
+// need to implemnt update
   return (
     <div className="mx-auto max-w-5xl">
       <h1 className="text-2xl font-bold">Students</h1>
@@ -57,7 +107,7 @@ export default function StudentsPage() {
       <form
         onSubmit={(e) => {
           e.preventDefault();
-         // create.mutate();
+         create();
         }}
         className="mt-6 grid grid-cols-2 gap-2 rounded-lg border bg-card p-3 sm:grid-cols-6"
       >
@@ -68,11 +118,11 @@ export default function StudentsPage() {
           className="h-9 rounded-md border border-input bg-background px-2 text-sm"
         >
           <option value="">Org…</option>
-          {/* {orgs.data?.organizations?.map((o) => (
+          {organizations?.map((o) => (
             <option key={o.id} value={o.id}>
               {o.name}
             </option>
-          ))} */}
+          ))}
         </select>
         <input
           required
@@ -107,11 +157,11 @@ export default function StudentsPage() {
         </button>
       </form>
 
-      {/* {(students.error || create.error) && (
+      {(error) && (
         <p className="mt-2 text-sm text-destructive">
-          {(students.error as Error)?.message ?? (create.error as Error)?.message}
+          {(error as Error)?.message ?? (error as Error)?.message}
         </p>
-      )} */}
+      )}
 
       <div className="mt-6 overflow-hidden rounded-lg border bg-card">
         <table className="w-full text-sm">
@@ -125,7 +175,7 @@ export default function StudentsPage() {
             </tr>
           </thead>
           <tbody>
-            {/* {(students.data?.students ?? []).map((s) => (
+            {(students ?? []).map((s) => (
               <tr key={s.id} className="border-t">
                 <td className="p-2 font-medium">{s.name}</td>
                 <td className="p-2">{s.student_number}</td>
@@ -133,21 +183,21 @@ export default function StudentsPage() {
                 <td className="p-2">{s.school}</td>
                 <td className="p-2 text-right">
                   <button
-                 //   onClick={() => remove.mutate(s.id)}
+                   onClick={() => remove(s.id)}
                     className="text-xs text-destructive hover:underline"
                   >
                     Delete
                   </button>
                 </td>
               </tr>
-            ))} */}
-            {/* {students.data && students.data.students?.length === 0 && (
+            ))}
+            {students && students?.length === 0 && (
               <tr>
                 <td colSpan={5} className="p-4 text-center text-muted-foreground">
                   No students yet.
                 </td>
               </tr>
-            )} */}
+            )}
           </tbody>
         </table>
       </div>

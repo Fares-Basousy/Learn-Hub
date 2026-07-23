@@ -1,6 +1,7 @@
+'use server'
 import { z } from "zod";
 import { query } from "@/lib/db.server";
-import { handle, json, parseJson } from "@/lib/http";
+import { Student } from "@/src/lib/types";
 //import { requireSession } from "@/lib/session.server";
 
 const PatchSchema = z.object({
@@ -19,44 +20,40 @@ const CreateSchema = z.object({
 });
 
 export async function createStudent(formData: FormData) {
-  'use server'
    //requiresession();
         const entries = Object.fromEntries(formData.entries());
         const data = CreateSchema.safeParse(entries);
            //requiresession();
         // TODO: INSERT INTO students (org_id, name, student_number, grade, school) VALUES ... RETURNING *
-        const rows = await query(
+        const rows : Student[] = await query(
           "INSERT INTO students (org_id, name, student_number, grade, school) VALUES ($1,$2,$3,$4,$5) RETURNING *",
           [data.data?.org_id, data.data?.name, data.data?.student_number, data.data?.grade, data.data?.school],
         );
         return { student: rows[0] };
 
 }
-export async function getStudents(pageindex : number) {
-  'use server'
+export async function getStudents(pageIndex : number) {
    //requiresession();
     // TODO: add pagination SELECT id, org_id, name, student_number, grade, school FROM students ORDER BY name
-    const rows = await query("SELECT id, org_id, name, student_number, grade, school FROM students ORDER BY name",);
+    const rows : Student[] = await query(`SELECT id, org_id, name, student_number, grade, school FROM students ORDER BY name  OFFSET ${pageIndex* 20} LIMIT 20`,);
   return { students: rows };
 
 }
 export async function getStudentById(id : number) {
-  'use server'
    //requiresession();
    // TODO: SELECT ... FROM students WHERE id = $1
-   const rows = await query("SELECT id, org_id, name, student_number, grade, school FROM students WHERE id = $1", [id]);
+   const rows : Student[] = await query("SELECT id, org_id, name, student_number, grade, school FROM students WHERE id = $1", [id]);
    return { student: rows[0] ?? null };
 
 }
 export async function updateStudent(id: number, formData: FormData) {
-  'use server'
    //requiresession();
         const entries = Object.fromEntries(formData.entries());
-        const data = PatchSchema.safeParse(entries);
+        const data  = PatchSchema.safeParse(entries);
            //requiresession();
         // TODO: INSERT INTO students (org_id, name, student_number, grade, school) VALUES ... RETURNING *
         // TODO: UPDATE students SET <fields> WHERE id = $1 RETURNING *
-        const rows = await query(
+        const rows : Student[] = await query(
           "UPDATE students SET name = COALESCE($2, name), student_number = COALESCE($3, student_number), grade = COALESCE($4, grade), school = COALESCE($5, school), org_id = COALESCE($6, org_id) WHERE id = $1 RETURNING *",
           [
             id,
@@ -70,3 +67,10 @@ export async function updateStudent(id: number, formData: FormData) {
         return { student: rows[0] };
 
 }
+export async function deleteStudent(id: string) {
+  "use server"
+   //requiresession();
+        await query("DELETE FROM students WHERE id = $1", [id]);
+        return { ok: true };
+}
+
