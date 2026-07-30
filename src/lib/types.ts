@@ -1,3 +1,17 @@
+export const Grades = {
+  1 : "1st Elementary",
+  2 : "2nd Elementary",
+  3 : "3rd Elementary",
+  4 : "4th Elementary",
+  5 : "5th Elementary",
+  6 : "6th Elementary",
+  7 : "1st Middle",
+  8 : "2nd Middle",
+  9 : "3rd Middle",
+  10 : "1st Senior",
+  11 : "2nd Senior",
+  12 : "3rd Senior",
+}
 export type Organization = {
   id: string;
   name: string;
@@ -13,11 +27,12 @@ export type Organization = {
 
 export type Student = {
   id: string;
-  org_id: string;
+  org_id: Record<string,string>;
   name: string;
   student_number: string;
   grade: string;
   school: string;
+  type? : string | undefined;
 };
 
 
@@ -26,8 +41,8 @@ export type  TimetableEntry = {
   classroom: string;
   day_of_week: number;
   session_index: number;
-  start_time: string;
-  end_time: string;
+  start_time?: string;
+  end_time?: string;
   grade: string;
   course: string;
   teacher_name: string;

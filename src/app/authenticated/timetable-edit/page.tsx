@@ -5,36 +5,27 @@ import { useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import { createTimeTable, deleteTimeTable, getTimetableEntries, updateTimeTable } from "@/src/lib/actions/api/timetable/timetable-actions";
 import { time } from "console";
+import { TimetableEntry } from "@/src/lib/types";
 
 
-type Entry = {
-  id: number;
-  classroom: string;
-  day_of_week: number;
-  session_index: number;
-  grade: string;
-  course: string;
-  teacher_name: string;
-  teacher_school: string;
-};
+
 
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
 export default function TimetableEditPage() {
 
-  const [timetables, setTimetables] = useState<Entry[]>([])
+  const [timetables, setTimetables] = useState<TimetableEntry[]>([])
   const [error, setError] =useState()
   useEffect(()=>{
     const intialLoad = async ()=>{
         const  data  = await getTimetableEntries()
-        const parsedData = await data.json() 
-        const entries = parsedData?.entries?.length ? parsedData.entries : [];
+        const entries = data?.entries?.length ? data.entries : [];
         setTimetables(entries)
         }
         intialLoad()
   })
 
-  const [form, setForm] = useState<Omit<Entry, "id">>({
+  const [form, setForm] = useState<Omit<TimetableEntry, "id">>({
     classroom: "Classroom 1",
     day_of_week: 1,
     session_index: 0,
@@ -57,7 +48,7 @@ export default function TimetableEditPage() {
 
   }
   } 
-  const remove = async (id : number)=>{
+  const remove = async (id : string)=>{
     try{
       await deleteTimeTable(id)}
     catch(error : unknown){

@@ -1,9 +1,9 @@
 "use client"
 import { useEffect, useState } from "react";
-import { api } from "@/lib/api";
-import { createStudent, deleteStudent, getStudents } from "@/src/lib/actions/api/students/student-actions";
+import { createStudent, getStudents } from "@/src/lib/actions/api/students/student-actions";
 import { getOrganizationsAdmin } from "@/src/lib/actions/api/organizations/organizations-actions";
 import { Organization, Student } from "@/src/lib/types";
+import StudentRow from "@/src/components/student-row";
 
 
 export default function StudentsPage() {
@@ -81,23 +81,7 @@ export default function StudentsPage() {
   
     }
   }
-  const remove = async (id : string)=>{
-      try{
-        setPending(true)
-        
-        await deleteStudent(id).then(()=>{
-          setPending(false)
-          //give notification
-          })
-      }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      catch(error : any){
-        console.log(error)
-        setError(error.message)
   
-    }
-  }
-
 // need to implemnt update
   return (
     <div className="mx-auto max-w-5xl">
@@ -176,20 +160,14 @@ export default function StudentsPage() {
           </thead>
           <tbody>
             {(students ?? []).map((s) => (
-              <tr key={s.id} className="border-t">
-                <td className="p-2 font-medium">{s.name}</td>
-                <td className="p-2">{s.student_number}</td>
-                <td className="p-2">{s.grade}</td>
-                <td className="p-2">{s.school}</td>
-                <td className="p-2 text-right">
-                  <button
-                   onClick={() => remove(s.id)}
-                    className="text-xs text-destructive hover:underline"
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
+              <StudentRow
+                key={s.id}
+                student={s}
+                onDelete={(id) => setStudents((prev) => prev.filter((student) => student.id !== id))}
+                onUpdate={(updated) =>
+                  setStudents((prev) => prev.map((student) => (student.id === updated.id ? updated : student)))
+                }
+              />
             ))}
             {students && students?.length === 0 && (
               <tr>

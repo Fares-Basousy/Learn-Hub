@@ -38,7 +38,7 @@ export default function InventoryPage() {
       </p>
 
       {organizations && (
-        <p className="mt-4 text-sm text-destructive">{(error as Error).message}</p>
+        <p className="mt-4 text-sm text-destructive">{(error as Error)?.message}</p>
       )}
 
       <div className="mt-6 grid gap-3">

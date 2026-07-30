@@ -115,7 +115,7 @@ export async function readSession(): Promise<SessionPayload | null> {
   return decodeSession(cookieStore.get(COOKIE_NAME)?.value);
 }
 
-export async function //requiresession(): Promise<SessionPayload> {
+export async function requiresession(): Promise<SessionPayload> {
   const session = await readSession();
 
   if (!session) {

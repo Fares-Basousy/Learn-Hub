@@ -65,7 +65,7 @@ export async function updateTimeTable(formData: FormData, id : number) {
         return { entry: rows[0] };
       }
 
-export async function deleteTimeTable(id : number) {
+export async function deleteTimeTable(id : string) {
   
    //requiresession();
    //requiresession();
