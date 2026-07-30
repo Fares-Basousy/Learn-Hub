@@ -14,7 +14,7 @@ export default function StudentRow({ student, onDelete, onUpdate }: StudentRowPr
   const [error, setError] = useState<string>()
   const [form, setForm] = useState({
     name: student.name,
-    student_number: student.student_number,
+    number: student.number,
     grade: student.grade,
     school: student.school,
   })
@@ -46,7 +46,7 @@ export default function StudentRow({ student, onDelete, onUpdate }: StudentRowPr
         formData.append(key, String(value));
       });
 
-      await updateStudent(Number(id), formData).then(({ student: updated })=>{
+      await updateStudent(id, formData).then(({ student: updated })=>{
         setPending(false)
         setIsEditing(false)
         onUpdate(updated)
@@ -65,7 +65,7 @@ export default function StudentRow({ student, onDelete, onUpdate }: StudentRowPr
   const cancel = () => {
     setForm({
       name: student.name,
-      student_number: student.student_number,
+      number: student.number,
       grade: student.grade,
       school: student.school,
     })
@@ -86,15 +86,16 @@ export default function StudentRow({ student, onDelete, onUpdate }: StudentRowPr
                     </td>
                     <td className="p-2">
                       <input
-                        value={form.student_number}
-                        onChange={(e) => setForm({ ...form, student_number: e.target.value })}
+                        value={form.number}
+                        onChange={(e) => setForm({ ...form, number: e.target.value })}
                         className="h-8 w-full rounded-md border border-input bg-background px-2 text-sm"
                       />
                     </td>
                     <td className="p-2">
                       <input
+                        type="number"
                         value={form.grade}
-                        onChange={(e) => setForm({ ...form, grade: e.target.value })}
+                        onChange={(e) => setForm({ ...form, grade: Number(e.target.value) })}
                         className="h-8 w-full rounded-md border border-input bg-background px-2 text-sm"
                       />
                     </td>
@@ -109,7 +110,7 @@ export default function StudentRow({ student, onDelete, onUpdate }: StudentRowPr
                 ) : (
                   <>
                     <td className="p-2 font-medium">{student.name}</td>
-                    <td className="p-2">{student.student_number}</td>
+                    <td className="p-2">{student.number}</td>
                     <td className="p-2">{student.grade}</td>
                     <td className="p-2">{student.school}</td>
                   </>

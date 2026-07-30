@@ -1,69 +1,81 @@
-'use server'
-//import { requireSession } from "@/lib/session.server";
+"use server";
 import { z } from "zod";
-import { query, withTx } from "@/lib/db.server";
-import { json, parseJson } from "@/lib/http";
+import prisma from "@/lib/prisma";
 import { Sale } from "@/src/lib/types";
+import { requiresession } from "@/lib/session.server";
 
-const ItemSchema = z.object({
-  type: z.enum(["book", "code", "other"]),
-  count: z.number().int().positive(),
+const PAGE_SIZE = 10;
+
+const SaleItemSchema = z.object({
+  orgId: z.string().uuid(),
+  grade: z.coerce.number().int().min(1).max(12),
+  booksCount: z.coerce.number().int().nonnegative().default(0),
+  codesCount: z.coerce.number().int().nonnegative().default(0),
 });
 
 const CreateSchema = z.object({
-  org_id: z.string().uuid(),
-  items: z.array(ItemSchema).min(1),
-  sold_at: z.string().datetime().optional(),
+  items: z.string().min(1),
 });
 
-
 export async function createSale(formData: FormData) {
-   //requiresession();
-        const entries = Object.fromEntries(formData.entries());
-        const data = CreateSchema.safeParse(entries);
-        //requiresession();
-        // TODO: run inside a transaction:
-        //   1. INSERT INTO sales (org_id, items, sold_at) VALUES ($1,$2,$3) RETURNING *
-        //   2. UPDATE organizations SET books_count = books_count - <sum of books>,
-        //             codes_count = codes_count - <sum of codes> WHERE id = $1
-        const booksDelta = data.data?.items
-          .filter((i) => i.type === "book")
-          .reduce((a, b) => a + b.count, 0);
-        const codesDelta = data.data?.items
-          .filter((i) => i.type === "code")
-          .reduce((a, b) => a + b.count, 0);
+  const session = await requiresession();
+  const entries = Object.fromEntries(formData.entries());
+  const { items } = CreateSchema.parse(entries);
+  const parsedItems = SaleItemSchema.array().min(1).parse(JSON.parse(items));
+  const userId = session.userId;
 
-        const sale  = await withTx(async (tx) => {
-          const inserted = await tx.query(
-            "INSERT INTO sales (org_id, items, sold_at) VALUES ($1, $2, COALESCE($3, now())) RETURNING *",
-            [data.data?.org_id, JSON.stringify(data.data?.items), data.data?.sold_at ?? null],
-          );
-          await tx.query(
-            "UPDATE organizations SET books_count = books_count - $2, codes_count = codes_count - $3 WHERE id = $1",
-            [data.data?.org_id, booksDelta, codesDelta],
-          );
-          return inserted[0];
-        });
-        return { sale };
-        
+  const sale = await prisma.$transaction(async (tx) => {
+    const created = await tx.sale.create({
+      data: {
+        userId,
+        items: {
+          create: parsedItems.map((i) => ({
+            orgId: i.orgId,
+            grade: i.grade,
+            booksCount: i.booksCount,
+            codesCount: i.codesCount,
+          })),
+        },
+      },
+      include: { items: { include: { org: true } } },
+    });
 
+    for (const item of parsedItems) {
+      await tx.organizationInventory.update({
+        where: { orgId_grade: { orgId: item.orgId, grade: item.grade } },
+        data: {
+          booksCount: { decrement: item.booksCount },
+          codesCount: { decrement: item.codesCount },
+        },
+      });
+    }
+
+    return created;
+  });
+
+  return { sale };
 }
-export async function getSaleById(id : string) {
-   //requiresession();
-       //requiresession();
-        // TODO: SELECT * FROM sales WHERE id = $1
-        const rows : Sale[] = await query("SELECT id, org_id, items, sold_at FROM sales WHERE id = $1", [
-          id,
-        ]);
-        return { sale: rows[0] ?? null };
-        
 
+export async function getSaleById(id: string) {
+  //requiresession();
+  const sale = await prisma.sale.findUnique({
+    where: { id },
+    include: { items: { include: { org: true } } },
+  });
+  return { sale };
 }
-export async function getSales(pageIndex : number) {
-   //requiresession();
-        // TODO: SELECT id, org_id, items, sold_at FROM sales ORDER BY sold_at DESC
-        const rows : Sale[] = await query(
-          `SELECT id, org_id, items, sold_at FROM sales ORDER BY sold_at DESC OFFSET ${pageIndex* 10} LIMIT 10`,
-        );
-        return { sales: rows };
-      }
+
+export async function getSales(pageIndex: number) {
+  //requiresession();
+  try {
+    const sales = await prisma.sale.findMany({
+      orderBy: { soldAt: "desc" },
+      skip: pageIndex * PAGE_SIZE,
+      take: PAGE_SIZE,
+      include: { items: { include: { org: true } } },
+    });
+    return { sales };
+  } catch (e) {
+    return { sales: [] as Sale[], warning: (e as Error).message };
+  }
+}

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import './globals.css'
 import appCSS from './globals.css'
@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 export const links = () => [
   { rel: "stylesheet", href: appCSS },
 ]; 
-export const metadata = {
+export const metadata: Metadata = {
   title: "School Hub",
   description:
     "Public timetables and inventory management for our school network.",
@@ -48,6 +48,10 @@ export const metadata = {
   icons: {
     icon: "/favicon.ico",
   },
+};
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
 };
 export default function RootLayout({
   children,

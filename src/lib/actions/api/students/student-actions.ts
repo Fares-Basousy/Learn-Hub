@@ -1,76 +1,118 @@
-'use server'
+"use server";
 import { z } from "zod";
-import { query } from "@/lib/db.server";
+import prisma from "@/lib/prisma";
+import { Gender } from "@/src/generated/prisma/enums";
 import { Student } from "@/src/lib/types";
 //import { requireSession } from "@/lib/session.server";
 
+const PAGE_SIZE = 20;
+const MIN_GRADE_COUNT = 10;
+
+const CreateSchema = z.object({
+  orgId: z.string().uuid(),
+  name: z.string().min(1).max(200),
+  number: z.string().min(1).max(50),
+  grade: z.coerce.number().int().min(1).max(12),
+  school: z.string().min(1).max(200),
+  type: z.string().max(100).optional().or(z.literal("")),
+  gender: z.enum(["MALE", "FEMALE"]),
+});
 const PatchSchema = z.object({
   name: z.string().min(1).max(200).optional(),
-  student_number: z.string().min(1).max(50).optional(),
-  grade: z.string().min(1).max(50).optional(),
+  number: z.string().min(1).max(50).optional(),
+  grade: z.coerce.number().int().min(1).max(12).optional(),
   school: z.string().min(1).max(200).optional(),
-  org_id: z.string().uuid().optional(),
+  type: z.string().max(100).optional().or(z.literal("")),
+  gender: z.enum(["MALE", "FEMALE"]).optional(),
+  orgId: z.string().uuid().optional(),
 });
-const CreateSchema = z.object({
-  org_id: z.string().uuid(),
-  name: z.string().min(1).max(200),
-  student_number: z.string().min(1).max(50),
-  grade: z.string().min(1).max(50),
-  school: z.string().min(1).max(200),
-});
+
+export type StudentFilters = {
+  orgId?: string;
+  grade?: number;
+};
 
 export async function createStudent(formData: FormData) {
-   //requiresession();
-        const entries = Object.fromEntries(formData.entries());
-        const data = CreateSchema.safeParse(entries);
-           //requiresession();
-        // TODO: INSERT INTO students (org_id, name, student_number, grade, school) VALUES ... RETURNING *
-        const rows : Student[] = await query(
-          "INSERT INTO students (org_id, name, student_number, grade, school) VALUES ($1,$2,$3,$4,$5) RETURNING *",
-          [data.data?.org_id, data.data?.name, data.data?.student_number, data.data?.grade, data.data?.school],
-        );
-        return { student: rows[0] };
-
+  //requiresession();
+  const entries = Object.fromEntries(formData.entries());
+  const data = CreateSchema.parse(entries);
+  const student = await prisma.student.create({
+    data: {
+      orgId: data.orgId,
+      name: data.name,
+      number: data.number,
+      grade: data.grade,
+      school: data.school,
+      type: data.type || null,
+      gender: data.gender as Gender,
+    },
+  });
+  return { student };
 }
-export async function getStudents(pageIndex : number) {
-   //requiresession();
-    // TODO: add pagination SELECT id, org_id, name, student_number, grade, school FROM students ORDER BY name
-    const rows : Student[] = await query(`SELECT id, org_id, name, student_number, grade, school FROM students ORDER BY name  OFFSET ${pageIndex* 20} LIMIT 20`,);
-  return { students: rows };
 
+export async function getStudents(pageIndex: number, filters: StudentFilters = {}) {
+  //requiresession();
+  try {
+    const students = await prisma.student.findMany({
+      where: {
+        ...(filters.orgId ? { orgId: filters.orgId } : {}),
+        ...(filters.grade !== undefined ? { grade: filters.grade } : {}),
+      },
+      orderBy: { name: "asc" },
+      skip: pageIndex * PAGE_SIZE,
+      take: PAGE_SIZE,
+    });
+    return { students };
+  } catch (e) {
+    return { students: [] as Student[], warning: (e as Error).message };
+  }
 }
-export async function getStudentById(id : number) {
-   //requiresession();
-   // TODO: SELECT ... FROM students WHERE id = $1
-   const rows : Student[] = await query("SELECT id, org_id, name, student_number, grade, school FROM students WHERE id = $1", [id]);
-   return { student: rows[0] ?? null };
 
+export async function getStudentById(id: string) {
+  //requiresession();
+  const student = await prisma.student.findUnique({ where: { id } });
+  return { student };
 }
-export async function updateStudent(id: number, formData: FormData) {
-   //requiresession();
-        const entries = Object.fromEntries(formData.entries());
-        const data  = PatchSchema.safeParse(entries);
-           //requiresession();
-        // TODO: INSERT INTO students (org_id, name, student_number, grade, school) VALUES ... RETURNING *
-        // TODO: UPDATE students SET <fields> WHERE id = $1 RETURNING *
-        const rows : Student[] = await query(
-          "UPDATE students SET name = COALESCE($2, name), student_number = COALESCE($3, student_number), grade = COALESCE($4, grade), school = COALESCE($5, school), org_id = COALESCE($6, org_id) WHERE id = $1 RETURNING *",
-          [
-            id,
-            data.data?.name ?? null,
-            data.data?.student_number ?? null,
-            data.data?.grade ?? null,
-            data.data?.school ?? null,
-            data.data?.org_id ?? null,
-          ],
-        );
-        return { student: rows[0] };
 
+export async function updateStudent(id: string, formData: FormData) {
+  //requiresession();
+  const entries = Object.fromEntries(formData.entries());
+  const data = PatchSchema.parse(entries);
+  const student = await prisma.student.update({
+    where: { id },
+    data: {
+      name: data.name,
+      number: data.number,
+      grade: data.grade,
+      school: data.school,
+      ...(data.type !== undefined ? { type: data.type || null } : {}),
+      gender: data.gender as Gender | undefined,
+      orgId: data.orgId,
+    },
+  });
+  return { student };
 }
+
 export async function deleteStudent(id: string) {
-  "use server"
-   //requiresession();
-        await query("DELETE FROM students WHERE id = $1", [id]);
-        return { ok: true };
+  //requiresession();
+  await prisma.student.delete({ where: { id } });
+  return { ok: true };
 }
 
+// Grades with more than MIN_GRADE_COUNT enrolled students, for the dashboard.
+export async function getGradeCounts() {
+  //requiresession();
+  try {
+    const grouped = await prisma.student.groupBy({
+      by: ["grade"],
+      _count: { _all: true },
+      orderBy: { grade: "asc" },
+    });
+    const grades = grouped
+      .filter((g) => g._count._all > MIN_GRADE_COUNT)
+      .map((g) => ({ grade: g.grade, count: g._count._all }));
+    return { grades };
+  } catch (e) {
+    return { grades: [] as { grade: number; count: number }[], warning: (e as Error).message };
+  }
+}

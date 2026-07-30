@@ -12,27 +12,34 @@ export const Grades = {
   11 : "2nd Senior",
   12 : "3rd Senior",
 }
+export type Gender = "MALE" | "FEMALE";
+
+export type OrganizationInventory = {
+  id: string;
+  orgId: string;
+  grade: number;
+  booksCount: number;
+  codesCount: number;
+};
+
 export type Organization = {
   id: string;
   name: string;
   subject: string;
-  meta?: Record<string, unknown>;
-  books_count: number;
-  codes_count: number;
-  created_at?: string;
+  picUrl: string;
+  inventory?: OrganizationInventory[];
+  createdAt?: Date;
 };
-
-
-
 
 export type Student = {
   id: string;
-  org_id: Record<string,string>;
+  orgId: string;
   name: string;
-  student_number: string;
-  grade: string;
+  number: string;
+  grade: number;
   school: string;
-  type? : string | undefined;
+  type?: string | null;
+  gender: Gender;
 };
 
 
@@ -64,16 +71,20 @@ export type NewsItem = {
 
 
 export type SaleItem = {
-  type: "book" | "code" | "other";
-  count: number;
+  id: string;
+  saleId: string;
+  orgId: string;
+  org?: Organization;
+  grade: number;
+  booksCount: number;
+  codesCount: number;
 };
-
 
 export type Sale = {
   id: string;
-  org_id: string;
-  items: Array<{ type: string; count: number }>;
-  sold_at: string;
+  userId: string;
+  items: SaleItem[];
+  soldAt: Date;
 };
 
 

@@ -138,48 +138,50 @@ export default function TimetableEditPage() {
       ):null)}
 
       <div className="mt-6 overflow-hidden rounded-lg border bg-card">
-        <table className="w-full text-sm">
-          <thead className="bg-muted/50 text-left text-xs text-muted-foreground">
-            <tr>
-              <th className="p-2">Classroom</th>
-              <th className="p-2">Day</th>
-              <th className="p-2">Session</th>
-              <th className="p-2">Grade</th>
-              <th className="p-2">Course</th>
-              <th className="p-2">Teacher</th>
-              <th className="p-2">Teacher&apos;s school</th>
-              <th className="p-2" />
-            </tr>
-          </thead>
-          <tbody>
-            {(timetables ?? []).map((e) => (
-              <tr key={e.id} className="border-t">
-                <td className="p-2">{e.classroom}</td>
-                <td className="p-2">{DAYS[e.day_of_week]}</td>
-                <td className="p-2">{e.session_index + 1}</td>
-                <td className="p-2">{e.grade}</td>
-                <td className="p-2">{e.course}</td>
-                <td className="p-2">{e.teacher_name}</td>
-                <td className="p-2">{e.teacher_school}</td>
-                <td className="p-2 text-right">
-                  <button
-                    onClick={()=>{remove(e.id)}}
-                    className="text-xs text-destructive hover:underline"
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-            {timetables?.length === 0 && (
+        <div className="overflow-x-auto">
+          <table className="w-full text-sm">
+            <thead className="bg-muted/50 text-left text-xs text-muted-foreground">
               <tr>
-                <td colSpan={8} className="p-4 text-center text-muted-foreground">
-                  No entries yet.
-                </td>
+                <th className="p-2">Classroom</th>
+                <th className="p-2">Day</th>
+                <th className="p-2">Session</th>
+                <th className="p-2">Grade</th>
+                <th className="p-2">Course</th>
+                <th className="p-2">Teacher</th>
+                <th className="p-2">Teacher&apos;s school</th>
+                <th className="p-2" />
               </tr>
-            )}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {(timetables ?? []).map((e) => (
+                <tr key={e.id} className="border-t">
+                  <td className="p-2 whitespace-nowrap">{e.classroom}</td>
+                  <td className="p-2 whitespace-nowrap">{DAYS[e.day_of_week]}</td>
+                  <td className="p-2">{e.session_index + 1}</td>
+                  <td className="p-2">{e.grade}</td>
+                  <td className="p-2">{e.course}</td>
+                  <td className="p-2 whitespace-nowrap">{e.teacher_name}</td>
+                  <td className="p-2 whitespace-nowrap">{e.teacher_school}</td>
+                  <td className="p-2 text-right whitespace-nowrap">
+                    <button
+                      onClick={()=>{remove(e.id)}}
+                      className="text-xs text-destructive hover:underline"
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+              {timetables?.length === 0 && (
+                <tr>
+                  <td colSpan={8} className="p-4 text-center text-muted-foreground">
+                    No entries yet.
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
   );
