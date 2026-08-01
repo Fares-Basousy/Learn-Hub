@@ -6,7 +6,7 @@ import { getOrganizationsAdmin } from "@/src/lib/actions/api/organizations/organ
 import { getSales } from "@/src/lib/actions/api/sales/sales-actions";
 import { getGradeCounts } from "@/src/lib/actions/api/students/student-actions";
 import { getPosts } from "@/src/lib/actions/api/news/news-actions";
-import { NewsItem, Organization, Sale } from "@/src/lib/types";
+import { Grades, NewsItem, Organization, Sale } from "@/src/lib/types";
 
 type GradeCount = { grade: number; count: number };
 
@@ -55,7 +55,7 @@ export default function DashboardPage() {
               <li key={n.id} className="p-2 text-sm">
                 <div className="font-medium">{n.title}</div>
                 <div className="text-xs text-muted-foreground">
-                  {new Date(n.published_at).toLocaleDateString()}
+                  {new Date(n.publishedAt).toLocaleDateString()}
                 </div>
               </li>
             ))}
@@ -106,7 +106,7 @@ export default function DashboardPage() {
                   href={`/authenticated/students?grade=${g.grade}`}
                   className="font-medium hover:underline"
                 >
-                  Grade {g.grade}
+                  {Grades[g.grade as keyof typeof Grades] ?? `Grade ${g.grade}`}
                 </Link>
                 <span className="text-muted-foreground">{g.count} students</span>
               </li>

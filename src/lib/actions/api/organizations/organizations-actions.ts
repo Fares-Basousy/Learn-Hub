@@ -2,7 +2,7 @@
 import { z } from "zod";
 import prisma from "@/lib/prisma";
 import { Organization } from "@/src/lib/types";
-//import { requireSession } from "@/lib/session.server";
+import { requireUser } from "@/lib/require-user";
 
 const PAGE_SIZE = 20;
 
@@ -18,7 +18,7 @@ const PatchSchema = z.object({
 });
 
 export async function createOrganization(formData: FormData) {
-  //requiresession();
+  await requireUser();
   const entries = Object.fromEntries(formData.entries());
   const data = CreateSchema.parse(entries);
   const organization = await prisma.organization.create({
@@ -32,22 +32,23 @@ export async function createOrganization(formData: FormData) {
 }
 
 export async function getOrganizations(pageIndex: number) {
-  //requiresession();
+  await requireUser();
   try {
     const organizations = await prisma.organization.findMany({
       orderBy: { name: "asc" },
       skip: pageIndex * PAGE_SIZE,
-      take: PAGE_SIZE,
+      take: PAGE_SIZE + 1,
     });
-    return { organizations };
+    const hasMore = organizations.length > PAGE_SIZE;
+    return { organizations: organizations.slice(0, PAGE_SIZE), hasMore };
   } catch (e) {
-    return { organizations: [] as Organization[], warning: (e as Error).message };
+    return { organizations: [] as Organization[], hasMore: false, warning: (e as Error).message };
   }
 }
 
 // Full, unpaginated list — used to populate org dropdowns (students form, sales form, etc).
 export async function getOrganizationsAdmin() {
-  //requiresession();
+  await requireUser();
   try {
     const organizations = await prisma.organization.findMany({
       orderBy: { name: "asc" },
@@ -59,7 +60,7 @@ export async function getOrganizationsAdmin() {
 }
 
 export async function getOrganizationById(id: string) {
-  //requiresession();
+  await requireUser();
   const organization = await prisma.organization.findUnique({
     where: { id },
     include: {
@@ -70,7 +71,7 @@ export async function getOrganizationById(id: string) {
 }
 
 export async function updateOrganization(id: string, formData: FormData) {
-  //requiresession();
+  await requireUser();
   const entries = Object.fromEntries(formData.entries());
   const data = PatchSchema.parse(entries);
   const organization = await prisma.organization.update({
@@ -85,7 +86,7 @@ export async function updateOrganization(id: string, formData: FormData) {
 }
 
 export async function deleteOrganization(id: string) {
-  //requiresession();
+  await requireUser();
   await prisma.organization.delete({ where: { id } });
   return { ok: true };
 }

@@ -1,8 +1,9 @@
 "use client"
 import { useState } from "react";
+import toast from "react-hot-toast";
 import { createSale } from "@/src/lib/actions/api/sales/sales-actions";
 import { createStudent } from "@/src/lib/actions/api/students/student-actions";
-import { Gender, Organization } from "@/src/lib/types";
+import { Gender, Grades, Organization } from "@/src/lib/types";
 
 type SaleItemInput = { codesCount: string; booksCount: string; orgId: string; grade: string };
 
@@ -28,7 +29,6 @@ export default function SaleModal({
     gender: "MALE" as Gender,
   });
   const [pending, setPending] = useState(false);
-  const [error, setError] = useState<Error>();
 
   const updateItem = (idx: number, patch: Partial<SaleItemInput>) => {
     setItems((xs) => xs.map((x, i) => (i === idx ? { ...x, ...patch } : x)));
@@ -40,20 +40,21 @@ export default function SaleModal({
   const validStudent = !addStudent || (student.orgId && student.name && student.number && student.grade && student.school);
 
   const submit = async () => {
-    try {
-      setPending(true);
-      const formData = new FormData();
-      formData.append(
-        "items",
-        JSON.stringify(
-          items.map((i) => ({
-            orgId: i.orgId,
-            grade: Number(i.grade),
-            booksCount: Number(i.booksCount) || 0,
-            codesCount: Number(i.codesCount) || 0,
-          })),
-        ),
-      );
+    setPending(true);
+    const formData = new FormData();
+    formData.append(
+      "items",
+      JSON.stringify(
+        items.map((i) => ({
+          orgId: i.orgId,
+          grade: Number(i.grade),
+          booksCount: Number(i.booksCount) || 0,
+          codesCount: Number(i.codesCount) || 0,
+        })),
+      ),
+    );
+
+    const run = async () => {
       await createSale(formData);
 
       if (addStudent) {
@@ -66,14 +67,23 @@ export default function SaleModal({
         studentFormData.append("gender", student.gender);
         await createStudent(studentFormData);
       }
+    };
 
-      setPending(false);
+    try {
+      await toast.promise(run(), {
+        loading: "Recording sale…",
+        success: "Sale recorded",
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        error: (e: any) => e.message ?? "Failed to record sale",
+      });
       onCreated();
       onClose();
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     catch (e: any) {
-      setError(e);
+      console.log(e);
+    }
+    finally {
       setPending(false);
     }
   };
@@ -125,14 +135,18 @@ export default function SaleModal({
               </select>
               <label className="text-xs text-muted-foreground">
                 Grade
-                <input
-                  type="number"
-                  min={1}
-                  max={12}
+                <select
                   value={item.grade}
                   onChange={(e) => updateItem(idx, { grade: e.target.value })}
-                  className="ml-2 h-9 w-16 rounded-md border border-input bg-background px-2 text-sm"
-                />
+                  className="ml-2 h-9 rounded-md border border-input bg-background px-2 text-sm"
+                >
+                  <option value="">Grade…</option>
+                  {Object.entries(Grades).map(([value, label]) => (
+                    <option key={value} value={value}>
+                      {label}
+                    </option>
+                  ))}
+                </select>
               </label>
               {items.length > 1 && (
                 <button
@@ -193,13 +207,18 @@ export default function SaleModal({
                 onChange={(e) => setStudent({ ...student, number: e.target.value })}
                 className="h-9 rounded-md border border-input bg-background px-3 text-sm"
               />
-              <input
-                type="number"
-                placeholder="Grade"
+              <select
                 value={student.grade}
                 onChange={(e) => setStudent({ ...student, grade: e.target.value })}
                 className="h-9 rounded-md border border-input bg-background px-3 text-sm"
-              />
+              >
+                <option value="">Grade…</option>
+                {Object.entries(Grades).map(([value, label]) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </select>
               <input
                 placeholder="School"
                 value={student.school}
@@ -209,8 +228,6 @@ export default function SaleModal({
             </div>
           )}
         </div>
-
-        {error && <p className="mt-3 text-sm text-destructive">{error.message}</p>}
 
         <div className="mt-4 flex justify-end gap-2">
           <button onClick={onClose} className="h-9 rounded-md px-3 text-sm text-muted-foreground hover:bg-accent">

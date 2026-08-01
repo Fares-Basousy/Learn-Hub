@@ -2,6 +2,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { signOut } from "next-auth/react";
 import { Menu, X } from "lucide-react";
 
 const NAV = [
@@ -32,7 +33,7 @@ export default function AuthedLayout({ children }: { children: React.ReactNode }
           </nav>
 
           <button
-            // onClick={() => signOut.mutate()}
+            onClick={() => signOut({ callbackUrl: "/login" })}
             className="ml-auto hidden shrink-0 rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-foreground md:block"
           >
             Sign out
@@ -61,7 +62,7 @@ export default function AuthedLayout({ children }: { children: React.ReactNode }
               />
             ))}
             <button
-              // onClick={() => signOut.mutate()}
+              onClick={() => signOut({ callbackUrl: "/login" })}
               className="rounded-md px-3 py-2 text-left text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
             >
               Sign out

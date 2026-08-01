@@ -3,7 +3,7 @@ import { z } from "zod";
 import prisma from "@/lib/prisma";
 import { Gender } from "@/src/generated/prisma/enums";
 import { Student } from "@/src/lib/types";
-//import { requireSession } from "@/lib/session.server";
+import { requireUser } from "@/lib/require-user";
 
 const PAGE_SIZE = 20;
 const MIN_GRADE_COUNT = 10;
@@ -33,7 +33,7 @@ export type StudentFilters = {
 };
 
 export async function createStudent(formData: FormData) {
-  //requiresession();
+  await requireUser();
   const entries = Object.fromEntries(formData.entries());
   const data = CreateSchema.parse(entries);
   const student = await prisma.student.create({
@@ -51,7 +51,7 @@ export async function createStudent(formData: FormData) {
 }
 
 export async function getStudents(pageIndex: number, filters: StudentFilters = {}) {
-  //requiresession();
+  await requireUser();
   try {
     const students = await prisma.student.findMany({
       where: {
@@ -60,22 +60,23 @@ export async function getStudents(pageIndex: number, filters: StudentFilters = {
       },
       orderBy: { name: "asc" },
       skip: pageIndex * PAGE_SIZE,
-      take: PAGE_SIZE,
+      take: PAGE_SIZE + 1,
     });
-    return { students };
+    const hasMore = students.length > PAGE_SIZE;
+    return { students: students.slice(0, PAGE_SIZE), hasMore };
   } catch (e) {
-    return { students: [] as Student[], warning: (e as Error).message };
+    return { students: [] as Student[], hasMore: false, warning: (e as Error).message };
   }
 }
 
 export async function getStudentById(id: string) {
-  //requiresession();
+  await requireUser();
   const student = await prisma.student.findUnique({ where: { id } });
   return { student };
 }
 
 export async function updateStudent(id: string, formData: FormData) {
-  //requiresession();
+  await requireUser();
   const entries = Object.fromEntries(formData.entries());
   const data = PatchSchema.parse(entries);
   const student = await prisma.student.update({
@@ -94,14 +95,14 @@ export async function updateStudent(id: string, formData: FormData) {
 }
 
 export async function deleteStudent(id: string) {
-  //requiresession();
+  await requireUser();
   await prisma.student.delete({ where: { id } });
   return { ok: true };
 }
 
 // Grades with more than MIN_GRADE_COUNT enrolled students, for the dashboard.
 export async function getGradeCounts() {
-  //requiresession();
+  await requireUser();
   try {
     const grouped = await prisma.student.groupBy({
       by: ["grade"],

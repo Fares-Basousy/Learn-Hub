@@ -1,41 +1,57 @@
 "use client"
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
+import Link from "next/link";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { getSales } from "@/src/lib/actions/api/sales/sales-actions";
 import { getOrganizationsAdmin } from "@/src/lib/actions/api/organizations/organizations-actions";
-import { Organization, Sale } from "@/src/lib/types";
+import { Grades, Organization, Sale } from "@/src/lib/types";
 import SaleModal from "@/src/components/sale-modal";
 
-
-
 export default function SalesPage() {
+  return (
+    <Suspense fallback={<p className="text-sm text-muted-foreground">Loading…</p>}>
+      <SalesPageInner />
+    </Suspense>
+  );
+}
+
+function SalesPageInner() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const rawPage = Number(searchParams.get("page"));
+  // page is 0-indexed internally; an invalid/missing param falls back to the first page.
+  const pageIndex = Number.isInteger(rawPage) && rawPage > 0 ? rawPage : 0;
+
   const [sales, setSales] = useState<Sale[]>([])
+  const [hasMore, setHasMore] = useState(false)
   const [organizations, setOrganizations] = useState<Organization[]>([])
   const [error, setError] = useState<Error>()
   const [pending, setPending] = useState(true)
-  const [pageIndex, setPageIndex] = useState(0)
-  const [refreshKey, setRefreshKey] = useState(0)
   const [showModal, setShowModal] = useState(false)
+  const [refreshKey, setRefreshKey] = useState(0)
 
   useEffect(() => {
     const load = async () => {
       try {
         setPending(true)
         const data = await getSales(pageIndex)
-        const entries: Sale[] = data.sales?.length ? data.sales : [];
-        setSales((prev: Sale[]) => (pageIndex === 0 ? entries : [...prev, ...entries]))
+        setSales(data.sales?.length ? data.sales : [])
+        setHasMore(Boolean(data.hasMore))
         setPending(false)
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       catch (e: any) {
         setError(e)
+        setPending(false)
       }
     }
     load()
   }, [pageIndex, refreshKey])
 
   useEffect(() => {
-    const load = async () => {
+    const loadOrgs = async () => {
       try {
         const data = await getOrganizationsAdmin()
         setOrganizations(data.organizations ?? [])
@@ -45,8 +61,16 @@ export default function SalesPage() {
         setError(e)
       }
     }
-    load()
+    loadOrgs()
   }, [])
+
+  const hrefForPage = (page: number) => {
+    const params = new URLSearchParams(searchParams.toString())
+    if (page > 0) params.set("page", String(page))
+    else params.delete("page")
+    const qs = params.toString()
+    return qs ? `${pathname}?${qs}` : pathname
+  }
 
   return (
     <div className="mx-auto max-w-5xl">
@@ -83,7 +107,7 @@ export default function SalesPage() {
                     {s.items
                       .map(
                         (i) =>
-                          `${i.booksCount} books / ${i.codesCount} codes — ${i.org?.name ?? i.orgId.slice(0, 8)} (grade ${i.grade})`,
+                          `${i.booksCount} books / ${i.codesCount} codes — ${i.org?.name ?? i.orgId.slice(0, 8)} (${Grades[i.grade as keyof typeof Grades] ?? `grade ${i.grade}`})`,
                       )
                       .join(", ")}
                   </td>
@@ -101,21 +125,42 @@ export default function SalesPage() {
           </table>
         </div>
       </div>
-      <button
-        onClick={() => setPageIndex((prev) => prev + 1)}
-        disabled={pending}
-        className="mt-3 w-full rounded-md px-3 py-2 text-left text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
-      >
-        Next
-      </button>
+      <div className="mt-3 flex items-center justify-between gap-2">
+        {pageIndex > 0 ? (
+          <Link
+            href={hrefForPage(pageIndex - 1)}
+            className="rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
+          >
+            Previous
+          </Link>
+        ) : (
+          <span className="cursor-not-allowed rounded-md px-3 py-2 text-sm text-muted-foreground/40">
+            Previous
+          </span>
+        )}
+        <span className="text-xs text-muted-foreground">Page {pageIndex + 1}</span>
+        {hasMore ? (
+          <Link
+            href={hrefForPage(pageIndex + 1)}
+            className="rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
+          >
+            Next
+          </Link>
+        ) : (
+          <span className="cursor-not-allowed rounded-md px-3 py-2 text-sm text-muted-foreground/40">
+            Next
+          </span>
+        )}
+      </div>
 
       {showModal && (
         <SaleModal
           organizations={organizations}
           onClose={() => setShowModal(false)}
           onCreated={() => {
-            setPageIndex(0)
-            setRefreshKey((k) => k + 1)
+            setShowModal(false)
+            if (pageIndex !== 0) router.push(hrefForPage(0))
+            else setRefreshKey(Math.random())
           }}
         />
       )}

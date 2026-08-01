@@ -1,6 +1,9 @@
 import "dotenv/config";
+import { hash } from "bcryptjs";
 import prisma from "../src/lib/prisma";
 import { Gender } from "../src/generated/prisma/enums";
+
+const SALT_ROUNDS = 12;
 
 const GRADES = [9, 10, 11, 12];
 const SCHOOLS = ["Al-Noor Secondary", "Bright Future School", "Unity High", "Horizon Academy"];
@@ -24,12 +27,13 @@ async function main() {
   await prisma.user.deleteMany();
 
   console.log("Seeding users…");
+  const hashedPassword = await hash("password123", SALT_ROUNDS);
   const users = await Promise.all(
     [
       { name: "Admin User", email: "admin@school.local", number: "01000000001" },
       { name: "Sales Staff", email: "sales@school.local", number: "01000000002" },
       { name: "Front Desk", email: "desk@school.local", number: "01000000003" },
-    ].map((u) => prisma.user.create({ data: { ...u, password: "password123" } })),
+    ].map((u) => prisma.user.create({ data: { ...u, password: hashedPassword } })),
   );
 
   console.log("Seeding organizations + inventory…");
@@ -121,13 +125,13 @@ async function main() {
   const newsItems = [
     {
       title: "New semester registration is open",
-      description: "Students can now register for the upcoming semester through their organization.",
-      picUrl: "https://picsum.photos/seed/news-1/600/300",
+      body: "Students can now register for the upcoming semester through their organization.",
+      imageUrl: "https://picsum.photos/seed/news-1/600/300",
     },
     {
       title: "Updated grade 11 curriculum",
-      description: "The grade 11 curriculum has been refreshed for the new academic year.",
-      picUrl: "https://picsum.photos/seed/news-2/600/300",
+      body: "The grade 11 curriculum has been refreshed for the new academic year.",
+      imageUrl: "https://picsum.photos/seed/news-2/600/300",
     },
   ];
   for (const n of newsItems) {

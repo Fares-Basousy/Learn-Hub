@@ -2,7 +2,7 @@
 import { z } from "zod";
 import prisma from "@/lib/prisma";
 import { Sale } from "@/src/lib/types";
-import { requiresession } from "@/lib/session.server";
+import { requireUser } from "@/lib/require-user";
 
 const PAGE_SIZE = 10;
 
@@ -18,11 +18,11 @@ const CreateSchema = z.object({
 });
 
 export async function createSale(formData: FormData) {
-  const session = await requiresession();
+  const user = await requireUser();
   const entries = Object.fromEntries(formData.entries());
   const { items } = CreateSchema.parse(entries);
   const parsedItems = SaleItemSchema.array().min(1).parse(JSON.parse(items));
-  const userId = session.userId;
+  const userId = user.id;
 
   const sale = await prisma.$transaction(async (tx) => {
     const created = await tx.sale.create({
@@ -57,7 +57,7 @@ export async function createSale(formData: FormData) {
 }
 
 export async function getSaleById(id: string) {
-  //requiresession();
+  await requireUser();
   const sale = await prisma.sale.findUnique({
     where: { id },
     include: { items: { include: { org: true } } },
@@ -66,16 +66,17 @@ export async function getSaleById(id: string) {
 }
 
 export async function getSales(pageIndex: number) {
-  //requiresession();
+  await requireUser();
   try {
     const sales = await prisma.sale.findMany({
       orderBy: { soldAt: "desc" },
       skip: pageIndex * PAGE_SIZE,
-      take: PAGE_SIZE,
+      take: PAGE_SIZE + 1,
       include: { items: { include: { org: true } } },
     });
-    return { sales };
+    const hasMore = sales.length > PAGE_SIZE;
+    return { sales: sales.slice(0, PAGE_SIZE), hasMore };
   } catch (e) {
-    return { sales: [] as Sale[], warning: (e as Error).message };
+    return { sales: [] as Sale[], hasMore: false, warning: (e as Error).message };
   }
 }

@@ -2,8 +2,9 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import toast from "react-hot-toast";
 import { getOrganizationById, updateOrganization } from "@/src/lib/actions/api/organizations/organizations-actions";
-import { Organization } from "@/src/lib/types";
+import { Grades, Organization } from "@/src/lib/types";
 
 export default function OrganizationDetailPage() {
   const params = useParams<{ orgId: string }>();
@@ -40,20 +41,26 @@ export default function OrganizationDetailPage() {
   }, [orgId])
 
   const save = async () => {
+    setPending(true)
+    const formData = new FormData();
+    formData.append('name', form.name);
+    formData.append('subject', form.subject);
+    if (form.picUrl) formData.append('picUrl', form.picUrl);
     try {
-      setPending(true)
-      const formData = new FormData();
-      formData.append('name', form.name);
-      formData.append('subject', form.subject);
-      if (form.picUrl) formData.append('picUrl', form.picUrl);
-      const { organization: updated } = await updateOrganization(orgId, formData)
+      const { organization: updated } = await toast.promise(updateOrganization(orgId, formData), {
+        loading: "Saving…",
+        success: "Organization updated",
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        error: (e: any) => e.message ?? "Failed to update organization",
+      })
       setOrganization(updated)
-      setPending(false)
       setIsEditing(false)
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     catch (e: any) {
-      setError(e)
+      console.log(e)
+    }
+    finally {
       setPending(false)
     }
   }
@@ -154,8 +161,6 @@ export default function OrganizationDetailPage() {
         </div>
       </div>
 
-      {error && <p className="mt-2 text-sm text-destructive">{error.message}</p>}
-
       <div className="mt-6">
         <h2 className="text-lg font-semibold">Inventory by grade</h2>
         <div className="mt-3 overflow-hidden rounded-lg border bg-card">
@@ -172,7 +177,7 @@ export default function OrganizationDetailPage() {
               <tbody>
                 {inventory.map((inv) => (
                   <tr key={inv.id} className="border-t">
-                    <td className="p-2 font-medium whitespace-nowrap">Grade {inv.grade}</td>
+                    <td className="p-2 font-medium whitespace-nowrap">{Grades[inv.grade as keyof typeof Grades] ?? `Grade ${inv.grade}`}</td>
                     <td className="p-2 text-right">{inv.booksCount}</td>
                     <td className="p-2 text-right">{inv.codesCount}</td>
                     <td className="p-2 text-right whitespace-nowrap">

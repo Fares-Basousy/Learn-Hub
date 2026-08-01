@@ -1,5 +1,6 @@
-import { Student } from "../lib/types";
+import { Grades, Student } from "../lib/types";
 import { useState } from "react";
+import toast from "react-hot-toast";
 import { deleteStudent, updateStudent } from "@/src/lib/actions/api/students/student-actions";
 
 type StudentRowProps = {
@@ -11,7 +12,6 @@ type StudentRowProps = {
 export default function StudentRow({ student, onDelete, onUpdate }: StudentRowProps) {
   const [pending, setPending] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
-  const [error, setError] = useState<string>()
   const [form, setForm] = useState({
     name: student.name,
     number: student.number,
@@ -20,47 +20,48 @@ export default function StudentRow({ student, onDelete, onUpdate }: StudentRowPr
   })
 
   const remove = async (id : string)=>{
+    setPending(true)
     try{
-      setPending(true)
-
-      await deleteStudent(id).then(()=>{
-        setPending(false)
-        onDelete(id)
-        //give notification
-        })
+      await toast.promise(deleteStudent(id), {
+        loading: "Deleting student…",
+        success: "Student deleted",
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        error: (e: any) => e.message ?? "Failed to delete student",
+      })
+      onDelete(id)
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     catch(error : any){
       console.log(error)
+    }
+    finally {
       setPending(false)
-      //setError(error.message)
-
+    }
   }
-}
   const update = async (id : string)=>{
+    setPending(true)
+    const formData = new FormData();
+    Object.entries(form).forEach(([key, value]) => {
+      formData.append(key, String(value));
+    });
     try{
-      setPending(true)
-
-      const formData = new FormData();
-      Object.entries(form).forEach(([key, value]) => {
-        formData.append(key, String(value));
-      });
-
-      await updateStudent(id, formData).then(({ student: updated })=>{
-        setPending(false)
-        setIsEditing(false)
-        onUpdate(updated)
-        //give notification
-        })
+      const { student: updated } = await toast.promise(updateStudent(id, formData), {
+        loading: "Saving…",
+        success: "Student updated",
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        error: (e: any) => e.message ?? "Failed to update student",
+      })
+      setIsEditing(false)
+      onUpdate(updated)
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     catch(error : any){
       console.log(error)
+    }
+    finally {
       setPending(false)
-      setError(error.message)
-
+    }
   }
-}
 
   const cancel = () => {
     setForm({
@@ -92,12 +93,17 @@ export default function StudentRow({ student, onDelete, onUpdate }: StudentRowPr
                       />
                     </td>
                     <td className="p-2">
-                      <input
-                        type="number"
+                      <select
                         value={form.grade}
                         onChange={(e) => setForm({ ...form, grade: Number(e.target.value) })}
                         className="h-8 w-full rounded-md border border-input bg-background px-2 text-sm"
-                      />
+                      >
+                        {Object.entries(Grades).map(([value, label]) => (
+                          <option key={value} value={value}>
+                            {label}
+                          </option>
+                        ))}
+                      </select>
                     </td>
                     <td className="p-2">
                       <input
@@ -111,7 +117,7 @@ export default function StudentRow({ student, onDelete, onUpdate }: StudentRowPr
                   <>
                     <td className="p-2 font-medium">{student.name}</td>
                     <td className="p-2">{student.number}</td>
-                    <td className="p-2">{student.grade}</td>
+                    <td className="p-2">{Grades[student.grade as keyof typeof Grades] ?? student.grade}</td>
                     <td className="p-2">{student.school}</td>
                   </>
                 )}
@@ -150,7 +156,6 @@ export default function StudentRow({ student, onDelete, onUpdate }: StudentRowPr
                       </button>
                     </>
                   )}
-                  {error && <p className="mt-1 text-xs text-destructive">{error}</p>}
                 </td>
               </tr>
 )}

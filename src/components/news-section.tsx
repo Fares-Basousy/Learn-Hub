@@ -30,11 +30,10 @@ export function NewsSection() {
         </div>
         <div className="space-y-6">
           {news.map((n) => {
-            const title = lang === "ar" ? n.title_ar ?? n.title : n.title;
-            const body = lang === "ar" ? n.body_ar ?? n.body : n.body;
-            const linkLabel =
-              (lang === "ar" ? n.link_label_ar ?? n.link_label : n.link_label) ?? "Learn more";
-            const date = new Date(n.published_at).toLocaleDateString(locale, {
+            const title = n.title;
+            const body = n.body;
+            const linkLabel = n.linkLabel ?? "Learn more";
+            const date = new Date(n.publishedAt).toLocaleDateString(locale, {
               year: "numeric",
               month: "short",
               day: "numeric",
@@ -44,10 +43,10 @@ export function NewsSection() {
                 key={n.id}
                 className="relative overflow-hidden rounded-2xl border bg-card shadow-sm"
               >
-                {n.image_url ? (
+                {n.imageUrl ? (
                   <div className="relative h-[280px] w-full sm:h-[360px] md:h-[420px]">
                     <img
-                      src={n.image_url}
+                      src={n.imageUrl}
                       alt={title}
                       className="h-full w-full object-cover"
                     />
@@ -62,10 +61,10 @@ export function NewsSection() {
                           {body}
                         </p>
                       )}
-                      {n.link_url && (
+                      {n.linkUrl && (
                         <a
-                          href={n.link_url}
-                          target={n.link_url.startsWith("http") ? "_blank" : undefined}
+                          href={n.linkUrl}
+                          target={n.linkUrl.startsWith("http") ? "_blank" : undefined}
                           rel="noreferrer"
                           className="mt-4 inline-flex items-center gap-1.5 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
                         >
@@ -82,10 +81,10 @@ export function NewsSection() {
                     </div>
                     <h3 className="mt-1 text-2xl font-bold">{title}</h3>
                     {body && <p className="mt-2 text-muted-foreground">{body}</p>}
-                    {n.link_url && (
+                    {n.linkUrl && (
                       <a
-                        href={n.link_url}
-                        target={n.link_url.startsWith("http") ? "_blank" : undefined}
+                        href={n.linkUrl}
+                        target={n.linkUrl.startsWith("http") ? "_blank" : undefined}
                         rel="noreferrer"
                         className="mt-4 inline-flex items-center gap-1.5 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
                       >

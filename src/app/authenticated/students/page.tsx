@@ -1,10 +1,11 @@
 "use client"
 import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import toast from "react-hot-toast";
 import { createStudent, getStudents } from "@/src/lib/actions/api/students/student-actions";
 import { getOrganizationsAdmin } from "@/src/lib/actions/api/organizations/organizations-actions";
-import { Gender, Organization, Student } from "@/src/lib/types";
+import { Gender, Grades, Organization, Student } from "@/src/lib/types";
 import StudentRow from "@/src/components/student-row";
 
 export default function StudentsPage() {
@@ -16,8 +17,8 @@ export default function StudentsPage() {
 }
 
 // Reading the filter here and re-keying the inner component on it means the
-// inner component's pageIndex/students state resets cleanly whenever the
-// org/grade filter changes, without needing a setState-in-effect reset.
+// inner component's students state resets cleanly whenever the org/grade
+// filter changes, without needing a setState-in-effect reset.
 function StudentsPageWithFilters() {
   const searchParams = useSearchParams();
   const filterOrgId = searchParams.get("orgId") ?? undefined;
@@ -37,11 +38,18 @@ function StudentsPageInner({
   filterOrgId?: string;
   filterGrade?: number;
 }) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const rawPage = Number(searchParams.get("page"));
+  // page is 0-indexed internally; an invalid/missing param falls back to the first page.
+  const pageIndex = Number.isInteger(rawPage) && rawPage > 0 ? rawPage : 0;
+
   const [students, setStudents] = useState<Student[]>([])
+  const [hasMore, setHasMore] = useState(false)
   const [organizations, setOrganizations] = useState<Organization[]>([])
-  const [pageIndex, setPageIndex] = useState(0)
   const [pending, setPending] = useState(false)
-  const [error, setError] = useState<Error>()
+  const [refreshKey, setRefreshKey] = useState(0)
   const [form, setForm] = useState({
     orgId: "",
     name: "",
@@ -60,7 +68,7 @@ function StudentsPageInner({
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       catch (e: any) {
-        setError(e)
+        toast.error(e.message ?? "Failed to load organizations")
       }
     }
     load()
@@ -70,34 +78,48 @@ function StudentsPageInner({
     const load = async () => {
       try {
         const studentsData = await getStudents(pageIndex, { orgId: filterOrgId, grade: filterGrade })
-        setStudents((prev) => (pageIndex === 0 ? studentsData.students : [...prev, ...studentsData.students]))
+        setStudents(studentsData.students)
+        setHasMore(Boolean(studentsData.hasMore))
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       catch (e: any) {
-        setError(e)
+        toast.error(e.message ?? "Failed to load students")
       }
     }
     load()
-  }, [pageIndex, filterOrgId, filterGrade])
+  }, [pageIndex, filterOrgId, filterGrade, refreshKey])
+
+  const hrefForPage = (page: number) => {
+    const params = new URLSearchParams(searchParams.toString())
+    if (page > 0) params.set("page", String(page))
+    else params.delete("page")
+    const qs = params.toString()
+    return qs ? `${pathname}?${qs}` : pathname
+  }
 
   const create = async () => {
+    setPending(true)
+    const formData = new FormData();
+    Object.entries(form).forEach(([key, value]) => {
+      if (value) formData.append(key, String(value));
+    });
     try {
-      setPending(true)
-      const formData = new FormData();
-      Object.entries(form).forEach(([key, value]) => {
-        if (value) formData.append(key, String(value));
-      });
-      await createStudent(formData).then(() => {
-        setForm({ orgId: "", name: "", number: "", grade: "", school: "", gender: "MALE", type: "" })
-        setPending(false)
-        setPageIndex(0)
+      await toast.promise(createStudent(formData), {
+        loading: "Adding student…",
+        success: "Student added",
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        error: (e: any) => e.message ?? "Failed to add student",
       })
+      setForm({ orgId: "", name: "", number: "", grade: "", school: "", gender: "MALE", type: "" })
+      if (pageIndex !== 0) router.push(hrefForPage(0))
+      else setRefreshKey(Math.random())
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     catch (error: any) {
       console.log(error)
+    }
+    finally {
       setPending(false)
-      setError(error.message)
     }
   }
 
@@ -115,7 +137,7 @@ function StudentsPageInner({
             Filtered by
             {filterOrg && <> organization <strong>{filterOrg.name}</strong></>}
             {filterOrg && filterGrade !== undefined && " · "}
-            {filterGrade !== undefined && <>grade <strong>{filterGrade}</strong></>}
+            {filterGrade !== undefined && <>grade <strong>{Grades[filterGrade as keyof typeof Grades] ?? filterGrade}</strong></>}
           </span>
           <Link href="/authenticated/students" className="text-xs text-primary hover:underline">
             Clear filter
@@ -157,14 +179,19 @@ function StudentsPageInner({
           onChange={(e) => setForm({ ...form, number: e.target.value })}
           className="h-9 rounded-md border border-input bg-background px-2 text-sm"
         />
-        <input
+        <select
           required
-          type="number"
-          placeholder="Grade"
           value={form.grade}
           onChange={(e) => setForm({ ...form, grade: e.target.value })}
           className="h-9 rounded-md border border-input bg-background px-2 text-sm"
-        />
+        >
+          <option value="">Grade…</option>
+          {Object.entries(Grades).map(([value, label]) => (
+            <option key={value} value={value}>
+              {label}
+            </option>
+          ))}
+        </select>
         <input
           required
           placeholder="School"
@@ -193,12 +220,6 @@ function StudentsPageInner({
           Add
         </button>
       </form>
-
-      {(error) && (
-        <p className="mt-2 text-sm text-destructive">
-          {(error as Error)?.message ?? (error as Error)?.message}
-        </p>
-      )}
 
       <div className="mt-6 overflow-hidden rounded-lg border bg-card">
         <div className="overflow-x-auto">
@@ -235,12 +256,33 @@ function StudentsPageInner({
         </div>
       </div>
 
-      <button
-        onClick={() => setPageIndex((prev) => prev + 1)}
-        className="mt-3 w-full rounded-md px-3 py-2 text-left text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
-      >
-        Next
-      </button>
+      <div className="mt-3 flex items-center justify-between gap-2">
+        {pageIndex > 0 ? (
+          <Link
+            href={hrefForPage(pageIndex - 1)}
+            className="rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
+          >
+            Previous
+          </Link>
+        ) : (
+          <span className="cursor-not-allowed rounded-md px-3 py-2 text-sm text-muted-foreground/40">
+            Previous
+          </span>
+        )}
+        <span className="text-xs text-muted-foreground">Page {pageIndex + 1}</span>
+        {hasMore ? (
+          <Link
+            href={hrefForPage(pageIndex + 1)}
+            className="rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
+          >
+            Next
+          </Link>
+        ) : (
+          <span className="cursor-not-allowed rounded-md px-3 py-2 text-sm text-muted-foreground/40">
+            Next
+          </span>
+        )}
+      </div>
     </div>
   );
 }

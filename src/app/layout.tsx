@@ -1,9 +1,11 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { Toaster } from "react-hot-toast";
 import './globals.css'
 import appCSS from './globals.css'
 import { ThemeProvider } from "../components/theme-provider";
 import { LangProvider } from "../components/lang-provider";
+import { AuthSessionProvider } from "../components/session-provider";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -62,11 +64,14 @@ export default function RootLayout({
     <html lang="en" className={`min-h-full flex flex-col ${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
       <body>
     {/* <QueryClientProvider client={queryClient}> */}
+      <AuthSessionProvider>
       <ThemeProvider>
         <LangProvider>
      {children}
+     <Toaster position="top-right" />
         </LangProvider>
       </ThemeProvider>
+      </AuthSessionProvider>
     {/* </QueryClientProvider> */}
 
      </body>

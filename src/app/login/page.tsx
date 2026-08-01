@@ -1,42 +1,42 @@
 'use client'
 import { useRouter } from "next/navigation";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { api } from "@/lib/api";
+import { signIn } from "next-auth/react";
+import toast from "react-hot-toast";
 import { SiteHeader } from "@/components/site-header";
 
-
-// export const metadata = {
-//  title: "Sign in — School Hub",
-//   name: "description", content: "Sign in to manage inventory, sales, and timetable.",
-//   twitter: {
-//    title: "Sign in — School Hub",
-//     name: "description", content: "Sign in to manage inventory, sales, and timetable.",
-//   },
-//   openopenGraph: {
-//    title: "Sign in — School Hub",
-//     name: "description", content: "Sign in to manage inventory, sales, and timetable.",
-//   }
-// };
 export default function LoginPage() {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [err, setErr] = useState<string | null>(null);
-  //const qc = useQueryClient();
+  const [isPending, setIsPending] = useState(false);
   const router = useRouter();
 
-  // const mutation = useMutation({
-  //   mutationFn: () =>
-  //     api<{ user: { id: string; username: string } }>("/api/auth/login", {
-  //       method: "POST",
-  //       body: JSON.stringify({ username, password }),
-  //     }),
-  //   onSuccess: async () => {
-  //     await qc.invalidateQueries({ queryKey: ["me"] });
-  //     router.push("/dashboard");
-  //   },
-  //   onError: (e: Error) => setErr(e.message),
-  // });
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setErr(null);
+    setIsPending(true);
+
+    try {
+      await toast.promise(
+        signIn("credentials", { email, password, redirect: false }).then((result) => {
+          if (result?.error) throw new Error("Invalid email or password.");
+          return result;
+        }),
+        {
+          loading: "Signing in…",
+          success: "Signed in",
+          error: (e) => e.message,
+        },
+      );
+      router.push("/authenticated/dashboard");
+      router.refresh();
+    } catch (e) {
+      setErr((e as Error).message);
+    } finally {
+      setIsPending(false);
+    }
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -47,21 +47,15 @@ export default function LoginPage() {
         <p className="mt-1 text-sm text-muted-foreground">
           Access the inventory and timetable admin.
         </p>
-        <form
-          onSubmit={(e) => {
-            e.preventDefault();
-            setErr(null);
-          //  mutation.mutate();
-          }}
-          className="mt-6 space-y-4"
-        >
+        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <div>
-            <label className="block text-sm font-medium">Username</label>
+            <label className="block text-sm font-medium">Email</label>
             <input
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
-              autoComplete="username"
+              autoComplete="email"
               className="mt-1 h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
             />
           </div>
@@ -79,10 +73,10 @@ export default function LoginPage() {
           {err && <p className="text-sm text-destructive">{err}</p>}
           <button
             type="submit"
-            // disabled={mutation.isPending}
+            disabled={isPending}
             className="h-10 w-full rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
           >
-            {/* {mutation.isPending ? "Signing in…" : "Sign in"} */}
+            {isPending ? "Signing in…" : "Sign in"}
           </button>
         </form>
       </main>

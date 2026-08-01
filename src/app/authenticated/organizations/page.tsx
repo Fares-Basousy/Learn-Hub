@@ -1,15 +1,32 @@
 "use client"
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import toast from "react-hot-toast";
 import { createOrganization, deleteOrganization, getOrganizations } from "@/src/lib/actions/api/organizations/organizations-actions";
 import { Organization } from "@/src/lib/types";
 
 export default function OrganizationsPage() {
+  return (
+    <Suspense fallback={<p className="text-sm text-muted-foreground">Loading…</p>}>
+      <OrganizationsPageInner />
+    </Suspense>
+  );
+}
+
+function OrganizationsPageInner() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const rawPage = Number(searchParams.get("page"));
+  // page is 0-indexed internally; an invalid/missing param falls back to the first page.
+  const pageIndex = Number.isInteger(rawPage) && rawPage > 0 ? rawPage : 0;
+
   const [organizations, setOrganizations] = useState<Organization[]>([])
-  const [error, setError] = useState<Error>()
+  const [hasMore, setHasMore] = useState(false)
   const [pending, setPending] = useState(false)
   const [loading, setLoading] = useState(true)
-  const [pageIndex, setPageIndex] = useState(0)
+  const [refreshKey, setRefreshKey] = useState(0)
   const [form, setForm] = useState({
     name: '',
     subject: '',
@@ -18,52 +35,69 @@ export default function OrganizationsPage() {
 
   useEffect(() => {
     const load = async () => {
+      setLoading(true)
       try {
         const data = await getOrganizations(pageIndex)
-        const entries = data.organizations ?? []
-        setOrganizations((prev) => (pageIndex === 0 ? entries : [...prev, ...entries]))
+        setOrganizations(data.organizations ?? [])
+        setHasMore(Boolean(data.hasMore))
         setLoading(false)
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       catch (e: any) {
-        setError(e)
+        toast.error(e.message ?? "Failed to load organizations")
         setLoading(false)
       }
     }
     load()
-  }, [pageIndex])
+  }, [pageIndex, refreshKey])
+
+  const hrefForPage = (page: number) => {
+    const params = new URLSearchParams(searchParams.toString())
+    if (page > 0) params.set("page", String(page))
+    else params.delete("page")
+    const qs = params.toString()
+    return qs ? `${pathname}?${qs}` : pathname
+  }
 
   const create = async () => {
+    setPending(true)
+    const formData = new FormData();
+    Object.entries(form).forEach(([key, value]) => {
+      if (value) formData.append(key, String(value));
+    });
     try {
-      setPending(true)
-      const formData = new FormData();
-      Object.entries(form).forEach(([key, value]) => {
-        if (value) formData.append(key, String(value));
-      });
-      await createOrganization(formData).then(() => {
-        setForm({ name: '', subject: '', picUrl: '' })
-        setPending(false)
-        setPageIndex(0)
+      await toast.promise(createOrganization(formData), {
+        loading: "Adding organization…",
+        success: "Organization added",
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        error: (e: any) => e.message ?? "Failed to add organization",
       })
+      setForm({ name: '', subject: '', picUrl: '' })
+      if (pageIndex !== 0) router.push(hrefForPage(0))
+      else setRefreshKey(Math.random())
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     catch (error: any) {
       console.log(error)
+    }
+    finally {
       setPending(false)
-      setError(error.message)
     }
   }
 
   const remove = async (id: string) => {
     try {
-      await deleteOrganization(id).then(() => {
-        setOrganizations((prev) => prev.filter((o) => o.id !== id))
+      await toast.promise(deleteOrganization(id), {
+        loading: "Deleting organization…",
+        success: "Organization deleted",
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        error: (e: any) => e.message ?? "Failed to delete organization",
       })
+      setOrganizations((prev) => prev.filter((o) => o.id !== id))
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     catch (error: any) {
       console.log(error)
-      setError(error.message)
     }
   }
 
@@ -107,10 +141,6 @@ export default function OrganizationsPage() {
           Add
         </button>
       </form>
-
-      {error && (
-        <p className="mt-2 text-sm text-destructive">{error.message}</p>
-      )}
 
       <div className="mt-6 overflow-hidden rounded-lg border bg-card">
         <div className="overflow-x-auto">
@@ -162,12 +192,33 @@ export default function OrganizationsPage() {
         </div>
       </div>
 
-      <button
-        onClick={() => setPageIndex((prev) => prev + 1)}
-        className="mt-3 w-full rounded-md px-3 py-2 text-left text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
-      >
-        Next
-      </button>
+      <div className="mt-3 flex items-center justify-between gap-2">
+        {pageIndex > 0 ? (
+          <Link
+            href={hrefForPage(pageIndex - 1)}
+            className="rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
+          >
+            Previous
+          </Link>
+        ) : (
+          <span className="cursor-not-allowed rounded-md px-3 py-2 text-sm text-muted-foreground/40">
+            Previous
+          </span>
+        )}
+        <span className="text-xs text-muted-foreground">Page {pageIndex + 1}</span>
+        {hasMore ? (
+          <Link
+            href={hrefForPage(pageIndex + 1)}
+            className="rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
+          >
+            Next
+          </Link>
+        ) : (
+          <span className="cursor-not-allowed rounded-md px-3 py-2 text-sm text-muted-foreground/40">
+            Next
+          </span>
+        )}
+      </div>
     </div>
   );
 }

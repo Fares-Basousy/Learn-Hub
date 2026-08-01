@@ -1,40 +1,32 @@
 'use client'
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import { NewsItem } from "@/src/lib/types";
 import { createPost, deletePost, getPosts, updatePost } from "@/src/lib/actions/api/news/news-actions";
 export type Form = {
   title: string;
-  title_ar: string;
   body: string;
-  body_ar: string;
-  image_url: string;
-  link_url: string;
-  link_label: string;
-  link_label_ar: string;
+  imageUrl: string;
+  linkUrl: string;
+  linkLabel: string;
 };
 
 const emptyForm: Form = {
   title: "",
-  title_ar: "",
   body: "",
-  body_ar: "",
-  image_url: "",
-  link_url: "",
-  link_label: "",
-  link_label_ar: "",
+  imageUrl: "",
+  linkUrl: "",
+  linkLabel: "",
 };
 
 function toBody(f: Form) {
   const clean = (v: string) => (v.trim() === "" ? null : v.trim());
   return {
     title: f.title.trim(),
-    title_ar: clean(f.title_ar),
     body: clean(f.body),
-    body_ar: clean(f.body_ar),
-    image_url: clean(f.image_url),
-    link_url: clean(f.link_url),
-    link_label: clean(f.link_label),
-    link_label_ar: clean(f.link_label_ar),
+    imageUrl: clean(f.imageUrl),
+    linkUrl: clean(f.linkUrl),
+    linkLabel: clean(f.linkLabel),
   };
 }
 
@@ -48,105 +40,99 @@ export default function NewsEditPage() {
   const [news, setNews] = useState<NewsItem[]>([])
   const [form, setForm] = useState<Form>(emptyForm);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [error, setError] = useState<Error>()
   const [pending, setPending] = useState(false)
   const [refresh, setRefresh] = useState(false)
 useEffect(()=>{
           const Load = async ()=>{
               try{
                 const  data  = await getPosts()
-                const entries : NewsItem[] = data?.items.length ? data.items : [];
-                setNews((prev : NewsItem[])=>[...prev,...entries])
+                setNews(data?.items ?? [])
               }
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               catch(e : any){
-                setError(e)
+                toast.error(e.message ?? "Failed to load news")
               }
               }
               Load()
-        },[refresh]) 
+        },[refresh])
   const create =  async () =>{
+      setPending(true)
+      const formData = new FormData();
+      Object.entries(toBody(form)).forEach(([key, value]) => {
+        if (key !== 'id' && value !== null) formData.append(key, String(value));
+        });
       try{
-          setPending(true)
-          const formData = new FormData();
-          Object.entries(toBody(form)).forEach(([key, value]) => {
-            if(key != 'id')
-              formData.append(key, String(value));
-            });
-          await createPost(formData).then(async ()=>{
-            setPending(false)
-            setForm(emptyForm)
-            setRefresh(!refresh)
+          await toast.promise(createPost(formData), {
+            loading: "Adding news…",
+            success: "News added",
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            error: (e: any) => e.message ?? "Failed to add news",
           })
+          setForm(emptyForm)
+          setRefresh(!refresh)
         }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       catch(error : any){
-              setPending(false)
-              setError(error)
-              console.log(error)      
+              console.log(error)
           }
+      finally {
+        setPending(false)
+      }
     }
-  // useMutation({
-  //   mutationFn: () =>
-  //     api("/api/news", { method: "POST", body: JSON.stringify(toBody(toBody(form))) }),
-  //   onSuccess: () => {
-  //     qc.invalidateQueries({ queryKey: ["news"] });
-  //     qc.invalidateQueries({ queryKey: ["news-public"] });
-  //     setForm(emptyForm);
-  //   },
-  // });
 
   const update =  async (id : string) =>{
+      setPending(true)
+      const formData = new FormData();
+      Object.entries(toBody(form)).forEach(([key, value]) => {
+        if (value !== null) formData.append(key, String(value));
+        });
       try{
-          setPending(true)
-          const formData = new FormData();
-          Object.entries(toBody(form)).forEach(([key, value]) => {
-            
-            formData.append(key, String(value));
-            });
-          await updatePost(formData,id).then(async ()=>{
-            setPending(false)
-            setForm(emptyForm)
-            setRefresh(!refresh)
+          await toast.promise(updatePost(formData, id), {
+            loading: "Saving…",
+            success: "News updated",
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            error: (e: any) => e.message ?? "Failed to update news",
           })
+          setForm(emptyForm)
+          setRefresh(!refresh)
         }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       catch(error : any){
-              setPending(false)
-              setError(error)
-              console.log(error)      
+              console.log(error)
           }
+      finally {
+        setPending(false)
+      }
     }
 
   const remove =  async (id : string) =>{
+      setPending(true)
       try{
-          setPending(true)
-          setPending(false)
-
-          await deletePost(id).then(async ()=>{
-            setPending(false)
-            setRefresh(!refresh)
+          await toast.promise(deletePost(id), {
+            loading: "Deleting news…",
+            success: "News deleted",
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            error: (e: any) => e.message ?? "Failed to delete news",
           })
+          setRefresh(!refresh)
         }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       catch(error : any){
-              setError(error)
-              setPending(false)
-              console.log(error)      
+              console.log(error)
           }
+      finally {
+        setPending(false)
+      }
     }
 
   function startEdit(n: NewsItem) {
     setEditingId(n.id);
     setForm({
       title: n.title ?? "",
-      title_ar: n.title_ar ?? "",
       body: n.body ?? "",
-      body_ar: n.body_ar ?? "",
-      image_url: n.image_url ?? "",
-      link_url: n.link_url ?? "",
-      link_label: n.link_label ?? "",
-      link_label_ar: n.link_label_ar ?? "",
+      imageUrl: n.imageUrl ?? "",
+      linkUrl: n.linkUrl ?? "",
+      linkLabel: n.linkLabel ?? "",
     });
   }
 
@@ -169,7 +155,7 @@ useEffect(()=>{
         }}
         className="mt-6 grid gap-3 rounded-lg border bg-card p-4 sm:grid-cols-2">
         <label className="text-xs font-medium sm:col-span-2">
-          Title (EN)
+          Title
           <input
             required
             value={form.title}
@@ -178,16 +164,7 @@ useEffect(()=>{
           />
         </label>
         <label className="text-xs font-medium sm:col-span-2">
-          Title (AR)
-          <input
-            value={form.title_ar}
-            onChange={(e) => setForm({ ...form, title_ar: e.target.value })}
-            className={inputCls}
-            dir="rtl"
-          />
-        </label>
-        <label className="text-xs font-medium sm:col-span-2">
-          Body (EN)
+          Body
           <textarea
             value={form.body}
             onChange={(e) => setForm({ ...form, body: e.target.value })}
@@ -195,20 +172,11 @@ useEffect(()=>{
           />
         </label>
         <label className="text-xs font-medium sm:col-span-2">
-          Body (AR)
-          <textarea
-            value={form.body_ar}
-            onChange={(e) => setForm({ ...form, body_ar: e.target.value })}
-            className="min-h-[70px] w-full rounded-md border border-input bg-background p-2 text-sm"
-            dir="rtl"
-          />
-        </label>
-        <label className="text-xs font-medium sm:col-span-2">
           Image URL
           <input
             type="url"
-            value={form.image_url}
-            onChange={(e) => setForm({ ...form, image_url: e.target.value })}
+            value={form.imageUrl}
+            onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
             className={inputCls}
             placeholder="https://…"
           />
@@ -217,29 +185,19 @@ useEffect(()=>{
           Link URL
           <input
             type="url"
-            value={form.link_url}
-            onChange={(e) => setForm({ ...form, link_url: e.target.value })}
+            value={form.linkUrl}
+            onChange={(e) => setForm({ ...form, linkUrl: e.target.value })}
             className={inputCls}
             placeholder="https://…"
           />
         </label>
         <label className="text-xs font-medium">
-          Link label (EN)
+          Link label
           <input
-            value={form.link_label}
-            onChange={(e) => setForm({ ...form, link_label: e.target.value })}
+            value={form.linkLabel}
+            onChange={(e) => setForm({ ...form, linkLabel: e.target.value })}
             className={inputCls}
             placeholder="Learn more"
-          />
-        </label>
-        <label className="text-xs font-medium">
-          Link label (AR)
-          <input
-            value={form.link_label_ar}
-            onChange={(e) => setForm({ ...form, link_label_ar: e.target.value })}
-            className={inputCls}
-            placeholder="اعرف المزيد"
-            dir="rtl"
           />
         </label>
 
@@ -263,35 +221,28 @@ useEffect(()=>{
         </div>
       </form>
 
-      {(error) && (
-        <p className="mt-2 text-sm text-destructive">
-          {(error as Error)?.message ??
-          (error as Error)?.message}
-        </p>
-      )}
-
       <div className="mt-6 space-y-3">
         {(news ?? []).map((n) => (
           <div key={n.id} className="flex gap-3 rounded-lg border bg-card p-3">
-            {n.image_url && (
+            {n.imageUrl && (
               <img
-                src={n.image_url}
+                src={n.imageUrl}
                 alt=""
                 className="h-16 w-24 shrink-0 rounded object-cover"
               />
             )}
             <div className="min-w-0 flex-1">
               <div className="truncate font-semibold">{n.title}</div>
-               {n.link_url && (
+               {n.linkUrl && (
                 <a
-                  href={n.link_url}
+                  href={n.linkUrl}
                   target="_blank"
                   rel="noreferrer"
                   className="truncate text-xs text-primary hover:underline"
                 >
-                  {n.link_url}
+                  {n.linkUrl}
                 </a>
-               )} 
+               )}
              </div>
              <div className="flex shrink-0 items-start gap-2">
                <button

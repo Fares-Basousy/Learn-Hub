@@ -181,10 +181,11 @@ export type SaleItemScalarFieldEnum = (typeof SaleItemScalarFieldEnum)[keyof typ
 export const NewsScalarFieldEnum = {
   id: 'id',
   title: 'title',
-  description: 'description',
-  picUrl: 'picUrl',
+  body: 'body',
+  imageUrl: 'imageUrl',
   linkUrl: 'linkUrl',
-  createdAt: 'createdAt'
+  linkLabel: 'linkLabel',
+  publishedAt: 'publishedAt'
 } as const
 
 export type NewsScalarFieldEnum = (typeof NewsScalarFieldEnum)[keyof typeof NewsScalarFieldEnum]

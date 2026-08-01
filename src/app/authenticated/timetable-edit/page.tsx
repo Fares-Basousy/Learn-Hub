@@ -2,9 +2,9 @@
 'use client'
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import { api } from "@/lib/api";
 import { createTimeTable, deleteTimeTable, getTimetableEntries, updateTimeTable } from "@/src/lib/actions/api/timetable/timetable-actions";
-import { time } from "console";
 import { TimetableEntry } from "@/src/lib/types";
 
 
@@ -15,15 +15,20 @@ const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 export default function TimetableEditPage() {
 
   const [timetables, setTimetables] = useState<TimetableEntry[]>([])
-  const [error, setError] =useState()
+  const [refreshKey, setRefreshKey] = useState(0)
+
   useEffect(()=>{
-    const intialLoad = async ()=>{
-        const  data  = await getTimetableEntries()
+    const load = async ()=>{
+      try {
+        const data = await getTimetableEntries()
         const entries = data?.entries?.length ? data.entries : [];
         setTimetables(entries)
-        }
-        intialLoad()
-  })
+      } catch (e: any) {
+        toast.error(e.message ?? "Failed to load timetable")
+      }
+    }
+    load()
+  }, [refreshKey])
 
   const [form, setForm] = useState<Omit<TimetableEntry, "id">>({
     classroom: "Classroom 1",
@@ -36,24 +41,34 @@ export default function TimetableEditPage() {
   });
 
   const create =async ()=>{
+    const formData = new FormData();
+    Object.entries(form).forEach(([key, value]) => {
+    formData.append(key, String(value));
+    });
     try{
-      const formData = new FormData();
-      Object.entries(form).forEach(([key, value]) => {
-      formData.append(key, String(value));
-      });
-      await createTimeTable(formData)}
+      await toast.promise(createTimeTable(formData), {
+        loading: "Adding entry…",
+        success: "Timetable entry added",
+        error: (e: any) => e.message ?? "Failed to add timetable entry",
+      })
+      setRefreshKey(Math.random())
+    }
     catch(error : any){
       console.log(error)
-      setError(error.message)
-
+    }
   }
-  } 
   const remove = async (id : string)=>{
     try{
-      await deleteTimeTable(id)}
+      await toast.promise(deleteTimeTable(id), {
+        loading: "Deleting entry…",
+        success: "Timetable entry deleted",
+        error: (e: any) => e.message ?? "Failed to delete timetable entry",
+      })
+      setRefreshKey(Math.random())
+    }
     catch(error : unknown){
       console.log(error)
-    } 
+    }
   }
 
   return (
@@ -130,12 +145,6 @@ export default function TimetableEditPage() {
           Add
         </button>
       </form>
-
-      {(error? (
-        <p className="mt-2 text-sm text-destructive">
-          {(error as any)?.message}
-        </p>
-      ):null)}
 
       <div className="mt-6 overflow-hidden rounded-lg border bg-card">
         <div className="overflow-x-auto">

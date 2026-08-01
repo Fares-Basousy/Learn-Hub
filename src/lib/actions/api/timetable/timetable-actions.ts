@@ -3,7 +3,7 @@ import { z } from "zod";
 import { query } from "@/lib/db.server";
 import { handle, json, parseJson } from "@/lib/http";
 import { TimetableEntry } from "@/src/lib/types";
-//import { requireSession } from "@/lib/session.server";
+import { requireUser } from "@/lib/require-user";
 
 const PatchSchema = z.object({
   classroom: z.string().min(1).max(50).optional(),
@@ -24,8 +24,7 @@ const EntrySchema = z.object({
   teacher_school: z.string().min(1).max(200),
 });
 export async function createTimeTable(formData: FormData) {
-  
-  //requiresession();
+  await requireUser();
   const entries = Object.fromEntries(formData.entries());
   const data = EntrySchema.safeParse(entries);
   // TODO: INSERT INTO timetable_entries (...) VALUES (...) RETURNING *
@@ -44,8 +43,7 @@ export async function createTimeTable(formData: FormData) {
   return { entry: rows[0] };
       }
 export async function updateTimeTable(formData: FormData, id : number) {
-  
-   //requiresession();
+   await requireUser();
    const entries = Object.fromEntries(formData.entries());
    const data = PatchSchema.safeParse(entries);
         // TODO: UPDATE timetable_entries SET <fields> WHERE id = $1 RETURNING *
@@ -66,9 +64,7 @@ export async function updateTimeTable(formData: FormData, id : number) {
       }
 
 export async function deleteTimeTable(id : string) {
-  
-   //requiresession();
-   //requiresession();
+   await requireUser();
         // TODO: DELETE FROM timetable_entries WHERE id = $1
         await query("DELETE FROM timetable_entries WHERE id = $1", [id]);
         return { ok: true };

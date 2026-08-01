@@ -134,10 +134,11 @@ model SaleItem {
 model News {
   id          String   @id @default(uuid())
   title       String
-  description String
-  picUrl      String
+  body        String?
+  imageUrl    String?
   linkUrl     String?
-  createdAt   DateTime @default(now())
+  linkLabel   String?
+  publishedAt DateTime @default(now())
 
   @@map("news")
 }
