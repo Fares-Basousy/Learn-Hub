@@ -28,13 +28,15 @@ export type AggregateTimetableEntry = {
 
 export type TimetableEntryAvgAggregateOutputType = {
   dayOfWeek: number | null
-  sessionIndex: number | null
+  startMinute: number | null
+  endMinute: number | null
   grade: number | null
 }
 
 export type TimetableEntrySumAggregateOutputType = {
   dayOfWeek: number | null
-  sessionIndex: number | null
+  startMinute: number | null
+  endMinute: number | null
   grade: number | null
 }
 
@@ -42,9 +44,8 @@ export type TimetableEntryMinAggregateOutputType = {
   id: string | null
   classroom: string | null
   dayOfWeek: number | null
-  sessionIndex: number | null
-  startTime: string | null
-  endTime: string | null
+  startMinute: number | null
+  endMinute: number | null
   grade: number | null
   course: string | null
   teacherName: string | null
@@ -56,9 +57,8 @@ export type TimetableEntryMaxAggregateOutputType = {
   id: string | null
   classroom: string | null
   dayOfWeek: number | null
-  sessionIndex: number | null
-  startTime: string | null
-  endTime: string | null
+  startMinute: number | null
+  endMinute: number | null
   grade: number | null
   course: string | null
   teacherName: string | null
@@ -70,9 +70,8 @@ export type TimetableEntryCountAggregateOutputType = {
   id: number
   classroom: number
   dayOfWeek: number
-  sessionIndex: number
-  startTime: number
-  endTime: number
+  startMinute: number
+  endMinute: number
   grade: number
   course: number
   teacherName: number
@@ -84,13 +83,15 @@ export type TimetableEntryCountAggregateOutputType = {
 
 export type TimetableEntryAvgAggregateInputType = {
   dayOfWeek?: true
-  sessionIndex?: true
+  startMinute?: true
+  endMinute?: true
   grade?: true
 }
 
 export type TimetableEntrySumAggregateInputType = {
   dayOfWeek?: true
-  sessionIndex?: true
+  startMinute?: true
+  endMinute?: true
   grade?: true
 }
 
@@ -98,9 +99,8 @@ export type TimetableEntryMinAggregateInputType = {
   id?: true
   classroom?: true
   dayOfWeek?: true
-  sessionIndex?: true
-  startTime?: true
-  endTime?: true
+  startMinute?: true
+  endMinute?: true
   grade?: true
   course?: true
   teacherName?: true
@@ -112,9 +112,8 @@ export type TimetableEntryMaxAggregateInputType = {
   id?: true
   classroom?: true
   dayOfWeek?: true
-  sessionIndex?: true
-  startTime?: true
-  endTime?: true
+  startMinute?: true
+  endMinute?: true
   grade?: true
   course?: true
   teacherName?: true
@@ -126,9 +125,8 @@ export type TimetableEntryCountAggregateInputType = {
   id?: true
   classroom?: true
   dayOfWeek?: true
-  sessionIndex?: true
-  startTime?: true
-  endTime?: true
+  startMinute?: true
+  endMinute?: true
   grade?: true
   course?: true
   teacherName?: true
@@ -227,9 +225,8 @@ export type TimetableEntryGroupByOutputType = {
   id: string
   classroom: string
   dayOfWeek: number
-  sessionIndex: number
-  startTime: string | null
-  endTime: string | null
+  startMinute: number
+  endMinute: number
   grade: number
   course: string
   teacherName: string
@@ -264,9 +261,8 @@ export type TimetableEntryWhereInput = {
   id?: Prisma.StringFilter<"TimetableEntry"> | string
   classroom?: Prisma.StringFilter<"TimetableEntry"> | string
   dayOfWeek?: Prisma.IntFilter<"TimetableEntry"> | number
-  sessionIndex?: Prisma.IntFilter<"TimetableEntry"> | number
-  startTime?: Prisma.StringNullableFilter<"TimetableEntry"> | string | null
-  endTime?: Prisma.StringNullableFilter<"TimetableEntry"> | string | null
+  startMinute?: Prisma.IntFilter<"TimetableEntry"> | number
+  endMinute?: Prisma.IntFilter<"TimetableEntry"> | number
   grade?: Prisma.IntFilter<"TimetableEntry"> | number
   course?: Prisma.StringFilter<"TimetableEntry"> | string
   teacherName?: Prisma.StringFilter<"TimetableEntry"> | string
@@ -278,9 +274,8 @@ export type TimetableEntryOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   classroom?: Prisma.SortOrder
   dayOfWeek?: Prisma.SortOrder
-  sessionIndex?: Prisma.SortOrder
-  startTime?: Prisma.SortOrderInput | Prisma.SortOrder
-  endTime?: Prisma.SortOrderInput | Prisma.SortOrder
+  startMinute?: Prisma.SortOrder
+  endMinute?: Prisma.SortOrder
   grade?: Prisma.SortOrder
   course?: Prisma.SortOrder
   teacherName?: Prisma.SortOrder
@@ -295,9 +290,8 @@ export type TimetableEntryWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.TimetableEntryWhereInput | Prisma.TimetableEntryWhereInput[]
   classroom?: Prisma.StringFilter<"TimetableEntry"> | string
   dayOfWeek?: Prisma.IntFilter<"TimetableEntry"> | number
-  sessionIndex?: Prisma.IntFilter<"TimetableEntry"> | number
-  startTime?: Prisma.StringNullableFilter<"TimetableEntry"> | string | null
-  endTime?: Prisma.StringNullableFilter<"TimetableEntry"> | string | null
+  startMinute?: Prisma.IntFilter<"TimetableEntry"> | number
+  endMinute?: Prisma.IntFilter<"TimetableEntry"> | number
   grade?: Prisma.IntFilter<"TimetableEntry"> | number
   course?: Prisma.StringFilter<"TimetableEntry"> | string
   teacherName?: Prisma.StringFilter<"TimetableEntry"> | string
@@ -309,9 +303,8 @@ export type TimetableEntryOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   classroom?: Prisma.SortOrder
   dayOfWeek?: Prisma.SortOrder
-  sessionIndex?: Prisma.SortOrder
-  startTime?: Prisma.SortOrderInput | Prisma.SortOrder
-  endTime?: Prisma.SortOrderInput | Prisma.SortOrder
+  startMinute?: Prisma.SortOrder
+  endMinute?: Prisma.SortOrder
   grade?: Prisma.SortOrder
   course?: Prisma.SortOrder
   teacherName?: Prisma.SortOrder
@@ -331,9 +324,8 @@ export type TimetableEntryScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"TimetableEntry"> | string
   classroom?: Prisma.StringWithAggregatesFilter<"TimetableEntry"> | string
   dayOfWeek?: Prisma.IntWithAggregatesFilter<"TimetableEntry"> | number
-  sessionIndex?: Prisma.IntWithAggregatesFilter<"TimetableEntry"> | number
-  startTime?: Prisma.StringNullableWithAggregatesFilter<"TimetableEntry"> | string | null
-  endTime?: Prisma.StringNullableWithAggregatesFilter<"TimetableEntry"> | string | null
+  startMinute?: Prisma.IntWithAggregatesFilter<"TimetableEntry"> | number
+  endMinute?: Prisma.IntWithAggregatesFilter<"TimetableEntry"> | number
   grade?: Prisma.IntWithAggregatesFilter<"TimetableEntry"> | number
   course?: Prisma.StringWithAggregatesFilter<"TimetableEntry"> | string
   teacherName?: Prisma.StringWithAggregatesFilter<"TimetableEntry"> | string
@@ -345,9 +337,8 @@ export type TimetableEntryCreateInput = {
   id?: string
   classroom: string
   dayOfWeek: number
-  sessionIndex: number
-  startTime?: string | null
-  endTime?: string | null
+  startMinute: number
+  endMinute: number
   grade: number
   course: string
   teacherName: string
@@ -359,9 +350,8 @@ export type TimetableEntryUncheckedCreateInput = {
   id?: string
   classroom: string
   dayOfWeek: number
-  sessionIndex: number
-  startTime?: string | null
-  endTime?: string | null
+  startMinute: number
+  endMinute: number
   grade: number
   course: string
   teacherName: string
@@ -373,9 +363,8 @@ export type TimetableEntryUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   classroom?: Prisma.StringFieldUpdateOperationsInput | string
   dayOfWeek?: Prisma.IntFieldUpdateOperationsInput | number
-  sessionIndex?: Prisma.IntFieldUpdateOperationsInput | number
-  startTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  endTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  startMinute?: Prisma.IntFieldUpdateOperationsInput | number
+  endMinute?: Prisma.IntFieldUpdateOperationsInput | number
   grade?: Prisma.IntFieldUpdateOperationsInput | number
   course?: Prisma.StringFieldUpdateOperationsInput | string
   teacherName?: Prisma.StringFieldUpdateOperationsInput | string
@@ -387,9 +376,8 @@ export type TimetableEntryUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   classroom?: Prisma.StringFieldUpdateOperationsInput | string
   dayOfWeek?: Prisma.IntFieldUpdateOperationsInput | number
-  sessionIndex?: Prisma.IntFieldUpdateOperationsInput | number
-  startTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  endTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  startMinute?: Prisma.IntFieldUpdateOperationsInput | number
+  endMinute?: Prisma.IntFieldUpdateOperationsInput | number
   grade?: Prisma.IntFieldUpdateOperationsInput | number
   course?: Prisma.StringFieldUpdateOperationsInput | string
   teacherName?: Prisma.StringFieldUpdateOperationsInput | string
@@ -401,9 +389,8 @@ export type TimetableEntryCreateManyInput = {
   id?: string
   classroom: string
   dayOfWeek: number
-  sessionIndex: number
-  startTime?: string | null
-  endTime?: string | null
+  startMinute: number
+  endMinute: number
   grade: number
   course: string
   teacherName: string
@@ -415,9 +402,8 @@ export type TimetableEntryUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   classroom?: Prisma.StringFieldUpdateOperationsInput | string
   dayOfWeek?: Prisma.IntFieldUpdateOperationsInput | number
-  sessionIndex?: Prisma.IntFieldUpdateOperationsInput | number
-  startTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  endTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  startMinute?: Prisma.IntFieldUpdateOperationsInput | number
+  endMinute?: Prisma.IntFieldUpdateOperationsInput | number
   grade?: Prisma.IntFieldUpdateOperationsInput | number
   course?: Prisma.StringFieldUpdateOperationsInput | string
   teacherName?: Prisma.StringFieldUpdateOperationsInput | string
@@ -429,9 +415,8 @@ export type TimetableEntryUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   classroom?: Prisma.StringFieldUpdateOperationsInput | string
   dayOfWeek?: Prisma.IntFieldUpdateOperationsInput | number
-  sessionIndex?: Prisma.IntFieldUpdateOperationsInput | number
-  startTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  endTime?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  startMinute?: Prisma.IntFieldUpdateOperationsInput | number
+  endMinute?: Prisma.IntFieldUpdateOperationsInput | number
   grade?: Prisma.IntFieldUpdateOperationsInput | number
   course?: Prisma.StringFieldUpdateOperationsInput | string
   teacherName?: Prisma.StringFieldUpdateOperationsInput | string
@@ -443,9 +428,8 @@ export type TimetableEntryCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   classroom?: Prisma.SortOrder
   dayOfWeek?: Prisma.SortOrder
-  sessionIndex?: Prisma.SortOrder
-  startTime?: Prisma.SortOrder
-  endTime?: Prisma.SortOrder
+  startMinute?: Prisma.SortOrder
+  endMinute?: Prisma.SortOrder
   grade?: Prisma.SortOrder
   course?: Prisma.SortOrder
   teacherName?: Prisma.SortOrder
@@ -455,7 +439,8 @@ export type TimetableEntryCountOrderByAggregateInput = {
 
 export type TimetableEntryAvgOrderByAggregateInput = {
   dayOfWeek?: Prisma.SortOrder
-  sessionIndex?: Prisma.SortOrder
+  startMinute?: Prisma.SortOrder
+  endMinute?: Prisma.SortOrder
   grade?: Prisma.SortOrder
 }
 
@@ -463,9 +448,8 @@ export type TimetableEntryMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   classroom?: Prisma.SortOrder
   dayOfWeek?: Prisma.SortOrder
-  sessionIndex?: Prisma.SortOrder
-  startTime?: Prisma.SortOrder
-  endTime?: Prisma.SortOrder
+  startMinute?: Prisma.SortOrder
+  endMinute?: Prisma.SortOrder
   grade?: Prisma.SortOrder
   course?: Prisma.SortOrder
   teacherName?: Prisma.SortOrder
@@ -477,9 +461,8 @@ export type TimetableEntryMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   classroom?: Prisma.SortOrder
   dayOfWeek?: Prisma.SortOrder
-  sessionIndex?: Prisma.SortOrder
-  startTime?: Prisma.SortOrder
-  endTime?: Prisma.SortOrder
+  startMinute?: Prisma.SortOrder
+  endMinute?: Prisma.SortOrder
   grade?: Prisma.SortOrder
   course?: Prisma.SortOrder
   teacherName?: Prisma.SortOrder
@@ -489,7 +472,8 @@ export type TimetableEntryMinOrderByAggregateInput = {
 
 export type TimetableEntrySumOrderByAggregateInput = {
   dayOfWeek?: Prisma.SortOrder
-  sessionIndex?: Prisma.SortOrder
+  startMinute?: Prisma.SortOrder
+  endMinute?: Prisma.SortOrder
   grade?: Prisma.SortOrder
 }
 
@@ -499,9 +483,8 @@ export type TimetableEntrySelect<ExtArgs extends runtime.Types.Extensions.Intern
   id?: boolean
   classroom?: boolean
   dayOfWeek?: boolean
-  sessionIndex?: boolean
-  startTime?: boolean
-  endTime?: boolean
+  startMinute?: boolean
+  endMinute?: boolean
   grade?: boolean
   course?: boolean
   teacherName?: boolean
@@ -513,9 +496,8 @@ export type TimetableEntrySelectCreateManyAndReturn<ExtArgs extends runtime.Type
   id?: boolean
   classroom?: boolean
   dayOfWeek?: boolean
-  sessionIndex?: boolean
-  startTime?: boolean
-  endTime?: boolean
+  startMinute?: boolean
+  endMinute?: boolean
   grade?: boolean
   course?: boolean
   teacherName?: boolean
@@ -527,9 +509,8 @@ export type TimetableEntrySelectUpdateManyAndReturn<ExtArgs extends runtime.Type
   id?: boolean
   classroom?: boolean
   dayOfWeek?: boolean
-  sessionIndex?: boolean
-  startTime?: boolean
-  endTime?: boolean
+  startMinute?: boolean
+  endMinute?: boolean
   grade?: boolean
   course?: boolean
   teacherName?: boolean
@@ -541,9 +522,8 @@ export type TimetableEntrySelectScalar = {
   id?: boolean
   classroom?: boolean
   dayOfWeek?: boolean
-  sessionIndex?: boolean
-  startTime?: boolean
-  endTime?: boolean
+  startMinute?: boolean
+  endMinute?: boolean
   grade?: boolean
   course?: boolean
   teacherName?: boolean
@@ -551,7 +531,7 @@ export type TimetableEntrySelectScalar = {
   createdAt?: boolean
 }
 
-export type TimetableEntryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "classroom" | "dayOfWeek" | "sessionIndex" | "startTime" | "endTime" | "grade" | "course" | "teacherName" | "teacherSchool" | "createdAt", ExtArgs["result"]["timetableEntry"]>
+export type TimetableEntryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "classroom" | "dayOfWeek" | "startMinute" | "endMinute" | "grade" | "course" | "teacherName" | "teacherSchool" | "createdAt", ExtArgs["result"]["timetableEntry"]>
 
 export type $TimetableEntryPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "TimetableEntry"
@@ -560,9 +540,8 @@ export type $TimetableEntryPayload<ExtArgs extends runtime.Types.Extensions.Inte
     id: string
     classroom: string
     dayOfWeek: number
-    sessionIndex: number
-    startTime: string | null
-    endTime: string | null
+    startMinute: number
+    endMinute: number
     grade: number
     course: string
     teacherName: string
@@ -994,9 +973,8 @@ export interface TimetableEntryFieldRefs {
   readonly id: Prisma.FieldRef<"TimetableEntry", 'String'>
   readonly classroom: Prisma.FieldRef<"TimetableEntry", 'String'>
   readonly dayOfWeek: Prisma.FieldRef<"TimetableEntry", 'Int'>
-  readonly sessionIndex: Prisma.FieldRef<"TimetableEntry", 'Int'>
-  readonly startTime: Prisma.FieldRef<"TimetableEntry", 'String'>
-  readonly endTime: Prisma.FieldRef<"TimetableEntry", 'String'>
+  readonly startMinute: Prisma.FieldRef<"TimetableEntry", 'Int'>
+  readonly endMinute: Prisma.FieldRef<"TimetableEntry", 'Int'>
   readonly grade: Prisma.FieldRef<"TimetableEntry", 'Int'>
   readonly course: Prisma.FieldRef<"TimetableEntry", 'String'>
   readonly teacherName: Prisma.FieldRef<"TimetableEntry", 'String'>

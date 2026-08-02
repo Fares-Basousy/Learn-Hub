@@ -4,9 +4,12 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import { getOrganizationById, updateOrganization } from "@/src/lib/actions/api/organizations/organizations-actions";
+import { uploadImage } from "@/src/lib/actions/api/upload/upload-actions";
 import { Grades, Organization } from "@/src/lib/types";
+import { useLang } from "@/components/lang-provider";
 
 export default function OrganizationDetailPage() {
+  const { t } = useLang();
   const params = useParams<{ orgId: string }>();
   const orgId = params.orgId;
 
@@ -15,7 +18,32 @@ export default function OrganizationDetailPage() {
   const [error, setError] = useState<Error>()
   const [isEditing, setIsEditing] = useState(false)
   const [pending, setPending] = useState(false)
+  const [uploading, setUploading] = useState(false)
   const [form, setForm] = useState({ name: "", subject: "", picUrl: "" })
+
+  const handleImageChange = async (file: File | undefined) => {
+    if (!file) return;
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("folder", "organizations");
+    setUploading(true)
+    try {
+      const { url } = await toast.promise(uploadImage(formData), {
+        loading: "Uploading image…",
+        success: "Image uploaded",
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        error: (e: any) => e.message ?? "Failed to upload image",
+      })
+      setForm((f) => ({ ...f, picUrl: url }))
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    catch (error: any) {
+      console.log(error)
+    }
+    finally {
+      setUploading(false)
+    }
+  }
 
   useEffect(() => {
     const load = async () => {
@@ -66,15 +94,15 @@ export default function OrganizationDetailPage() {
   }
 
   if (loading) {
-    return <p className="text-sm text-muted-foreground">Loading…</p>
+    return <p className="text-sm text-muted-foreground">{t("loading")}</p>
   }
 
   if (!organization) {
     return (
       <div>
-        <p className="text-sm text-destructive">{error?.message ?? "Organization not found."}</p>
+        <p className="text-sm text-destructive">{error?.message ?? t("orgNotFound")}</p>
         <Link href="/authenticated/organizations" className="text-sm text-primary hover:underline">
-          Back to organizations
+          ← {t("organizations")}
         </Link>
       </div>
     )
@@ -85,7 +113,7 @@ export default function OrganizationDetailPage() {
   return (
     <div className="mx-auto max-w-4xl">
       <Link href="/authenticated/organizations" className="text-sm text-muted-foreground hover:underline">
-        ← Organizations
+        ← {t("organizations")}
       </Link>
 
       <div className="mt-3 flex flex-col gap-4 rounded-lg border bg-card p-4 sm:flex-row sm:items-start sm:justify-between">
@@ -105,20 +133,29 @@ export default function OrganizationDetailPage() {
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
                   className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm font-semibold"
-                  placeholder="Name"
+                  placeholder={t("namePlaceholder")}
                 />
                 <input
                   value={form.subject}
                   onChange={(e) => setForm({ ...form, subject: e.target.value })}
                   className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm"
-                  placeholder="Subject"
+                  placeholder={t("subjectPlaceholder")}
                 />
                 <input
-                  value={form.picUrl}
-                  onChange={(e) => setForm({ ...form, picUrl: e.target.value })}
+                  type="file"
+                  accept="image/*"
+                  disabled={uploading}
+                  onChange={(e) => handleImageChange(e.target.files?.[0])}
                   className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm"
-                  placeholder="Picture URL"
                 />
+                {form.picUrl && (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={form.picUrl}
+                    alt=""
+                    className="h-16 w-16 rounded-md object-cover"
+                  />
+                )}
               </div>
             ) : (
               <>
@@ -133,11 +170,11 @@ export default function OrganizationDetailPage() {
           {isEditing ? (
             <>
               <button
-                disabled={pending}
+                disabled={pending || uploading}
                 onClick={save}
                 className="h-8 rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
               >
-                Save
+                {t("save")}
               </button>
               <button
                 disabled={pending}
@@ -147,7 +184,7 @@ export default function OrganizationDetailPage() {
                 }}
                 className="h-8 rounded-md px-3 text-sm text-muted-foreground hover:bg-accent"
               >
-                Cancel
+                {t("cancel")}
               </button>
             </>
           ) : (
@@ -155,22 +192,22 @@ export default function OrganizationDetailPage() {
               onClick={() => setIsEditing(true)}
               className="h-8 rounded-md px-3 text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
             >
-              Edit
+              {t("edit")}
             </button>
           )}
         </div>
       </div>
 
       <div className="mt-6">
-        <h2 className="text-lg font-semibold">Inventory by grade</h2>
+        <h2 className="text-lg font-semibold">{t("inventoryByGrade")}</h2>
         <div className="mt-3 overflow-hidden rounded-lg border bg-card">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-muted/50 text-left text-xs text-muted-foreground">
                 <tr>
-                  <th className="p-2">Grade</th>
-                  <th className="p-2 text-right">Books</th>
-                  <th className="p-2 text-right">Codes</th>
+                  <th className="p-2">{t("colGrade")}</th>
+                  <th className="p-2 text-right">{t("colBooks")}</th>
+                  <th className="p-2 text-right">{t("colCodes")}</th>
                   <th className="p-2" />
                 </tr>
               </thead>
@@ -185,7 +222,7 @@ export default function OrganizationDetailPage() {
                         href={`/authenticated/students?orgId=${organization.id}&grade=${inv.grade}`}
                         className="text-xs text-primary hover:underline"
                       >
-                        Students
+                        {t("students")}
                       </Link>
                     </td>
                   </tr>
@@ -193,7 +230,7 @@ export default function OrganizationDetailPage() {
                 {inventory.length === 0 && (
                   <tr>
                     <td colSpan={4} className="p-4 text-center text-muted-foreground">
-                      No inventory recorded yet.
+                      {t("noInventoryYet")}
                     </td>
                   </tr>
                 )}

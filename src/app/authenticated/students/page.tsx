@@ -7,6 +7,7 @@ import { createStudent, getStudents } from "@/src/lib/actions/api/students/stude
 import { getOrganizationsAdmin } from "@/src/lib/actions/api/organizations/organizations-actions";
 import { Gender, Grades, Organization, Student } from "@/src/lib/types";
 import StudentRow from "@/src/components/student-row";
+import { useLang } from "@/components/lang-provider";
 
 export default function StudentsPage() {
   return (
@@ -38,6 +39,7 @@ function StudentsPageInner({
   filterOrgId?: string;
   filterGrade?: number;
 }) {
+  const { t } = useLang();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -128,19 +130,19 @@ function StudentsPageInner({
 
   return (
     <div className="mx-auto max-w-5xl">
-      <h1 className="text-2xl font-bold">Students</h1>
-      <p className="text-sm text-muted-foreground">Students associated with organizations.</p>
+      <h1 className="text-2xl font-bold">{t("students")}</h1>
+      <p className="text-sm text-muted-foreground">{t("studentsSubtitle")}</p>
 
       {isFiltered && (
         <div className="mt-4 flex flex-wrap items-center justify-between gap-2 rounded-md border bg-accent/40 px-3 py-2 text-sm">
           <span>
-            Filtered by
-            {filterOrg && <> organization <strong>{filterOrg.name}</strong></>}
+            {t("filteredBy")}
+            {filterOrg && <> {t("organizationWord")} <strong>{filterOrg.name}</strong></>}
             {filterOrg && filterGrade !== undefined && " · "}
-            {filterGrade !== undefined && <>grade <strong>{Grades[filterGrade as keyof typeof Grades] ?? filterGrade}</strong></>}
+            {filterGrade !== undefined && <>{t("gradeWordLower")} <strong>{Grades[filterGrade as keyof typeof Grades] ?? filterGrade}</strong></>}
           </span>
           <Link href="/authenticated/students" className="text-xs text-primary hover:underline">
-            Clear filter
+            {t("clearFilter")}
           </Link>
         </div>
       )}
@@ -158,7 +160,7 @@ function StudentsPageInner({
           onChange={(e) => setForm({ ...form, orgId: e.target.value })}
           className="h-9 rounded-md border border-input bg-background px-2 text-sm"
         >
-          <option value="">Org…</option>
+          <option value="">{t("orgOptionPlaceholder")}</option>
           {organizations?.map((o) => (
             <option key={o.id} value={o.id}>
               {o.name}
@@ -167,14 +169,14 @@ function StudentsPageInner({
         </select>
         <input
           required
-          placeholder="Name"
+          placeholder={t("namePlaceholder")}
           value={form.name}
           onChange={(e) => setForm({ ...form, name: e.target.value })}
           className="h-9 rounded-md border border-input bg-background px-2 text-sm"
         />
         <input
           required
-          placeholder="Number"
+          placeholder={t("numberPlaceholder")}
           value={form.number}
           onChange={(e) => setForm({ ...form, number: e.target.value })}
           className="h-9 rounded-md border border-input bg-background px-2 text-sm"
@@ -185,7 +187,7 @@ function StudentsPageInner({
           onChange={(e) => setForm({ ...form, grade: e.target.value })}
           className="h-9 rounded-md border border-input bg-background px-2 text-sm"
         >
-          <option value="">Grade…</option>
+          <option value="">{t("gradeOptionPlaceholder")}</option>
           {Object.entries(Grades).map(([value, label]) => (
             <option key={value} value={value}>
               {label}
@@ -194,7 +196,7 @@ function StudentsPageInner({
         </select>
         <input
           required
-          placeholder="School"
+          placeholder={t("schoolPlaceholder")}
           value={form.school}
           onChange={(e) => setForm({ ...form, school: e.target.value })}
           className="h-9 rounded-md border border-input bg-background px-2 text-sm"
@@ -204,11 +206,11 @@ function StudentsPageInner({
           onChange={(e) => setForm({ ...form, gender: e.target.value as Gender })}
           className="h-9 rounded-md border border-input bg-background px-2 text-sm"
         >
-          <option value="MALE">Male</option>
-          <option value="FEMALE">Female</option>
+          <option value="MALE">{t("male")}</option>
+          <option value="FEMALE">{t("female")}</option>
         </select>
         <input
-          placeholder="Type (optional)"
+          placeholder={t("typeOptionalPlaceholder")}
           value={form.type}
           onChange={(e) => setForm({ ...form, type: e.target.value })}
           className="h-9 rounded-md border border-input bg-background px-2 text-sm"
@@ -217,7 +219,7 @@ function StudentsPageInner({
           disabled={pending}
           className="h-9 rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
         >
-          Add
+          {t("add")}
         </button>
       </form>
 
@@ -226,10 +228,10 @@ function StudentsPageInner({
           <table className="w-full text-sm">
             <thead className="bg-muted/50 text-left text-xs text-muted-foreground">
               <tr>
-                <th className="p-2">Name</th>
-                <th className="p-2">Number</th>
-                <th className="p-2">Grade</th>
-                <th className="p-2">School</th>
+                <th className="p-2">{t("namePlaceholder")}</th>
+                <th className="p-2">{t("colNumber")}</th>
+                <th className="p-2">{t("colGrade")}</th>
+                <th className="p-2">{t("colSchool")}</th>
                 <th className="p-2" />
               </tr>
             </thead>
@@ -247,7 +249,7 @@ function StudentsPageInner({
               {students && students?.length === 0 && (
                 <tr>
                   <td colSpan={5} className="p-4 text-center text-muted-foreground">
-                    No students yet.
+                    {t("noStudentsYet")}
                   </td>
                 </tr>
               )}
@@ -262,24 +264,24 @@ function StudentsPageInner({
             href={hrefForPage(pageIndex - 1)}
             className="rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
           >
-            Previous
+            {t("previous")}
           </Link>
         ) : (
           <span className="cursor-not-allowed rounded-md px-3 py-2 text-sm text-muted-foreground/40">
-            Previous
+            {t("previous")}
           </span>
         )}
-        <span className="text-xs text-muted-foreground">Page {pageIndex + 1}</span>
+        <span className="text-xs text-muted-foreground">{t("page")} {pageIndex + 1}</span>
         {hasMore ? (
           <Link
             href={hrefForPage(pageIndex + 1)}
             className="rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
           >
-            Next
+            {t("next")}
           </Link>
         ) : (
           <span className="cursor-not-allowed rounded-md px-3 py-2 text-sm text-muted-foreground/40">
-            Next
+            {t("next")}
           </span>
         )}
       </div>

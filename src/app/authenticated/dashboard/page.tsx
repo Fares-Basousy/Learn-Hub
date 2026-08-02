@@ -7,10 +7,12 @@ import { getSales } from "@/src/lib/actions/api/sales/sales-actions";
 import { getGradeCounts } from "@/src/lib/actions/api/students/student-actions";
 import { getPosts } from "@/src/lib/actions/api/news/news-actions";
 import { Grades, NewsItem, Organization, Sale } from "@/src/lib/types";
+import { useLang } from "@/components/lang-provider";
 
 type GradeCount = { grade: number; count: number };
 
 export default function DashboardPage() {
+  const { t } = useLang();
   const [orgs, setOrgs] = useState<Organization[]>([]);
   const [sales, setSales] = useState<Sale[]>([]);
   const [news, setNews] = useState<NewsItem[]>([]);
@@ -39,8 +41,8 @@ export default function DashboardPage() {
 
   return (
     <div className="mx-auto max-w-5xl">
-      <h1 className="text-2xl font-bold">Dashboard</h1>
-      <p className="text-sm text-muted-foreground">Overview of inventory and activity.</p>
+      <h1 className="text-2xl font-bold">{t("dashboard")}</h1>
+      <p className="text-sm text-muted-foreground">{t("dashboardSubtitle")}</p>
 
       {error && (
         <div className="mt-4 rounded-md border border-destructive/40 bg-destructive/5 p-3 text-sm text-destructive">
@@ -49,7 +51,7 @@ export default function DashboardPage() {
       )}
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
-        <Section title="News" moreHref="/authenticated/news-edit">
+        <Section title={t("news")} moreLabel={t("moreDetails")} moreHref="/authenticated/news-edit">
           <ul className="divide-y">
             {news.slice(0, 5).map((n) => (
               <li key={n.id} className="p-2 text-sm">
@@ -59,11 +61,11 @@ export default function DashboardPage() {
                 </div>
               </li>
             ))}
-            {news.length === 0 && <Empty label="No news yet." />}
+            {news.length === 0 && <Empty label={t("noNewsYet")} />}
           </ul>
         </Section>
 
-        <Section title="Organizations" moreHref="/authenticated/organizations">
+        <Section title={t("organizations")} moreLabel={t("moreDetails")} moreHref="/authenticated/organizations">
           <ul className="divide-y">
             {orgs.slice(0, 5).map((o) => (
               <li key={o.id} className="p-2 text-sm">
@@ -73,11 +75,11 @@ export default function DashboardPage() {
                 <div className="text-xs text-muted-foreground">{o.subject}</div>
               </li>
             ))}
-            {orgs.length === 0 && <Empty label="No organizations yet." />}
+            {orgs.length === 0 && <Empty label={t("noOrganizationsYet")} />}
           </ul>
         </Section>
 
-        <Section title="Latest sales" moreHref="/authenticated/sales-index">
+        <Section title={t("latestSales")} moreLabel={t("moreDetails")} moreHref="/authenticated/sales-index">
           <ul className="divide-y">
             {sales.slice(0, 5).map((s) => (
               <li key={s.id} className="p-2 text-sm">
@@ -89,16 +91,16 @@ export default function DashboardPage() {
                 </div>
                 <div className="text-xs text-muted-foreground">
                   {s.items
-                    .map((i) => `${i.booksCount} books / ${i.codesCount} codes — ${i.org?.name ?? i.orgId.slice(0, 8)}`)
+                    .map((i) => `${i.booksCount} ${t("booksWord")} / ${i.codesCount} ${t("codesWord")} — ${i.org?.name ?? i.orgId.slice(0, 8)}`)
                     .join(", ")}
                 </div>
               </li>
             ))}
-            {sales.length === 0 && <Empty label="No sales yet." />}
+            {sales.length === 0 && <Empty label={t("noSalesYet")} />}
           </ul>
         </Section>
 
-        <Section title="Grades with 10+ students" moreHref="/authenticated/students">
+        <Section title={t("gradesWithTenPlus")} moreLabel={t("moreDetails")} moreHref="/authenticated/students">
           <ul className="divide-y">
             {gradeCounts.map((g) => (
               <li key={g.grade} className="flex items-center justify-between p-2 text-sm">
@@ -106,12 +108,12 @@ export default function DashboardPage() {
                   href={`/authenticated/students?grade=${g.grade}`}
                   className="font-medium hover:underline"
                 >
-                  {Grades[g.grade as keyof typeof Grades] ?? `Grade ${g.grade}`}
+                  {Grades[g.grade as keyof typeof Grades] ?? `${t("colGrade")} ${g.grade}`}
                 </Link>
-                <span className="text-muted-foreground">{g.count} students</span>
+                <span className="text-muted-foreground">{g.count} {t("studentsWord")}</span>
               </li>
             ))}
-            {gradeCounts.length === 0 && <Empty label="No grade has more than 10 students yet." />}
+            {gradeCounts.length === 0 && <Empty label={t("noGradeTenPlusYet")} />}
           </ul>
         </Section>
       </div>
@@ -122,10 +124,12 @@ export default function DashboardPage() {
 function Section({
   title,
   moreHref,
+  moreLabel,
   children,
 }: {
   title: string;
   moreHref: string;
+  moreLabel: string;
   children: React.ReactNode;
 }) {
   return (
@@ -133,7 +137,7 @@ function Section({
       <div className="flex items-center justify-between border-b bg-muted/50 px-3 py-2">
         <h2 className="text-sm font-semibold">{title}</h2>
         <Link href={moreHref} className="text-xs text-primary hover:underline">
-          More details
+          {moreLabel}
         </Link>
       </div>
       {children}

@@ -1,86 +1,114 @@
-'use server'
+"use server"
 import { z } from "zod";
-import { query } from "@/lib/db.server";
-import { handle, json, parseJson } from "@/lib/http";
-import { TimetableEntry } from "@/src/lib/types";
+import prisma from "@/lib/prisma";
 import { requireUser } from "@/lib/require-user";
+import { TimetableEntry } from "@/src/lib/types";
+import {
+  CLASSROOMS,
+  MAX_END_MINUTE,
+  MIN_DURATION_MINUTES,
+  MIN_START_MINUTE,
+  formatMinutes,
+  rangesOverlap,
+} from "@/lib/timetable";
+
+const EntrySchema = z.object({
+  classroom: z.enum(CLASSROOMS as [string, ...string[]]),
+  dayOfWeek: z.coerce.number().int().min(0).max(6),
+  startMinute: z.coerce.number().int().min(MIN_START_MINUTE).max(MAX_END_MINUTE),
+  endMinute: z.coerce.number().int().min(MIN_START_MINUTE).max(MAX_END_MINUTE),
+  grade: z.coerce.number().int().min(1).max(12),
+  course: z.string().trim().min(1).max(200),
+  teacherName: z.string().trim().min(1).max(200),
+  teacherSchool: z.string().trim().min(1).max(200),
+}).refine((d) => d.endMinute - d.startMinute >= MIN_DURATION_MINUTES, {
+  message: `Sessions must be at least ${MIN_DURATION_MINUTES} minutes long`,
+});
 
 const PatchSchema = z.object({
-  classroom: z.string().min(1).max(50).optional(),
-  day_of_week: z.number().int().min(0).max(6).optional(),
-  session_index: z.number().int().min(0).max(20).optional(),
-  grade: z.string().min(1).max(50).optional(),
-  course: z.string().min(1).max(200).optional(),
-  teacher_name: z.string().min(1).max(200).optional(),
-  teacher_school: z.string().min(1).max(200).optional(),
+  classroom: z.enum(CLASSROOMS as [string, ...string[]]).optional(),
+  dayOfWeek: z.coerce.number().int().min(0).max(6).optional(),
+  startMinute: z.coerce.number().int().min(MIN_START_MINUTE).max(MAX_END_MINUTE).optional(),
+  endMinute: z.coerce.number().int().min(MIN_START_MINUTE).max(MAX_END_MINUTE).optional(),
+  grade: z.coerce.number().int().min(1).max(12).optional(),
+  course: z.string().trim().min(1).max(200).optional(),
+  teacherName: z.string().trim().min(1).max(200).optional(),
+  teacherSchool: z.string().trim().min(1).max(200).optional(),
 });
-const EntrySchema = z.object({
-  classroom: z.string().min(1).max(50),
-  day_of_week: z.number().int().min(0).max(6),
-  session_index: z.number().int().min(0).max(20),
-  grade: z.string().min(1).max(50),
-  course: z.string().min(1).max(200),
-  teacher_name: z.string().min(1).max(200),
-  teacher_school: z.string().min(1).max(200),
-});
+
+async function assertNoOverlap(
+  classroom: string,
+  dayOfWeek: number,
+  startMinute: number,
+  endMinute: number,
+  excludeId?: string,
+) {
+  const existing = await prisma.timetableEntry.findMany({
+    where: { classroom, dayOfWeek, ...(excludeId ? { id: { not: excludeId } } : {}) },
+  });
+  const conflict = existing.find((e) =>
+    rangesOverlap(startMinute, endMinute, e.startMinute, e.endMinute),
+  );
+  if (conflict) {
+    throw new Error(
+      `This time overlaps with ${conflict.course} (${formatMinutes(conflict.startMinute)} – ${formatMinutes(conflict.endMinute)}) in ${classroom}`,
+    );
+  }
+}
+
 export async function createTimeTable(formData: FormData) {
   await requireUser();
   const entries = Object.fromEntries(formData.entries());
-  const data = EntrySchema.safeParse(entries);
-  // TODO: INSERT INTO timetable_entries (...) VALUES (...) RETURNING *
-  const rows : TimetableEntry[] = await query(
-    "INSERT INTO timetable_entries (classroom, day_of_week, session_index, grade, course, teacher_name, teacher_school) VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *",
-    [
-      data.data?.classroom,
-      data.data?.day_of_week,
-      data.data?.session_index,
-      data.data?.grade,
-      data.data?.course,
-      data.data?.teacher_name,
-      data.data?.teacher_school,
-    ],
-  );
-  return { entry: rows[0] };
-      }
-export async function updateTimeTable(formData: FormData, id : number) {
-   await requireUser();
-   const entries = Object.fromEntries(formData.entries());
-   const data = PatchSchema.safeParse(entries);
-        // TODO: UPDATE timetable_entries SET <fields> WHERE id = $1 RETURNING *
-        const rows : TimetableEntry[] = await query(
-          "UPDATE timetable_entries SET classroom = COALESCE($2, classroom), day_of_week = COALESCE($3, day_of_week), session_index = COALESCE($4, session_index), grade = COALESCE($5, grade), course = COALESCE($6, course), teacher_name = COALESCE($7, teacher_name), teacher_school = COALESCE($8, teacher_school) WHERE id = $1 RETURNING *",
-          [
-            id,
-            data.data?.classroom ?? null,
-            data.data?.day_of_week ?? null,
-            data.data?.session_index ?? null,
-            data.data?.grade ?? null,
-            data.data?.course ?? null,
-            data.data?.teacher_name ?? null,
-            data.data?.teacher_school ?? null,
-          ],
-        );
-        return { entry: rows[0] };
-      }
+  const data = EntrySchema.parse(entries);
+  await assertNoOverlap(data.classroom, data.dayOfWeek, data.startMinute, data.endMinute);
+  const entry = await prisma.timetableEntry.create({ data });
+  return { entry };
+}
 
-export async function deleteTimeTable(id : string) {
-   await requireUser();
-        // TODO: DELETE FROM timetable_entries WHERE id = $1
-        await query("DELETE FROM timetable_entries WHERE id = $1", [id]);
-        return { ok: true };
-      }
+export async function updateTimeTable(formData: FormData, id: string) {
+  await requireUser();
+  const entries = Object.fromEntries(formData.entries());
+  const data = PatchSchema.parse(entries);
+
+  const current = await prisma.timetableEntry.findUniqueOrThrow({ where: { id } });
+  const classroom = data.classroom ?? current.classroom;
+  const dayOfWeek = data.dayOfWeek ?? current.dayOfWeek;
+  const startMinute = data.startMinute ?? current.startMinute;
+  const endMinute = data.endMinute ?? current.endMinute;
+  if (endMinute - startMinute < MIN_DURATION_MINUTES) {
+    throw new Error(`Sessions must be at least ${MIN_DURATION_MINUTES} minutes long`);
+  }
+  await assertNoOverlap(classroom, dayOfWeek, startMinute, endMinute, id);
+
+  const entry = await prisma.timetableEntry.update({
+    where: { id },
+    data: {
+      classroom,
+      dayOfWeek,
+      startMinute,
+      endMinute,
+      grade: data.grade ?? current.grade,
+      course: data.course ?? current.course,
+      teacherName: data.teacherName ?? current.teacherName,
+      teacherSchool: data.teacherSchool ?? current.teacherSchool,
+    },
+  });
+  return { entry };
+}
+
+export async function deleteTimeTable(id: string) {
+  await requireUser();
+  await prisma.timetableEntry.delete({ where: { id } });
+  return { ok: true };
+}
+
 export async function getTimetableEntries() {
-  
-   //requiresession();
   try {
-          // TODO: SELECT * FROM timetable_entries ORDER BY classroom, day_of_week, session_index
-          const rows : TimetableEntry[] = await query(
-            "SELECT id, classroom, day_of_week, session_index, grade, course, teacher_name, teacher_school FROM timetable_entries ORDER BY classroom, day_of_week, session_index",
-          );
-          return { entries: rows };
-        } catch (e) {
-          // Empty when DB isn't wired yet — landing page still renders.
-          return { entries: [], warning: (e as Error).message };
-        }
-      }
-  
+    const entries: TimetableEntry[] = await prisma.timetableEntry.findMany({
+      orderBy: [{ classroom: "asc" }, { dayOfWeek: "asc" }, { startMinute: "asc" }],
+    });
+    return { entries };
+  } catch (e) {
+    return { entries: [] as TimetableEntry[], warning: (e as Error).message };
+  }
+}

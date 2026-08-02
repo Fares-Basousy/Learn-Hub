@@ -4,8 +4,10 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import toast from "react-hot-toast";
 import { SiteHeader } from "@/components/site-header";
+import { useLang } from "@/components/lang-provider";
 
 export default function LoginPage() {
+  const { t } = useLang();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [err, setErr] = useState<string | null>(null);
@@ -40,16 +42,16 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-background">
-      <title>Sign in</title>
+      <title>{t("signIn")}</title>
       <SiteHeader />
       <main className="mx-auto flex max-w-md flex-col px-4 py-16">
-        <h1 className="text-2xl font-bold">Sign in</h1>
+        <h1 className="text-2xl font-bold">{t("signIn")}</h1>
         <p className="mt-1 text-sm text-muted-foreground">
-          Access the inventory and timetable admin.
+          {t("loginSubtitle")}
         </p>
         <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           <div>
-            <label className="block text-sm font-medium">Email</label>
+            <label className="block text-sm font-medium">{t("emailLabel")}</label>
             <input
               type="email"
               value={email}
@@ -60,7 +62,7 @@ export default function LoginPage() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium">Password</label>
+            <label className="block text-sm font-medium">{t("passwordLabel")}</label>
             <input
               type="password"
               value={password}
@@ -76,7 +78,7 @@ export default function LoginPage() {
             disabled={isPending}
             className="h-10 w-full rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
           >
-            {isPending ? "Signing in…" : "Sign in"}
+            {isPending ? t("signingIn") : t("signIn")}
           </button>
         </form>
       </main>

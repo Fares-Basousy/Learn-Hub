@@ -4,7 +4,9 @@ import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
 import { createOrganization, deleteOrganization, getOrganizations } from "@/src/lib/actions/api/organizations/organizations-actions";
+import { uploadImage } from "@/src/lib/actions/api/upload/upload-actions";
 import { Organization } from "@/src/lib/types";
+import { useLang } from "@/components/lang-provider";
 
 export default function OrganizationsPage() {
   return (
@@ -15,6 +17,7 @@ export default function OrganizationsPage() {
 }
 
 function OrganizationsPageInner() {
+  const { t } = useLang();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -25,13 +28,39 @@ function OrganizationsPageInner() {
   const [organizations, setOrganizations] = useState<Organization[]>([])
   const [hasMore, setHasMore] = useState(false)
   const [pending, setPending] = useState(false)
+  const [uploading, setUploading] = useState(false)
   const [loading, setLoading] = useState(true)
   const [refreshKey, setRefreshKey] = useState(0)
+  const [fileInputKey, setFileInputKey] = useState(0)
   const [form, setForm] = useState({
     name: '',
     subject: '',
     picUrl: '',
   });
+
+  const handleImageChange = async (file: File | undefined) => {
+    if (!file) return;
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("folder", "organizations");
+    setUploading(true)
+    try {
+      const { url } = await toast.promise(uploadImage(formData), {
+        loading: "Uploading image…",
+        success: "Image uploaded",
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        error: (e: any) => e.message ?? "Failed to upload image",
+      })
+      setForm((f) => ({ ...f, picUrl: url }))
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    catch (error: any) {
+      console.log(error)
+    }
+    finally {
+      setUploading(false)
+    }
+  }
 
   useEffect(() => {
     const load = async () => {
@@ -73,6 +102,7 @@ function OrganizationsPageInner() {
         error: (e: any) => e.message ?? "Failed to add organization",
       })
       setForm({ name: '', subject: '', picUrl: '' })
+      setFileInputKey((k) => k + 1)
       if (pageIndex !== 0) router.push(hrefForPage(0))
       else setRefreshKey(Math.random())
     }
@@ -103,8 +133,8 @@ function OrganizationsPageInner() {
 
   return (
     <div className="mx-auto max-w-5xl">
-      <h1 className="text-2xl font-bold">Organizations</h1>
-      <p className="text-sm text-muted-foreground">Partner schools you distribute to.</p>
+      <h1 className="text-2xl font-bold">{t("organizations")}</h1>
+      <p className="text-sm text-muted-foreground">{t("orgsSubtitle")}</p>
 
       <form
         onSubmit={(e) => {
@@ -116,29 +146,31 @@ function OrganizationsPageInner() {
         <input
           value={form.name}
           onChange={(e) => setForm({ ...form, name: e.target.value })}
-          placeholder="Name"
+          placeholder={t("namePlaceholder")}
           required
           className="h-9 flex-1 rounded-md border border-input bg-background px-3 text-sm"
         />
         <input
           value={form.subject}
           onChange={(e) => setForm({ ...form, subject: e.target.value })}
-          placeholder="Subject"
+          placeholder={t("subjectPlaceholder")}
           required
           className="h-9 flex-1 rounded-md border border-input bg-background px-3 text-sm"
         />
         <input
-          value={form.picUrl}
-          onChange={(e) => setForm({ ...form, picUrl: e.target.value })}
-          placeholder="Picture URL"
-          required
+          key={fileInputKey}
+          type="file"
+          accept="image/*"
+          disabled={uploading}
+          onChange={(e) => handleImageChange(e.target.files?.[0])}
+          required={!form.picUrl}
           className="h-9 flex-1 rounded-md border border-input bg-background px-3 text-sm"
         />
         <button
-          disabled={pending}
+          disabled={pending || uploading || !form.picUrl}
           className="h-9 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
         >
-          Add
+          {t("add")}
         </button>
       </form>
 
@@ -147,8 +179,8 @@ function OrganizationsPageInner() {
           <table className="w-full text-sm">
             <thead className="bg-muted/50 text-left text-xs text-muted-foreground">
               <tr>
-                <th className="p-2">Name</th>
-                <th className="p-2">Subject</th>
+                <th className="p-2">{t("namePlaceholder")}</th>
+                <th className="p-2">{t("colSubject")}</th>
                 <th className="p-2" />
               </tr>
             </thead>
@@ -156,7 +188,7 @@ function OrganizationsPageInner() {
               {loading && (
                 <tr>
                   <td colSpan={3} className="p-4 text-center text-muted-foreground">
-                    Loading…
+                    {t("loading")}
                   </td>
                 </tr>
               )}
@@ -169,13 +201,13 @@ function OrganizationsPageInner() {
                       href={`/authenticated/organizations/${o.id}`}
                       className="text-xs text-primary hover:underline"
                     >
-                      Details
+                      {t("detailsLink")}
                     </Link>
                     <button
                       onClick={() => remove(o.id)}
                       className="ml-3 text-xs text-destructive hover:underline"
                     >
-                      Delete
+                      {t("delete")}
                     </button>
                   </td>
                 </tr>
@@ -183,7 +215,7 @@ function OrganizationsPageInner() {
               {organizations.length === 0 && !loading && (
                 <tr>
                   <td colSpan={3} className="p-4 text-center text-muted-foreground">
-                    No organizations yet.
+                    {t("noOrganizationsYet")}
                   </td>
                 </tr>
               )}
@@ -198,24 +230,24 @@ function OrganizationsPageInner() {
             href={hrefForPage(pageIndex - 1)}
             className="rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
           >
-            Previous
+            {t("previous")}
           </Link>
         ) : (
           <span className="cursor-not-allowed rounded-md px-3 py-2 text-sm text-muted-foreground/40">
-            Previous
+            {t("previous")}
           </span>
         )}
-        <span className="text-xs text-muted-foreground">Page {pageIndex + 1}</span>
+        <span className="text-xs text-muted-foreground">{t("page")} {pageIndex + 1}</span>
         {hasMore ? (
           <Link
             href={hrefForPage(pageIndex + 1)}
             className="rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
           >
-            Next
+            {t("next")}
           </Link>
         ) : (
           <span className="cursor-not-allowed rounded-md px-3 py-2 text-sm text-muted-foreground/40">
-            Next
+            {t("next")}
           </span>
         )}
       </div>

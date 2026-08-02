@@ -3,6 +3,8 @@ import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { NewsItem } from "@/src/lib/types";
 import { createPost, deletePost, getPosts, updatePost } from "@/src/lib/actions/api/news/news-actions";
+import { uploadImage } from "@/src/lib/actions/api/upload/upload-actions";
+import { useLang } from "@/components/lang-provider";
 export type Form = {
   title: string;
   body: string;
@@ -31,6 +33,7 @@ function toBody(f: Form) {
 }
 
 export default function NewsEditPage() {
+  const { t } = useLang();
   // const qc = useQueryClient();
   // const { data, error } = useQuery({
   //   queryKey: ["news"],
@@ -41,7 +44,29 @@ export default function NewsEditPage() {
   const [form, setForm] = useState<Form>(emptyForm);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [pending, setPending] = useState(false)
+  const [uploading, setUploading] = useState(false)
   const [refresh, setRefresh] = useState(false)
+
+  const handleImageChange = async (file: File | undefined) => {
+    if (!file) return;
+    const formData = new FormData();
+    formData.append("file", file);
+    setUploading(true);
+    try {
+      const { url } = await toast.promise(uploadImage(formData), {
+        loading: "Uploading image…",
+        success: "Image uploaded",
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        error: (e: any) => e.message ?? "Failed to upload image",
+      });
+      setForm((f) => ({ ...f, imageUrl: url }));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      console.log(error);
+    } finally {
+      setUploading(false);
+    }
+  };
 useEffect(()=>{
           const Load = async ()=>{
               try{
@@ -140,9 +165,9 @@ useEffect(()=>{
 
   return (
     <div className="mx-auto max-w-4xl">
-      <h1 className="text-2xl font-bold">News</h1>
+      <h1 className="text-2xl font-bold">{t("news")}</h1>
       <p className="text-sm text-muted-foreground">
-        Editable news hero shown at the top of the landing page.
+        {t("newsAdminSubtitle")}
       </p>
 
       <form
@@ -155,7 +180,7 @@ useEffect(()=>{
         }}
         className="mt-6 grid gap-3 rounded-lg border bg-card p-4 sm:grid-cols-2">
         <label className="text-xs font-medium sm:col-span-2">
-          Title
+          {t("titleLabel")}
           <input
             required
             value={form.title}
@@ -164,7 +189,7 @@ useEffect(()=>{
           />
         </label>
         <label className="text-xs font-medium sm:col-span-2">
-          Body
+          {t("bodyLabel")}
           <textarea
             value={form.body}
             onChange={(e) => setForm({ ...form, body: e.target.value })}
@@ -172,17 +197,24 @@ useEffect(()=>{
           />
         </label>
         <label className="text-xs font-medium sm:col-span-2">
-          Image URL
+          {t("imageLabel")}
           <input
-            type="url"
-            value={form.imageUrl}
-            onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
+            type="file"
+            accept="image/*"
+            disabled={uploading}
+            onChange={(e) => handleImageChange(e.target.files?.[0])}
             className={inputCls}
-            placeholder="https://…"
           />
+          {form.imageUrl && (
+            <img
+              src={form.imageUrl}
+              alt=""
+              className="mt-2 h-24 w-36 rounded object-cover"
+            />
+          )}
         </label>
         <label className="text-xs font-medium sm:col-span-2">
-          Link URL
+          {t("linkUrlLabel")}
           <input
             type="url"
             value={form.linkUrl}
@@ -192,18 +224,21 @@ useEffect(()=>{
           />
         </label>
         <label className="text-xs font-medium">
-          Link label
+          {t("linkLabelLabel")}
           <input
             value={form.linkLabel}
             onChange={(e) => setForm({ ...form, linkLabel: e.target.value })}
             className={inputCls}
-            placeholder="Learn more"
+            placeholder={t("learnMorePlaceholder")}
           />
         </label>
 
         <div className="flex items-center gap-2 sm:col-span-2">
-          <button className="h-9 rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground hover:bg-primary/90">
-            {editingId ? "Save changes" : "Add news"}
+          <button
+            disabled={pending || uploading}
+            className="h-9 rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+          >
+            {editingId ? t("saveChanges") : t("addNews")}
           </button>
           {editingId && (
             <button
@@ -215,7 +250,7 @@ useEffect(()=>{
               }}
               className="h-9 rounded-md border border-input px-3 text-sm hover:bg-accent"
             >
-              Cancel
+              {t("cancel")}
             </button>
           )}
         </div>
@@ -249,20 +284,20 @@ useEffect(()=>{
                  onClick={() => startEdit(n)}
                  className="text-xs text-primary hover:underline"
                >
-                 Edit
+                 {t("edit")}
                </button>
                <button
                  onClick={() => remove(n.id)}
                  className="text-xs text-destructive hover:underline"
                >
-                 Delete
+                 {t("delete")}
                </button>
              </div>
            </div>
          ))}
         {news && news?.length === 0 && (
           <div className="rounded-lg border bg-card p-6 text-center text-sm text-muted-foreground">
-            No news items yet.
+            {t("noNewsYet")}
           </div>
         )}
       </div>

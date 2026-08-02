@@ -81,15 +81,15 @@ model TimetableEntry {
   id            String   @id @default(uuid())
   classroom     String
   dayOfWeek     Int
-  sessionIndex  Int
-  startTime     String?
-  endTime       String?
+  startMinute   Int
+  endMinute     Int
   grade         Int
   course        String
   teacherName   String
   teacherSchool String
   createdAt     DateTime @default(now())
 
+  @@index([classroom, dayOfWeek])
   @@map("timetable_entries")
 }
 

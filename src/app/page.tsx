@@ -17,49 +17,28 @@ import {
 } from "@/components/ui/select";
 import { getTimetableEntries } from "../lib/actions/api/timetable/timetable-actions";
 import { TimetableEntry } from "../lib/types";
+import { CLASSROOMS, formatMinutes } from "../lib/timetable";
 
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
-const CLASSROOMS = ["Classroom 1", "Classroom 2", "Classroom 3"];
 const SESSIONS = [0, 1, 2, 3];
-const GRADES = ["Grade 7 Boys", "Grade 8 Girls", "Grade 9 Boys", "Grade 10 Girls"];
-
-// Per-classroom session times — each classroom can start/end at different times.
-const ROOM_TIMES: { start: string; end: string }[][] = [
-  [
-    { start: "8 AM", end: "10 AM" },
-    { start: "10 AM", end: "12 PM" },
-    { start: "2 PM", end: "4 PM" },
-    { start: "4 PM", end: "6 PM" },
-  ],
-  [
-    { start: "9 AM", end: "11 AM" },
-    { start: "11 AM", end: "1 PM" },
-    { start: "3 PM", end: "5 PM" },
-    { start: "5 PM", end: "7 PM" },
-  ],
-  [
-    { start: "10 AM", end: "12 PM" },
-    { start: "12 PM", end: "2 PM" },
-    { start: "4 PM", end: "6 PM" },
-    { start: "6 PM", end: "8 PM" },
-  ],
-];
 
 // Placeholder entries used when the DB isn't wired yet.
 const PLACEHOLDER: TimetableEntry[] = CLASSROOMS.flatMap((c, ci) =>
   [1, 2, 3, 4].flatMap((d) =>
-    SESSIONS.map((s) => ({
-      id: `${c}-${d}-${s}`,
-      classroom: c,
-      day_of_week: d,
-      session_index: s,
-      start_time: ROOM_TIMES[ci][s].start,
-      end_time: ROOM_TIMES[ci][s].end,
-      grade: GRADES[s % GRADES.length],
-      course: ["Math", "Science", "Arabic", "English"][(ci + s) % 4],
-      teacher_name: ["Mr. Ahmed", "Ms. Layla", "Mr. Omar", "Ms. Fatima"][(ci + d) % 4],
-      teacher_school: ["Al-Noor", "Bright Future", "Cedar High"][ci],
-    })),
+    SESSIONS.map((s) => {
+      const start = 480 + s * 150 + ci * 30;
+      return {
+        id: `${c}-${d}-${s}`,
+        classroom: c,
+        dayOfWeek: d,
+        startMinute: start,
+        endMinute: start + 120,
+        grade: ((s % 12) + 1),
+        course: ["Math", "Science", "Arabic", "English"][(ci + s) % 4],
+        teacherName: ["Mr. Ahmed", "Ms. Layla", "Mr. Omar", "Ms. Fatima"][(ci + d) % 4],
+        teacherSchool: ["Al-Noor", "Bright Future", "Cedar High"][ci],
+      };
+    }),
   ),
 );
 export default function Home() {
@@ -177,52 +156,39 @@ function TimetableGrid({
   entries: TimetableEntry[];
 }) {
   const { t, tm } = useLang();
-  const byKey = new Map(
-    entries.map((e) => [`${e.classroom}-${e.day_of_week}-${e.session_index}`, e]),
-  );
 
   return (
-    <div className="overflow-hidden rounded-xl border bg-card">
-      <div className="overflow-x-auto">
-        <table className="w-full min-w-[720px] text-xs">
-          <thead>
-            <tr className="border-b bg-muted/30">
-              {CLASSROOMS.map((room, i) => (
-                <th key={room} className="p-3 text-start font-medium text-muted-foreground">
-                  {t("classroom")} {i + 1}
-                </th>
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      {CLASSROOMS.map((room, i) => {
+        const roomEntries = entries
+          .filter((e) => e.classroom === room && e.dayOfWeek === day)
+          .sort((a, b) => a.startMinute - b.startMinute);
+
+        return (
+          <div key={room} className="overflow-hidden rounded-xl border bg-card">
+            <div className="border-b bg-muted/30 p-3 text-sm font-medium text-muted-foreground">
+              {t("classroom")} {i + 1}
+            </div>
+            <div className="divide-y">
+              {roomEntries.length === 0 && (
+                <div className="p-3 text-xs text-muted-foreground/50">—</div>
+              )}
+              {roomEntries.map((e) => (
+                <div key={e.id} className="space-y-0.5 p-3">
+                  <div className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+                    {formatMinutes(e.startMinute)} – {formatMinutes(e.endMinute)}
+                  </div>
+                  <div className="font-semibold">{tm("courses", e.course)}</div>
+                  <div className="text-muted-foreground">{e.teacherName}</div>
+                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                    {tm("grades", e.grade)} · {e.teacherSchool}
+                  </div>
+                </div>
               ))}
-            </tr>
-          </thead>
-          <tbody>
-            {SESSIONS.map((s) => (
-              <tr key={s} className="border-b last:border-0">
-                {CLASSROOMS.map((room) => {
-                  const e = byKey.get(`${room}-${day}-${s}`);
-                  return (
-                    <td key={room} className="p-3 align-top">
-                      {e ? (
-                        <div className="space-y-0.5">
-                          <div className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-                            {e.start_time} – {e.end_time}
-                          </div>
-                          <div className="font-semibold">{tm("courses", e.course)}</div>
-                          <div className="text-muted-foreground">{e.teacher_name}</div>
-                          <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                            {tm("grades", e.grade)} · {e.teacher_school}
-                          </div>
-                        </div>
-                      ) : (
-                        <span className="text-muted-foreground/50">—</span>
-                      )}
-                    </td>
-                  );
-                })}
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }

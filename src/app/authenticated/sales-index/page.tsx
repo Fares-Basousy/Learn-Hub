@@ -7,6 +7,7 @@ import { getSales } from "@/src/lib/actions/api/sales/sales-actions";
 import { getOrganizationsAdmin } from "@/src/lib/actions/api/organizations/organizations-actions";
 import { Grades, Organization, Sale } from "@/src/lib/types";
 import SaleModal from "@/src/components/sale-modal";
+import { useLang } from "@/components/lang-provider";
 
 export default function SalesPage() {
   return (
@@ -17,6 +18,7 @@ export default function SalesPage() {
 }
 
 function SalesPageInner() {
+  const { t } = useLang();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -76,14 +78,14 @@ function SalesPageInner() {
     <div className="mx-auto max-w-5xl">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold">Sales</h1>
-          <p className="text-sm text-muted-foreground">History of book and code sales.</p>
+          <h1 className="text-2xl font-bold">{t("sales")}</h1>
+          <p className="text-sm text-muted-foreground">{t("salesSubtitle")}</p>
         </div>
         <button
           onClick={() => setShowModal(true)}
           className="h-9 rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
         >
-          New sale
+          {t("newSale")}
         </button>
       </div>
 
@@ -94,9 +96,9 @@ function SalesPageInner() {
           <table className="w-full text-sm">
             <thead className="bg-muted/50 text-left text-xs text-muted-foreground">
               <tr>
-                <th className="p-2">ID</th>
-                <th className="p-2">Items</th>
-                <th className="p-2">Date</th>
+                <th className="p-2">{t("colId")}</th>
+                <th className="p-2">{t("colItems")}</th>
+                <th className="p-2">{t("colDate")}</th>
               </tr>
             </thead>
             <tbody>
@@ -107,7 +109,7 @@ function SalesPageInner() {
                     {s.items
                       .map(
                         (i) =>
-                          `${i.booksCount} books / ${i.codesCount} codes — ${i.org?.name ?? i.orgId.slice(0, 8)} (${Grades[i.grade as keyof typeof Grades] ?? `grade ${i.grade}`})`,
+                          `${i.booksCount} ${t("booksWord")} / ${i.codesCount} ${t("codesWord")} — ${i.org?.name ?? i.orgId.slice(0, 8)} (${Grades[i.grade as keyof typeof Grades] ?? `${t("gradeWordLower")} ${i.grade}`})`,
                       )
                       .join(", ")}
                   </td>
@@ -117,7 +119,7 @@ function SalesPageInner() {
               {(sales?.length === 0) && (
                 <tr>
                   <td colSpan={3} className="p-4 text-center text-muted-foreground">
-                    No sales yet.
+                    {t("noSalesYet")}
                   </td>
                 </tr>
               )}
@@ -131,24 +133,24 @@ function SalesPageInner() {
             href={hrefForPage(pageIndex - 1)}
             className="rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
           >
-            Previous
+            {t("previous")}
           </Link>
         ) : (
           <span className="cursor-not-allowed rounded-md px-3 py-2 text-sm text-muted-foreground/40">
-            Previous
+            {t("previous")}
           </span>
         )}
-        <span className="text-xs text-muted-foreground">Page {pageIndex + 1}</span>
+        <span className="text-xs text-muted-foreground">{t("page")} {pageIndex + 1}</span>
         {hasMore ? (
           <Link
             href={hrefForPage(pageIndex + 1)}
             className="rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
           >
-            Next
+            {t("next")}
           </Link>
         ) : (
           <span className="cursor-not-allowed rounded-md px-3 py-2 text-sm text-muted-foreground/40">
-            Next
+            {t("next")}
           </span>
         )}
       </div>

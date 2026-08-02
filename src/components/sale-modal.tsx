@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import { createSale } from "@/src/lib/actions/api/sales/sales-actions";
 import { createStudent } from "@/src/lib/actions/api/students/student-actions";
 import { Gender, Grades, Organization } from "@/src/lib/types";
+import { useLang } from "@/components/lang-provider";
 
 type SaleItemInput = { codesCount: string; booksCount: string; orgId: string; grade: string };
 
@@ -18,6 +19,7 @@ export default function SaleModal({
   onClose: () => void;
   onCreated: () => void;
 }) {
+  const { t } = useLang();
   const [items, setItems] = useState<SaleItemInput[]>([emptyItem()]);
   const [addStudent, setAddStudent] = useState(false);
   const [student, setStudent] = useState({
@@ -92,7 +94,7 @@ export default function SaleModal({
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-0 sm:p-4">
       <div className="h-full w-full overflow-y-auto rounded-none border-0 bg-card p-4 shadow-lg sm:h-auto sm:max-h-[90vh] sm:max-w-2xl sm:rounded-lg sm:border">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold">New sale</h2>
+          <h2 className="text-lg font-semibold">{t("newSale")}</h2>
           <button onClick={onClose} className="text-sm text-muted-foreground hover:text-foreground">
             ✕
           </button>
@@ -102,7 +104,7 @@ export default function SaleModal({
           {items.map((item, idx) => (
             <div key={idx} className="flex flex-wrap items-center gap-2 rounded-md border p-2">
               <label className="text-xs text-muted-foreground">
-                Codes
+                {t("codesWord")}
                 <input
                   type="number"
                   min={0}
@@ -112,7 +114,7 @@ export default function SaleModal({
                 />
               </label>
               <label className="text-xs text-muted-foreground">
-                Books
+                {t("booksWord")}
                 <input
                   type="number"
                   min={0}
@@ -126,7 +128,7 @@ export default function SaleModal({
                 onChange={(e) => updateItem(idx, { orgId: e.target.value })}
                 className="h-9 min-w-0 max-w-full flex-1 rounded-md border border-input bg-background px-2 text-sm sm:flex-none"
               >
-                <option value="">Org…</option>
+                <option value="">{t("orgOptionPlaceholder")}</option>
                 {organizations.map((o) => (
                   <option key={o.id} value={o.id}>
                     {o.name}
@@ -134,13 +136,13 @@ export default function SaleModal({
                 ))}
               </select>
               <label className="text-xs text-muted-foreground">
-                Grade
+                {t("colGrade")}
                 <select
                   value={item.grade}
                   onChange={(e) => updateItem(idx, { grade: e.target.value })}
                   className="ml-2 h-9 rounded-md border border-input bg-background px-2 text-sm"
                 >
-                  <option value="">Grade…</option>
+                  <option value="">{t("gradeOptionPlaceholder")}</option>
                   {Object.entries(Grades).map(([value, label]) => (
                     <option key={value} value={value}>
                       {label}
@@ -164,14 +166,14 @@ export default function SaleModal({
             onClick={() => setItems((xs) => [...xs, emptyItem()])}
             className="flex h-9 items-center gap-1 text-sm text-primary hover:underline"
           >
-            + Sell to another org
+            {t("sellToAnotherOrg")}
           </button>
         </div>
 
         <div className="mt-4 rounded-lg border bg-muted/30 p-3">
           <label className="flex items-center gap-2 text-sm font-medium">
             <input type="checkbox" checked={addStudent} onChange={(e) => setAddStudent(e.target.checked)} />
-            Also register a new student for this sale (optional)
+            {t("alsoRegisterStudent")}
           </label>
           {addStudent && (
             <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
@@ -180,7 +182,7 @@ export default function SaleModal({
                 onChange={(e) => setStudent({ ...student, orgId: e.target.value })}
                 className="h-9 rounded-md border border-input bg-background px-2 text-sm"
               >
-                <option value="">Org…</option>
+                <option value="">{t("orgOptionPlaceholder")}</option>
                 {organizations.map((o) => (
                   <option key={o.id} value={o.id}>
                     {o.name}
@@ -192,17 +194,17 @@ export default function SaleModal({
                 onChange={(e) => setStudent({ ...student, gender: e.target.value as Gender })}
                 className="h-9 rounded-md border border-input bg-background px-2 text-sm"
               >
-                <option value="MALE">Male</option>
-                <option value="FEMALE">Female</option>
+                <option value="MALE">{t("male")}</option>
+                <option value="FEMALE">{t("female")}</option>
               </select>
               <input
-                placeholder="Name"
+                placeholder={t("namePlaceholder")}
                 value={student.name}
                 onChange={(e) => setStudent({ ...student, name: e.target.value })}
                 className="h-9 rounded-md border border-input bg-background px-3 text-sm"
               />
               <input
-                placeholder="Student #"
+                placeholder={t("studentNumberPlaceholder")}
                 value={student.number}
                 onChange={(e) => setStudent({ ...student, number: e.target.value })}
                 className="h-9 rounded-md border border-input bg-background px-3 text-sm"
@@ -212,7 +214,7 @@ export default function SaleModal({
                 onChange={(e) => setStudent({ ...student, grade: e.target.value })}
                 className="h-9 rounded-md border border-input bg-background px-3 text-sm"
               >
-                <option value="">Grade…</option>
+                <option value="">{t("gradeOptionPlaceholder")}</option>
                 {Object.entries(Grades).map(([value, label]) => (
                   <option key={value} value={value}>
                     {label}
@@ -220,7 +222,7 @@ export default function SaleModal({
                 ))}
               </select>
               <input
-                placeholder="School"
+                placeholder={t("schoolPlaceholder")}
                 value={student.school}
                 onChange={(e) => setStudent({ ...student, school: e.target.value })}
                 className="h-9 rounded-md border border-input bg-background px-3 text-sm"
@@ -231,14 +233,14 @@ export default function SaleModal({
 
         <div className="mt-4 flex justify-end gap-2">
           <button onClick={onClose} className="h-9 rounded-md px-3 text-sm text-muted-foreground hover:bg-accent">
-            Cancel
+            {t("cancel")}
           </button>
           <button
             onClick={submit}
             disabled={pending || !validItems || !validStudent}
             className="h-9 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
           >
-            {pending ? "Saving…" : "Record sale"}
+            {pending ? t("saving") : t("recordSale")}
           </button>
         </div>
       </div>

@@ -2,6 +2,7 @@ import { Grades, Student } from "../lib/types";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { deleteStudent, updateStudent } from "@/src/lib/actions/api/students/student-actions";
+import { useLang } from "@/components/lang-provider";
 
 type StudentRowProps = {
   student: Student;
@@ -10,6 +11,7 @@ type StudentRowProps = {
 };
 
 export default function StudentRow({ student, onDelete, onUpdate }: StudentRowProps) {
+  const { t } = useLang();
   const [pending, setPending] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [form, setForm] = useState({
@@ -129,14 +131,14 @@ export default function StudentRow({ student, onDelete, onUpdate }: StudentRowPr
                         onClick={() => update(student.id)}
                         className="text-xs text-primary hover:underline disabled:opacity-50"
                       >
-                        Save
+                        {t("save")}
                       </button>
                       <button
                         disabled={pending}
                         onClick={cancel}
                         className="ml-2 text-xs text-muted-foreground hover:underline disabled:opacity-50"
                       >
-                        Cancel
+                        {t("cancel")}
                       </button>
                     </>
                   ) : (
@@ -145,14 +147,14 @@ export default function StudentRow({ student, onDelete, onUpdate }: StudentRowPr
                         onClick={() => setIsEditing(true)}
                         className="text-xs text-muted-foreground hover:underline"
                       >
-                        Edit
+                        {t("edit")}
                       </button>
                       <button
                        disabled={pending}
                        onClick={() => remove(student.id)}
                         className="ml-2 text-xs text-destructive hover:underline disabled:opacity-50"
                       >
-                        Delete
+                        {t("delete")}
                       </button>
                     </>
                   )}

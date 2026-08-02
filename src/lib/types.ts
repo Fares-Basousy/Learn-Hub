@@ -46,14 +46,13 @@ export type Student = {
 export type  TimetableEntry = {
   id: string;
   classroom: string;
-  day_of_week: number;
-  session_index: number;
-  start_time?: string;
-  end_time?: string;
-  grade: string;
+  dayOfWeek: number;
+  startMinute: number;
+  endMinute: number;
+  grade: number;
   course: string;
-  teacher_name: string;
-  teacher_school: string;
+  teacherName: string;
+  teacherSchool: string;
 };
 
 export type NewsItem = {
