@@ -110,6 +110,8 @@ export const translations = {
     // Timetable admin
     timetableAdminSubtitle: "Sessions shown on the public landing page.",
     addEntry: "Add entry",
+    otherCourseOption: "Other…",
+    otherCoursePlaceholder: "Course name",
     teacherPlaceholder: "Teacher",
     teacherSchoolPlaceholder: "Teacher's school",
     noEntriesYet: "No entries yet.",
@@ -151,6 +153,7 @@ export const translations = {
     courses: {
       Biology: "Biology",
       Chemistry: "Chemistry",
+      Computer: "Computer",
       Math: "Math",
       Physics: "Physics",
       Geography: "Geography",
@@ -166,6 +169,9 @@ export const translations = {
       Religion: "Religion",
       "Second Language": "Second Language",
       "Social Studies": "Social Studies",
+      French: "French",
+      German: "German",
+      Italian: "Italian",
     } as Record<string, string>,
   },
   ar: {
@@ -276,6 +282,8 @@ export const translations = {
     // Timetable admin
     timetableAdminSubtitle: "الحصص المعروضة في الصفحة الرئيسية العامة.",
     addEntry: "إضافة حصة",
+    otherCourseOption: "أخرى…",
+    otherCoursePlaceholder: "اسم المادة",
     teacherPlaceholder: "المعلم",
     teacherSchoolPlaceholder: "مدرسة المعلم",
     noEntriesYet: "لا توجد حصص بعد.",
@@ -317,6 +325,7 @@ export const translations = {
     courses: {
       Biology: "الأحياء",
       Chemistry: "الكيمياء",
+      Computer: "الحاسوب",
       Math: "الرياضيات",
       Physics: "الفيزياء",
       Geography: "الجغرافيا",
@@ -332,6 +341,9 @@ export const translations = {
       Religion: "التربية الدينية",
       "Second Language": "اللغة الثانية",
       "Social Studies": "الدراسات الاجتماعية",
+      French: "الفرنسية",
+      German: "الألمانية",
+      Italian: "الإيطالية",
     } as Record<string, string>,
   },
 } as const;

@@ -16,6 +16,7 @@ export const Grades = {
 export const Courses = [
   "Biology",
   "Chemistry",
+  "Computer",
   "Math",
   "Physics",
   "Geography",
@@ -31,6 +32,9 @@ export const Courses = [
   "Religion",
   "Second Language",
   "Social Studies",
+  "French",
+  "German",
+  "Italian",
 ] as const;
 
 export type Gender = "MALE" | "FEMALE";

@@ -19,6 +19,7 @@ import {
 import { useLang } from "@/components/lang-provider";
 
 const DAY_INDICES = [0, 1, 2, 3, 4, 5, 6];
+const OTHER_COURSE = "__other__";
 
 type FormState = {
   classroom: string;
@@ -54,6 +55,7 @@ export default function TimetableEditPage() {
   const [formOpen, setFormOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>(emptyForm(CLASSROOMS[0], new Date().getDay()));
+  const [courseIsOther, setCourseIsOther] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -75,6 +77,7 @@ export default function TimetableEditPage() {
   const openAddForm = () => {
     setEditingId(null);
     setForm(emptyForm(selectedClassroom, selectedDay));
+    setCourseIsOther(false);
     setFormOpen(true);
   };
 
@@ -90,6 +93,7 @@ export default function TimetableEditPage() {
       teacherName: entry.teacherName,
       teacherSchool: entry.teacherSchool,
     });
+    setCourseIsOther(!(Courses as readonly string[]).includes(entry.course));
     setFormOpen(true);
   };
 
@@ -251,8 +255,16 @@ export default function TimetableEditPage() {
             ))}
           </select>
           <select
-            value={form.course}
-            onChange={(e) => setForm({ ...form, course: e.target.value })}
+            value={courseIsOther ? OTHER_COURSE : form.course}
+            onChange={(e) => {
+              if (e.target.value === OTHER_COURSE) {
+                setCourseIsOther(true);
+                setForm({ ...form, course: "" });
+              } else {
+                setCourseIsOther(false);
+                setForm({ ...form, course: e.target.value });
+              }
+            }}
             className="h-9 rounded-full border border-input bg-background px-3 text-sm"
           >
             {Courses.map((c) => (
@@ -260,7 +272,17 @@ export default function TimetableEditPage() {
                 {tm("courses", c)}
               </option>
             ))}
+            <option value={OTHER_COURSE}>{t("otherCourseOption")}</option>
           </select>
+          {courseIsOther && (
+            <input
+              required
+              placeholder={t("otherCoursePlaceholder")}
+              value={form.course}
+              onChange={(e) => setForm({ ...form, course: e.target.value })}
+              className="h-9 rounded-full border border-input bg-background px-3 text-sm"
+            />
+          )}
           <input
             required
             placeholder={t("teacherPlaceholder")}
