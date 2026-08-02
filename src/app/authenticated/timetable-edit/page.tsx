@@ -8,7 +8,7 @@ import {
   getTimetableEntries,
   updateTimeTable,
 } from "@/src/lib/actions/api/timetable/timetable-actions";
-import { TimetableEntry, Grades } from "@/src/lib/types";
+import { TimetableEntry, Grades, Courses } from "@/src/lib/types";
 import {
   CLASSROOMS,
   MIN_DURATION_MINUTES,
@@ -39,7 +39,7 @@ function emptyForm(classroom: string, dayOfWeek: number): FormState {
     startMinute: start,
     endMinute: start + MIN_DURATION_MINUTES,
     grade: 1,
-    course: "",
+    course: Courses[0],
     teacherName: "",
     teacherSchool: "",
   };
@@ -250,13 +250,17 @@ export default function TimetableEditPage() {
               </option>
             ))}
           </select>
-          <input
-            required
-            placeholder={t("coursePlaceholder")}
+          <select
             value={form.course}
             onChange={(e) => setForm({ ...form, course: e.target.value })}
             className="h-9 rounded-full border border-input bg-background px-3 text-sm"
-          />
+          >
+            {Courses.map((c) => (
+              <option key={c} value={c}>
+                {tm("courses", c)}
+              </option>
+            ))}
+          </select>
           <input
             required
             placeholder={t("teacherPlaceholder")}
@@ -290,7 +294,7 @@ export default function TimetableEditPage() {
                 <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                   {formatMinutes(e.startMinute)} – {formatMinutes(e.endMinute)}
                 </div>
-                <div className="font-semibold">{e.course}</div>
+                <div className="font-semibold">{tm("courses", e.course)}</div>
                 <div className="text-sm text-muted-foreground">
                   {e.teacherName} · {e.teacherSchool}
                 </div>

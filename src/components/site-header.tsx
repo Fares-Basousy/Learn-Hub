@@ -1,20 +1,9 @@
 import Link from "next/link";
-import { useQuery } from "@tanstack/react-query";
 import { Moon, Sun, Languages } from "lucide-react";
-import { api } from "@/lib/api";
 import { useTheme } from "@/components/theme-provider";
 import { useLang } from "@/components/lang-provider";
 
-type Me = { user: { id: string; username: string } };
-
 export function SiteHeader() {
-  // const { data } = useQuery({
-  //   queryKey: ["me"],
-  //   queryFn: () => api<Me>("/api/auth/me").catch(() => null),
-  //   retry: false,
-  //   staleTime: 60_000,
-  // });
-  // const user = data?.user ?? null;
   const { theme, toggle: toggleTheme } = useTheme();
   const { lang, toggle: toggleLang, t } = useLang();
 

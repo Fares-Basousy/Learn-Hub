@@ -1,12 +1,10 @@
 'use client'
-import Image from "next/image";
 import { useEffect, useState } from "react";
 import { HeroFader } from "@/components/hero-fader";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { NewsSection } from "@/components/news-section";
 import { shortcuts } from "@/content/landing";
-import { api } from "@/lib/api";
 import { useLang } from "@/components/lang-provider";
 import {
   Select,
@@ -17,7 +15,7 @@ import {
 } from "@/components/ui/select";
 import { getTimetableEntries } from "../lib/actions/api/timetable/timetable-actions";
 import { getPublicOrganizations } from "../lib/actions/api/organizations/organizations-actions";
-import { TimetableEntry } from "../lib/types";
+import { Courses, TimetableEntry } from "../lib/types";
 import { CLASSROOMS, formatMinutes } from "../lib/timetable";
 
 type PublicOrganization = { id: string; name: string; subject: string; picUrl: string };
@@ -37,7 +35,7 @@ const PLACEHOLDER: TimetableEntry[] = CLASSROOMS.flatMap((c, ci) =>
         startMinute: start,
         endMinute: start + 120,
         grade: ((s % 12) + 1),
-        course: ["Math", "Science", "Arabic", "English"][(ci + s) % 4],
+        course: Courses[(ci + s) % Courses.length],
         teacherName: ["Mr. Ahmed", "Ms. Layla", "Mr. Omar", "Ms. Fatima"][(ci + d) % 4],
         teacherSchool: ["Al-Noor", "Bright Future", "Cedar High"][ci],
       };

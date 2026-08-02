@@ -12,6 +12,27 @@ export const Grades = {
   11 : "2nd Senior",
   12 : "3rd Senior",
 }
+
+export const Courses = [
+  "Biology",
+  "Chemistry",
+  "Math",
+  "Physics",
+  "Geography",
+  "Statistics",
+  "Economics",
+  "History",
+  "Programming",
+  "Psychiatry",
+  "Business",
+  "Accounting",
+  "Integrated Sciences",
+  "Philosophy",
+  "Religion",
+  "Second Language",
+  "Social Studies",
+] as const;
+
 export type Gender = "MALE" | "FEMALE";
 
 export type OrganizationInventory = {

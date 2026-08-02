@@ -34,12 +34,6 @@ function toBody(f: Form) {
 
 export default function NewsEditPage() {
   const { t } = useLang();
-  // const qc = useQueryClient();
-  // const { data, error } = useQuery({
-  //   queryKey: ["news"],
-  //   queryFn: () => api<{ items: NewsItem[] }>("/api/news"),
-  //   retry: false,
-  // });
   const [news, setNews] = useState<NewsItem[]>([])
   const [form, setForm] = useState<Form>(emptyForm);
   const [editingId, setEditingId] = useState<string | null>(null);
