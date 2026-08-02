@@ -28,9 +28,6 @@ export function SiteHeader() {
           <Link href="/" className="hidden text-muted-foreground hover:text-foreground sm:inline">
             {t("home")}
           </Link>
-          <Link href="/about" className="hidden text-muted-foreground hover:text-foreground sm:inline">
-            {t("about")}
-          </Link>
           <Link href="/contact" className="hidden text-muted-foreground hover:text-foreground sm:inline">
             {t("contact")}
           </Link>
@@ -38,7 +35,7 @@ export function SiteHeader() {
             type="button"
             onClick={toggleLang}
             aria-label={t("language")}
-            className="inline-flex h-9 items-center gap-1 rounded-md border border-input px-2 text-xs font-medium hover:bg-accent"
+            className="inline-flex h-9 items-center gap-1 rounded-full border border-input px-3 text-xs font-medium hover:bg-accent"
           >
             <Languages className="h-4 w-4" />
             {lang === "en" ? "ع" : "EN"}
@@ -47,7 +44,7 @@ export function SiteHeader() {
             type="button"
             onClick={toggleTheme}
             aria-label={t("theme")}
-            className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-input hover:bg-accent"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-input hover:bg-accent"
           >
             {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </button>
@@ -55,14 +52,14 @@ export function SiteHeader() {
            ? (
             <Link
               href="/dashboard"
-              className="rounded-md bg-primary px-3 py-1.5 font-medium text-primary-foreground hover:bg-primary/90"
+              className="rounded-full bg-primary px-4 py-1.5 font-medium text-primary-foreground hover:bg-primary/90"
             >
               {t("dashboard")}
             </Link>
           ) : (
             <Link
               href="/login"
-              className="rounded-md border border-input px-3 py-1.5 font-medium hover:bg-accent"
+              className="rounded-full border border-input px-4 py-1.5 font-medium hover:bg-accent"
             >
               {t("signIn")}
             </Link>

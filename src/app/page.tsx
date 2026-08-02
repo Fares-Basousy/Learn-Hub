@@ -5,7 +5,7 @@ import { HeroFader } from "@/components/hero-fader";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { NewsSection } from "@/components/news-section";
-import { orgSections, shortcuts } from "@/content/landing";
+import { shortcuts } from "@/content/landing";
 import { api } from "@/lib/api";
 import { useLang } from "@/components/lang-provider";
 import {
@@ -16,8 +16,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { getTimetableEntries } from "../lib/actions/api/timetable/timetable-actions";
+import { getPublicOrganizations } from "../lib/actions/api/organizations/organizations-actions";
 import { TimetableEntry } from "../lib/types";
 import { CLASSROOMS, formatMinutes } from "../lib/timetable";
+
+type PublicOrganization = { id: string; name: string; subject: string; picUrl: string };
 
 const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const SESSIONS = [0, 1, 2, 3];
@@ -45,6 +48,7 @@ export default function Home() {
   const [selectedDay, setSelectedDay] = useState(1);
   const { lang, t, tm } = useLang();
   const [timetables,setTimetables] = useState<TimetableEntry[]>([])
+  const [organizations, setOrganizations] = useState<PublicOrganization[]>([])
   useEffect(()=>{
     const intialLoad = async ()=>{
     const  data  = await getTimetableEntries()
@@ -52,10 +56,18 @@ export default function Home() {
     setTimetables(entries)
     }
     intialLoad()
-  
-  
+
+
   },[])
-  
+
+  useEffect(()=>{
+    const loadOrgs = async ()=>{
+      const data = await getPublicOrganizations()
+      setOrganizations(data?.organizations ?? [])
+    }
+    loadOrgs()
+  },[])
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       <SiteHeader />
@@ -112,35 +124,34 @@ export default function Home() {
 
         <section id="organizations" className="mx-auto max-w-6xl px-4 py-12">
           <h2 className="mb-6 text-2xl font-bold">{t("partners")}</h2>
-          <div className="space-y-6">
-            {orgSections.map((o, i) => (
-              <article
-                key={o.id}
-                className={`grid gap-6 overflow-hidden rounded-2xl border bg-card md:grid-cols-2 ${
-                  i % 2 === 1 ? "md:[&>div:first-child]:order-2" : ""
-                }`}
-              >
-                <div className="aspect-[4/3] overflow-hidden">
-                  <img
-                    src={o.image}
-                    alt={lang === "ar" ? o.name_ar ?? o.name : o.name}
-                    className="h-full w-full object-cover"
-                  />
-                </div>
-                <div className="flex flex-col justify-center p-6">
-                  <div className="text-xs font-semibold uppercase tracking-wider text-primary">
-                    {lang === "ar" ? o.subject_ar ?? o.subject : o.subject}
+          {organizations.length === 0 ? (
+            <p className="text-sm text-muted-foreground">{t("noOrganizationsYet")}</p>
+          ) : (
+            <div className="space-y-6">
+              {organizations.map((o, i) => (
+                <article
+                  key={o.id}
+                  className={`grid gap-6 overflow-hidden rounded-2xl border bg-card md:grid-cols-2 ${
+                    i % 2 === 1 ? "md:[&>div:first-child]:order-2" : ""
+                  }`}
+                >
+                  <div className="aspect-[4/3] overflow-hidden">
+                    <img
+                      src={o.picUrl}
+                      alt={o.name}
+                      className="washed h-full w-full object-cover"
+                    />
                   </div>
-                  <h3 className="mt-2 text-xl font-bold">
-                    {lang === "ar" ? o.name_ar ?? o.name : o.name}
-                  </h3>
-                  <p className="mt-3 text-sm text-muted-foreground">
-                    {lang === "ar" ? o.description_ar ?? o.description : o.description}
-                  </p>
-                </div>
-              </article>
-            ))}
-          </div>
+                  <div className="flex flex-col justify-center p-6">
+                    <div className="text-xs font-semibold uppercase tracking-wider text-primary">
+                      {o.subject}
+                    </div>
+                    <h3 className="mt-2 text-xl font-bold">{o.name}</h3>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
         </section>
       </main>
       <SiteFooter />

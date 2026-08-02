@@ -34,7 +34,7 @@ export default function AuthedLayout({ children }: { children: React.ReactNode }
 
           <button
             onClick={() => signOut({ callbackUrl: "/login" })}
-            className="ml-auto hidden shrink-0 rounded-md px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-foreground md:block"
+            className="ml-auto hidden shrink-0 rounded-full px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-foreground md:block"
           >
             Sign out
           </button>
@@ -43,7 +43,7 @@ export default function AuthedLayout({ children }: { children: React.ReactNode }
             onClick={() => setMenuOpen((v) => !v)}
             aria-label={menuOpen ? "Close menu" : "Open menu"}
             aria-expanded={menuOpen}
-            className="ml-auto flex h-10 w-10 shrink-0 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground md:hidden"
+            className="ml-auto flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-muted-foreground hover:bg-accent hover:text-foreground md:hidden"
           >
             {menuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
           </button>

@@ -148,14 +148,14 @@ function OrganizationsPageInner() {
           onChange={(e) => setForm({ ...form, name: e.target.value })}
           placeholder={t("namePlaceholder")}
           required
-          className="h-9 flex-1 rounded-md border border-input bg-background px-3 text-sm"
+          className="h-9 flex-1 rounded-full border border-input bg-background px-3 text-sm"
         />
         <input
           value={form.subject}
           onChange={(e) => setForm({ ...form, subject: e.target.value })}
           placeholder={t("subjectPlaceholder")}
           required
-          className="h-9 flex-1 rounded-md border border-input bg-background px-3 text-sm"
+          className="h-9 flex-1 rounded-full border border-input bg-background px-3 text-sm"
         />
         <input
           key={fileInputKey}
@@ -164,11 +164,11 @@ function OrganizationsPageInner() {
           disabled={uploading}
           onChange={(e) => handleImageChange(e.target.files?.[0])}
           required={!form.picUrl}
-          className="h-9 flex-1 rounded-md border border-input bg-background px-3 text-sm"
+          className="h-9 flex-1 rounded-full border border-input bg-background px-3 text-sm"
         />
         <button
           disabled={pending || uploading || !form.picUrl}
-          className="h-9 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
+          className="h-9 rounded-full bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
         >
           {t("add")}
         </button>

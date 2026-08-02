@@ -110,7 +110,7 @@ export default function SaleModal({
                   min={0}
                   value={item.codesCount}
                   onChange={(e) => updateItem(idx, { codesCount: e.target.value })}
-                  className="ml-2 h-9 w-20 rounded-md border border-input bg-background px-2 text-sm"
+                  className="ml-2 h-9 w-20 rounded-full border border-input bg-background px-3 text-sm"
                 />
               </label>
               <label className="text-xs text-muted-foreground">
@@ -120,13 +120,13 @@ export default function SaleModal({
                   min={0}
                   value={item.booksCount}
                   onChange={(e) => updateItem(idx, { booksCount: e.target.value })}
-                  className="ml-2 h-9 w-20 rounded-md border border-input bg-background px-2 text-sm"
+                  className="ml-2 h-9 w-20 rounded-full border border-input bg-background px-3 text-sm"
                 />
               </label>
               <select
                 value={item.orgId}
                 onChange={(e) => updateItem(idx, { orgId: e.target.value })}
-                className="h-9 min-w-0 max-w-full flex-1 rounded-md border border-input bg-background px-2 text-sm sm:flex-none"
+                className="h-9 min-w-0 max-w-full flex-1 rounded-full border border-input bg-background px-3 text-sm sm:flex-none"
               >
                 <option value="">{t("orgOptionPlaceholder")}</option>
                 {organizations.map((o) => (
@@ -140,7 +140,7 @@ export default function SaleModal({
                 <select
                   value={item.grade}
                   onChange={(e) => updateItem(idx, { grade: e.target.value })}
-                  className="ml-2 h-9 rounded-md border border-input bg-background px-2 text-sm"
+                  className="ml-2 h-9 rounded-full border border-input bg-background px-3 text-sm"
                 >
                   <option value="">{t("gradeOptionPlaceholder")}</option>
                   {Object.entries(Grades).map(([value, label]) => (
@@ -154,7 +154,7 @@ export default function SaleModal({
                 <button
                   type="button"
                   onClick={() => setItems((xs) => xs.filter((_, i) => i !== idx))}
-                  className="ml-auto h-9 rounded-md border px-3 text-sm"
+                  className="ml-auto h-9 rounded-full border px-3 text-sm"
                 >
                   −
                 </button>
@@ -180,7 +180,7 @@ export default function SaleModal({
               <select
                 value={student.orgId}
                 onChange={(e) => setStudent({ ...student, orgId: e.target.value })}
-                className="h-9 rounded-md border border-input bg-background px-2 text-sm"
+                className="h-9 rounded-full border border-input bg-background px-3 text-sm"
               >
                 <option value="">{t("orgOptionPlaceholder")}</option>
                 {organizations.map((o) => (
@@ -192,7 +192,7 @@ export default function SaleModal({
               <select
                 value={student.gender}
                 onChange={(e) => setStudent({ ...student, gender: e.target.value as Gender })}
-                className="h-9 rounded-md border border-input bg-background px-2 text-sm"
+                className="h-9 rounded-full border border-input bg-background px-3 text-sm"
               >
                 <option value="MALE">{t("male")}</option>
                 <option value="FEMALE">{t("female")}</option>
@@ -201,18 +201,18 @@ export default function SaleModal({
                 placeholder={t("namePlaceholder")}
                 value={student.name}
                 onChange={(e) => setStudent({ ...student, name: e.target.value })}
-                className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+                className="h-9 rounded-full border border-input bg-background px-3 text-sm"
               />
               <input
                 placeholder={t("studentNumberPlaceholder")}
                 value={student.number}
                 onChange={(e) => setStudent({ ...student, number: e.target.value })}
-                className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+                className="h-9 rounded-full border border-input bg-background px-3 text-sm"
               />
               <select
                 value={student.grade}
                 onChange={(e) => setStudent({ ...student, grade: e.target.value })}
-                className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+                className="h-9 rounded-full border border-input bg-background px-3 text-sm"
               >
                 <option value="">{t("gradeOptionPlaceholder")}</option>
                 {Object.entries(Grades).map(([value, label]) => (
@@ -225,20 +225,20 @@ export default function SaleModal({
                 placeholder={t("schoolPlaceholder")}
                 value={student.school}
                 onChange={(e) => setStudent({ ...student, school: e.target.value })}
-                className="h-9 rounded-md border border-input bg-background px-3 text-sm"
+                className="h-9 rounded-full border border-input bg-background px-3 text-sm"
               />
             </div>
           )}
         </div>
 
         <div className="mt-4 flex justify-end gap-2">
-          <button onClick={onClose} className="h-9 rounded-md px-3 text-sm text-muted-foreground hover:bg-accent">
+          <button onClick={onClose} className="h-9 rounded-full px-3 text-sm text-muted-foreground hover:bg-accent">
             {t("cancel")}
           </button>
           <button
             onClick={submit}
             disabled={pending || !validItems || !validStudent}
-            className="h-9 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
+            className="h-9 rounded-full bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
           >
             {pending ? t("saving") : t("recordSale")}
           </button>

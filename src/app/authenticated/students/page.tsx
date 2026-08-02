@@ -158,7 +158,7 @@ function StudentsPageInner({
           required
           value={form.orgId}
           onChange={(e) => setForm({ ...form, orgId: e.target.value })}
-          className="h-9 rounded-md border border-input bg-background px-2 text-sm"
+          className="h-9 rounded-full border border-input bg-background px-3 text-sm"
         >
           <option value="">{t("orgOptionPlaceholder")}</option>
           {organizations?.map((o) => (
@@ -172,20 +172,20 @@ function StudentsPageInner({
           placeholder={t("namePlaceholder")}
           value={form.name}
           onChange={(e) => setForm({ ...form, name: e.target.value })}
-          className="h-9 rounded-md border border-input bg-background px-2 text-sm"
+          className="h-9 rounded-full border border-input bg-background px-3 text-sm"
         />
         <input
           required
           placeholder={t("numberPlaceholder")}
           value={form.number}
           onChange={(e) => setForm({ ...form, number: e.target.value })}
-          className="h-9 rounded-md border border-input bg-background px-2 text-sm"
+          className="h-9 rounded-full border border-input bg-background px-3 text-sm"
         />
         <select
           required
           value={form.grade}
           onChange={(e) => setForm({ ...form, grade: e.target.value })}
-          className="h-9 rounded-md border border-input bg-background px-2 text-sm"
+          className="h-9 rounded-full border border-input bg-background px-3 text-sm"
         >
           <option value="">{t("gradeOptionPlaceholder")}</option>
           {Object.entries(Grades).map(([value, label]) => (
@@ -199,12 +199,12 @@ function StudentsPageInner({
           placeholder={t("schoolPlaceholder")}
           value={form.school}
           onChange={(e) => setForm({ ...form, school: e.target.value })}
-          className="h-9 rounded-md border border-input bg-background px-2 text-sm"
+          className="h-9 rounded-full border border-input bg-background px-3 text-sm"
         />
         <select
           value={form.gender}
           onChange={(e) => setForm({ ...form, gender: e.target.value as Gender })}
-          className="h-9 rounded-md border border-input bg-background px-2 text-sm"
+          className="h-9 rounded-full border border-input bg-background px-3 text-sm"
         >
           <option value="MALE">{t("male")}</option>
           <option value="FEMALE">{t("female")}</option>
@@ -213,11 +213,11 @@ function StudentsPageInner({
           placeholder={t("typeOptionalPlaceholder")}
           value={form.type}
           onChange={(e) => setForm({ ...form, type: e.target.value })}
-          className="h-9 rounded-md border border-input bg-background px-2 text-sm"
+          className="h-9 rounded-full border border-input bg-background px-3 text-sm"
         />
         <button
           disabled={pending}
-          className="h-9 rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
+          className="h-9 rounded-full bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
         >
           {t("add")}
         </button>

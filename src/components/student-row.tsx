@@ -84,21 +84,21 @@ export default function StudentRow({ student, onDelete, onUpdate }: StudentRowPr
                       <input
                         value={form.name}
                         onChange={(e) => setForm({ ...form, name: e.target.value })}
-                        className="h-8 w-full rounded-md border border-input bg-background px-2 text-sm"
+                        className="h-8 w-full rounded-full border border-input bg-background px-3 text-sm"
                       />
                     </td>
                     <td className="p-2">
                       <input
                         value={form.number}
                         onChange={(e) => setForm({ ...form, number: e.target.value })}
-                        className="h-8 w-full rounded-md border border-input bg-background px-2 text-sm"
+                        className="h-8 w-full rounded-full border border-input bg-background px-3 text-sm"
                       />
                     </td>
                     <td className="p-2">
                       <select
                         value={form.grade}
                         onChange={(e) => setForm({ ...form, grade: Number(e.target.value) })}
-                        className="h-8 w-full rounded-md border border-input bg-background px-2 text-sm"
+                        className="h-8 w-full rounded-full border border-input bg-background px-3 text-sm"
                       >
                         {Object.entries(Grades).map(([value, label]) => (
                           <option key={value} value={value}>
@@ -111,7 +111,7 @@ export default function StudentRow({ student, onDelete, onUpdate }: StudentRowPr
                       <input
                         value={form.school}
                         onChange={(e) => setForm({ ...form, school: e.target.value })}
-                        className="h-8 w-full rounded-md border border-input bg-background px-2 text-sm"
+                        className="h-8 w-full rounded-full border border-input bg-background px-3 text-sm"
                       />
                     </td>
                   </>

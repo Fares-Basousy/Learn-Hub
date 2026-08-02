@@ -132,13 +132,13 @@ export default function OrganizationDetailPage() {
                 <input
                   value={form.name}
                   onChange={(e) => setForm({ ...form, name: e.target.value })}
-                  className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm font-semibold"
+                  className="h-9 w-full rounded-full border border-input bg-background px-3 text-sm font-semibold"
                   placeholder={t("namePlaceholder")}
                 />
                 <input
                   value={form.subject}
                   onChange={(e) => setForm({ ...form, subject: e.target.value })}
-                  className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm"
+                  className="h-9 w-full rounded-full border border-input bg-background px-3 text-sm"
                   placeholder={t("subjectPlaceholder")}
                 />
                 <input
@@ -146,7 +146,7 @@ export default function OrganizationDetailPage() {
                   accept="image/*"
                   disabled={uploading}
                   onChange={(e) => handleImageChange(e.target.files?.[0])}
-                  className="h-9 w-full rounded-md border border-input bg-background px-2 text-sm"
+                  className="h-9 w-full rounded-full border border-input bg-background px-2 text-sm"
                 />
                 {form.picUrl && (
                   // eslint-disable-next-line @next/next/no-img-element
@@ -172,7 +172,7 @@ export default function OrganizationDetailPage() {
               <button
                 disabled={pending || uploading}
                 onClick={save}
-                className="h-8 rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
+                className="h-8 rounded-full bg-primary px-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
               >
                 {t("save")}
               </button>
@@ -182,7 +182,7 @@ export default function OrganizationDetailPage() {
                   setIsEditing(false)
                   setForm({ name: organization.name, subject: organization.subject, picUrl: organization.picUrl ?? "" })
                 }}
-                className="h-8 rounded-md px-3 text-sm text-muted-foreground hover:bg-accent"
+                className="h-8 rounded-full px-3 text-sm text-muted-foreground hover:bg-accent"
               >
                 {t("cancel")}
               </button>
@@ -190,7 +190,7 @@ export default function OrganizationDetailPage() {
           ) : (
             <button
               onClick={() => setIsEditing(true)}
-              className="h-8 rounded-md px-3 text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
+              className="h-8 rounded-full px-3 text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
             >
               {t("edit")}
             </button>

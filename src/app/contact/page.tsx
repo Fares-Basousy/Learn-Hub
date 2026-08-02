@@ -3,6 +3,7 @@
 import Head from "next/head";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { ContactInfoBlock } from "@/components/contact-info";
 import { useLang } from "@/components/lang-provider";
 
 export default function ContactPage() {
@@ -34,6 +35,9 @@ export default function ContactPage() {
           <p className="mt-4 text-muted-foreground">
             {t("contactBody")}
           </p>
+          <div className="mt-8">
+            <ContactInfoBlock />
+          </div>
         </main>
         <SiteFooter />
       </div>

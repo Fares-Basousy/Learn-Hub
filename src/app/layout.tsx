@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Caprasimo, Figtree } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import './globals.css'
 import appCSS from './globals.css'
@@ -7,14 +7,15 @@ import { ThemeProvider } from "../components/theme-provider";
 import { LangProvider } from "../components/lang-provider";
 import { AuthSessionProvider } from "../components/session-provider";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const figtree = Figtree({
+  variable: "--font-figtree",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const caprasimo = Caprasimo({
+  variable: "--font-caprasimo",
   subsets: ["latin"],
+  weight: "400",
 });
 
 export const links = () => [
@@ -61,7 +62,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`min-h-full flex flex-col ${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
+    <html lang="en" className={`min-h-full flex flex-col ${figtree.variable} ${caprasimo.variable} h-full antialiased`}>
       <body>
     {/* <QueryClientProvider client={queryClient}> */}
       <AuthSessionProvider>

@@ -15,21 +15,21 @@ export function HeroFader() {
           key={s.src}
           src={s.src}
           alt={s.alt}
-          className={`absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ease-in-out ${
+          className={`washed absolute inset-0 h-full w-full object-cover transition-opacity duration-1000 ease-in-out ${
             idx === i ? "opacity-100" : "opacity-0"
           }`}
         />
       ))}
-      <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/30 to-black/70" />
-      <div className="relative z-10 flex h-full flex-col items-center justify-end px-6 pb-16 text-center text-white">
-        <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">
+      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-black/10" />
+      <div className="relative z-10 mx-auto flex h-full max-w-6xl flex-col items-start justify-end px-6 pb-16 text-left text-white">
+        <h1 className="max-w-2xl text-4xl tracking-tight sm:text-5xl md:text-6xl">
           Learning, distribution, everything in one place
         </h1>
-        <p className="mt-4 max-w-2xl text-base text-white/85 sm:text-lg">
+        <p className="mt-4 max-w-xl text-base text-white/85 sm:text-lg">
           Timetables, partner schools, and inventory management for our network.
         </p>
       </div>
-      <div className="absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 gap-2">
+      <div className="absolute bottom-4 left-6 z-10 flex gap-2">
         {heroSlides.map((_, idx) => (
           <span
             key={idx}

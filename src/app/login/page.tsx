@@ -58,7 +58,7 @@ export default function LoginPage() {
               onChange={(e) => setEmail(e.target.value)}
               required
               autoComplete="email"
-              className="mt-1 h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+              className="mt-1 h-10 w-full rounded-full border border-input bg-background px-3 text-sm"
             />
           </div>
           <div>
@@ -69,14 +69,14 @@ export default function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               required
               autoComplete="current-password"
-              className="mt-1 h-10 w-full rounded-md border border-input bg-background px-3 text-sm"
+              className="mt-1 h-10 w-full rounded-full border border-input bg-background px-3 text-sm"
             />
           </div>
           {err && <p className="text-sm text-destructive">{err}</p>}
           <button
             type="submit"
             disabled={isPending}
-            className="h-10 w-full rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
+            className="h-10 w-full rounded-full bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
           >
             {isPending ? t("signingIn") : t("signIn")}
           </button>

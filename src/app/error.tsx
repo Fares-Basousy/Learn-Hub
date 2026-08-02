@@ -16,7 +16,7 @@ export default function Error() {
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <Link
             href="/"
-            className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
+            className="inline-flex items-center justify-center rounded-full border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
           >
             Go home
           </Link>

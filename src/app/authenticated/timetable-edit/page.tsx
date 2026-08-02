@@ -174,7 +174,7 @@ export default function TimetableEditPage() {
 
       <button
         onClick={() => (formOpen ? setFormOpen(false) : openAddForm())}
-        className="mt-4 h-9 w-full rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground hover:bg-primary/90"
+        className="mt-4 h-9 w-full rounded-full bg-primary px-3 text-sm font-medium text-primary-foreground hover:bg-primary/90"
       >
         {formOpen ? t("cancel") : t("addEntry")}
       </button>
@@ -190,7 +190,7 @@ export default function TimetableEditPage() {
           <select
             value={form.classroom}
             onChange={(e) => setForm({ ...form, classroom: e.target.value })}
-            className="h-9 rounded-md border border-input bg-background px-2 text-sm"
+            className="h-9 rounded-full border border-input bg-background px-3 text-sm"
           >
             {CLASSROOMS.map((c) => (
               <option key={c}>{c}</option>
@@ -199,7 +199,7 @@ export default function TimetableEditPage() {
           <select
             value={form.dayOfWeek}
             onChange={(e) => setForm({ ...form, dayOfWeek: Number(e.target.value) })}
-            className="h-9 rounded-md border border-input bg-background px-2 text-sm"
+            className="h-9 rounded-full border border-input bg-background px-3 text-sm"
           >
             {DAY_INDICES.map((i) => (
               <option key={i} value={i}>
@@ -218,7 +218,7 @@ export default function TimetableEditPage() {
                 endMinute: startMinute + Math.max(duration, MIN_DURATION_MINUTES),
               });
             }}
-            className="h-9 rounded-md border border-input bg-background px-2 text-sm"
+            className="h-9 rounded-full border border-input bg-background px-3 text-sm"
           >
             {startTimeOptions().map((m) => (
               <option key={m} value={m}>
@@ -231,7 +231,7 @@ export default function TimetableEditPage() {
             onChange={(e) =>
               setForm({ ...form, endMinute: form.startMinute + Number(e.target.value) })
             }
-            className="h-9 rounded-md border border-input bg-background px-2 text-sm"
+            className="h-9 rounded-full border border-input bg-background px-3 text-sm"
           >
             {durationOptions(form.startMinute).map((d) => (
               <option key={d} value={d}>
@@ -242,7 +242,7 @@ export default function TimetableEditPage() {
           <select
             value={form.grade}
             onChange={(e) => setForm({ ...form, grade: Number(e.target.value) })}
-            className="h-9 rounded-md border border-input bg-background px-2 text-sm"
+            className="h-9 rounded-full border border-input bg-background px-3 text-sm"
           >
             {Object.entries(Grades).map(([value, label]) => (
               <option key={value} value={value}>
@@ -255,23 +255,23 @@ export default function TimetableEditPage() {
             placeholder={t("coursePlaceholder")}
             value={form.course}
             onChange={(e) => setForm({ ...form, course: e.target.value })}
-            className="h-9 rounded-md border border-input bg-background px-2 text-sm"
+            className="h-9 rounded-full border border-input bg-background px-3 text-sm"
           />
           <input
             required
             placeholder={t("teacherPlaceholder")}
             value={form.teacherName}
             onChange={(e) => setForm({ ...form, teacherName: e.target.value })}
-            className="h-9 rounded-md border border-input bg-background px-2 text-sm"
+            className="h-9 rounded-full border border-input bg-background px-3 text-sm"
           />
           <input
             required
             placeholder={t("teacherSchoolPlaceholder")}
             value={form.teacherSchool}
             onChange={(e) => setForm({ ...form, teacherSchool: e.target.value })}
-            className="h-9 rounded-md border border-input bg-background px-2 text-sm"
+            className="h-9 rounded-full border border-input bg-background px-3 text-sm"
           />
-          <button className="col-span-2 h-9 rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground hover:bg-primary/90">
+          <button className="col-span-2 h-9 rounded-full bg-primary px-3 text-sm font-medium text-primary-foreground hover:bg-primary/90">
             {editingId ? t("save") : t("add")}
           </button>
         </form>

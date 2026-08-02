@@ -161,7 +161,7 @@ useEffect(()=>{
     });
   }
 
-  const inputCls = "h-9 w-full rounded-md border border-input bg-background px-2 text-sm";
+  const inputCls = "h-9 w-full rounded-full border border-input bg-background px-3 text-sm";
 
   return (
     <div className="mx-auto max-w-4xl">
@@ -193,7 +193,7 @@ useEffect(()=>{
           <textarea
             value={form.body}
             onChange={(e) => setForm({ ...form, body: e.target.value })}
-            className="min-h-[70px] w-full rounded-md border border-input bg-background p-2 text-sm"
+            className="min-h-[70px] w-full rounded-2xl border border-input bg-background p-3 text-sm"
           />
         </label>
         <label className="text-xs font-medium sm:col-span-2">
@@ -236,7 +236,7 @@ useEffect(()=>{
         <div className="flex items-center gap-2 sm:col-span-2">
           <button
             disabled={pending || uploading}
-            className="h-9 rounded-md bg-primary px-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
+            className="h-9 rounded-full bg-primary px-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
           >
             {editingId ? t("saveChanges") : t("addNews")}
           </button>
@@ -248,7 +248,7 @@ useEffect(()=>{
                 setEditingId(null);
                 setForm(emptyForm);
               }}
-              className="h-9 rounded-md border border-input px-3 text-sm hover:bg-accent"
+              className="h-9 rounded-full border border-input px-3 text-sm hover:bg-accent"
             >
               {t("cancel")}
             </button>

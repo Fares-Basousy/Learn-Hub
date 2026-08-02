@@ -46,6 +46,19 @@ export async function getOrganizations(pageIndex: number) {
   }
 }
 
+// Public, unauthenticated list for the landing page — no inventory/business data included.
+export async function getPublicOrganizations() {
+  try {
+    const organizations = await prisma.organization.findMany({
+      orderBy: { name: "asc" },
+      select: { id: true, name: true, subject: true, picUrl: true },
+    });
+    return { organizations };
+  } catch (e) {
+    return { organizations: [] as Pick<Organization, "id" | "name" | "subject" | "picUrl">[], warning: (e as Error).message };
+  }
+}
+
 // Full, unpaginated list — used to populate org dropdowns (students form, sales form, etc).
 export async function getOrganizationsAdmin() {
   await requireUser();

@@ -4,7 +4,6 @@ export const translations = {
   en: {
     brand: "School Hub",
     home: "Home",
-    about: "About",
     contact: "Contact",
     signIn: "Sign in",
     signOut: "Sign out",
@@ -23,9 +22,6 @@ export const translations = {
     admin: "Admin",
     selectDay: "Select a day",
     classroom: "Classroom",
-    aboutTitle: "About us",
-    aboutBody:
-      "Placeholder text. Describe your organization, its mission, and history here.",
     address: "Address",
     openInMaps: "Open in Google Maps",
     callUs: "Call us",
@@ -163,7 +159,6 @@ export const translations = {
   ar: {
     brand: "سنتر الفردوس",
     home: "الرئيسية",
-    about: "من نحن",
     contact: "اتصل بنا",
     signIn: "تسجيل الدخول",
     signOut: "تسجيل الخروج",
@@ -182,8 +177,6 @@ export const translations = {
     admin: "الإدارة",
     selectDay: "اختر يومًا",
     classroom: "فصل",
-    aboutTitle: "من نحن",
-    aboutBody: "نص مؤقت. صف مؤسستك ورسالتها وتاريخها هنا.",
     address: "العنوان",
     openInMaps: "افتح في خرائط جوجل",
     callUs: "اتصل بنا",
