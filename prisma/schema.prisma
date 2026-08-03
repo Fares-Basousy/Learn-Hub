@@ -52,29 +52,54 @@ model Student {
 }
 
 model Organization {
-  id        String                   @id @default(uuid())
-  name      String
-  subject   String
-  picUrl    String
-  students  Student[]
-  inventory OrganizationInventory[]
-  saleItems SaleItem[]
-  createdAt DateTime                 @default(now())
+  id            String                   @id @default(uuid())
+  name          String
+  subject       String
+  picUrl        String
+  students      Student[]
+  inventory     OrganizationInventory[]
+  bookInventory BookInventory[]
+  saleItems     SaleItem[]
+  createdAt     DateTime                 @default(now())
 
   @@map("organizations")
 }
 
-// One row per (org, grade) pair — keeps book/code counts from mixing across grades.
+// One row per (org, grade) pair — codes aren't edition-specific, so a single count suffices.
 model OrganizationInventory {
   id         String       @id @default(uuid())
   org        Organization @relation(fields: [orgId], references: [id])
   orgId      String
   grade      Int
-  booksCount Int          @default(0)
   codesCount Int          @default(0)
 
   @@unique([orgId, grade])
   @@map("organization_inventory")
+}
+
+// A reusable, shared catalog of book editions (e.g. "Chapter 1", "Revision 2") — not org-specific.
+model BookEdition {
+  id        String          @id @default(uuid())
+  name      String          @unique
+  createdAt DateTime        @default(now())
+  inventory BookInventory[]
+  saleItems SaleItem[]
+
+  @@map("book_editions")
+}
+
+// One row per (org, grade, edition) triple — books are tracked per specific edition.
+model BookInventory {
+  id        String       @id @default(uuid())
+  org       Organization @relation(fields: [orgId], references: [id])
+  orgId     String
+  grade     Int
+  edition   BookEdition  @relation(fields: [editionId], references: [id])
+  editionId String
+  count     Int          @default(0)
+
+  @@unique([orgId, grade, editionId])
+  @@map("book_inventory")
 }
 
 model TimetableEntry {
@@ -117,7 +142,7 @@ model Sale {
   @@map("sales")
 }
 
-// A single line item within a sale — e.g. "2 books + 3 codes from org_2, grade 11".
+// A single line item within a sale — e.g. "2 books (Chapter 1) + 3 codes from org_2, grade 11".
 model SaleItem {
   id         String       @id @default(uuid())
   sale       Sale         @relation(fields: [saleId], references: [id])
@@ -125,6 +150,8 @@ model SaleItem {
   org        Organization @relation(fields: [orgId], references: [id])
   orgId      String
   grade      Int
+  edition    BookEdition? @relation(fields: [editionId], references: [id])
+  editionId  String?
   booksCount Int          @default(0)
   codesCount Int          @default(0)
 

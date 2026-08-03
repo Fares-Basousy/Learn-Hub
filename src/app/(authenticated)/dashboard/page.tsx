@@ -8,6 +8,7 @@ import { getGradeCounts } from "@/src/lib/actions/api/students/student-actions";
 import { getPosts } from "@/src/lib/actions/api/news/news-actions";
 import { Grades, NewsItem, Organization, Sale } from "@/src/lib/types";
 import { useLang } from "@/components/lang-provider";
+import { PageLoader } from "@/components/spinner";
 
 type GradeCount = { grade: number; count: number };
 
@@ -18,6 +19,7 @@ export default function DashboardPage() {
   const [news, setNews] = useState<NewsItem[]>([]);
   const [gradeCounts, setGradeCounts] = useState<GradeCount[]>([]);
   const [error, setError] = useState<Error>();
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const load = async () => {
@@ -34,6 +36,8 @@ export default function DashboardPage() {
         setNews(newsData?.items ?? []);
       } catch (e) {
         setError(e as Error);
+      } finally {
+        setLoading(false);
       }
     };
     load();
@@ -50,8 +54,11 @@ export default function DashboardPage() {
         </div>
       )}
 
+      {loading ? (
+        <PageLoader />
+      ) : (
       <div className="mt-6 grid gap-4 sm:grid-cols-2">
-        <Section title={t("news")} moreLabel={t("moreDetails")} moreHref="/authenticated/news-edit">
+        <Section title={t("news")} moreLabel={t("moreDetails")} moreHref="/news-edit">
           <ul className="divide-y">
             {news.slice(0, 5).map((n) => (
               <li key={n.id} className="p-2 text-sm">
@@ -65,11 +72,11 @@ export default function DashboardPage() {
           </ul>
         </Section>
 
-        <Section title={t("organizations")} moreLabel={t("moreDetails")} moreHref="/authenticated/organizations">
+        <Section title={t("organizations")} moreLabel={t("moreDetails")} moreHref="/organizations">
           <ul className="divide-y">
             {orgs.slice(0, 5).map((o) => (
               <li key={o.id} className="p-2 text-sm">
-                <Link href={`/authenticated/organizations/${o.id}`} className="font-medium hover:underline">
+                <Link href={`/organizations/${o.id}`} className="font-medium hover:underline">
                   {o.name}
                 </Link>
                 <div className="text-xs text-muted-foreground">{o.subject}</div>
@@ -79,7 +86,7 @@ export default function DashboardPage() {
           </ul>
         </Section>
 
-        <Section title={t("latestSales")} moreLabel={t("moreDetails")} moreHref="/authenticated/sales-index">
+        <Section title={t("latestSales")} moreLabel={t("moreDetails")} moreHref="/sales-index">
           <ul className="divide-y">
             {sales.slice(0, 5).map((s) => (
               <li key={s.id} className="p-2 text-sm">
@@ -91,7 +98,7 @@ export default function DashboardPage() {
                 </div>
                 <div className="text-xs text-muted-foreground">
                   {s.items
-                    .map((i) => `${i.booksCount} ${t("booksWord")} / ${i.codesCount} ${t("codesWord")} — ${i.org?.name ?? i.orgId.slice(0, 8)}`)
+                    .map((i) => `${i.booksCount} ${t("booksWord")}${i.booksCount > 0 && i.edition?.name ? ` (${i.edition.name})` : ""} / ${i.codesCount} ${t("codesWord")} — ${i.org?.name ?? i.orgId.slice(0, 8)}`)
                     .join(", ")}
                 </div>
               </li>
@@ -100,12 +107,12 @@ export default function DashboardPage() {
           </ul>
         </Section>
 
-        <Section title={t("gradesWithTenPlus")} moreLabel={t("moreDetails")} moreHref="/authenticated/students">
+        <Section title={t("gradesWithTenPlus")} moreLabel={t("moreDetails")} moreHref="/students">
           <ul className="divide-y">
             {gradeCounts.map((g) => (
               <li key={g.grade} className="flex items-center justify-between p-2 text-sm">
                 <Link
-                  href={`/authenticated/students?grade=${g.grade}`}
+                  href={`/students?grade=${g.grade}`}
                   className="font-medium hover:underline"
                 >
                   {Grades[g.grade as keyof typeof Grades] ?? `${t("colGrade")} ${g.grade}`}
@@ -117,6 +124,7 @@ export default function DashboardPage() {
           </ul>
         </Section>
       </div>
+      )}
     </div>
   );
 }

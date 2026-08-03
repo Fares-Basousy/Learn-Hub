@@ -21,6 +21,8 @@ async function main() {
   await prisma.sale.deleteMany();
   await prisma.action.deleteMany();
   await prisma.student.deleteMany();
+  await prisma.bookInventory.deleteMany();
+  await prisma.bookEdition.deleteMany();
   await prisma.organizationInventory.deleteMany();
   await prisma.organization.deleteMany();
   await prisma.news.deleteMany();
@@ -48,6 +50,13 @@ async function main() {
     { name: "Al-Rawda Institute", subject: "Mathematics" },
   ];
 
+  console.log("Seeding book editions…");
+  const editions = await Promise.all(
+    ["Chapter 1", "Chapter 2", "Chapter 3", "Revision 1", "Revision 2"].map((name) =>
+      prisma.bookEdition.create({ data: { name } }),
+    ),
+  );
+
   const organizations = [];
   for (let i = 0; i < orgNames.length; i++) {
     const { name, subject } = orgNames[i];
@@ -67,10 +76,21 @@ async function main() {
         data: {
           orgId: org.id,
           grade,
-          booksCount: 10 + Math.floor(Math.random() * 50),
           codesCount: 10 + Math.floor(Math.random() * 50),
         },
       });
+      // Stock 1-3 editions of books for this org/grade.
+      const editionsForGrade = [...editions].sort(() => Math.random() - 0.5).slice(0, 1 + Math.floor(Math.random() * 3));
+      for (const edition of editionsForGrade) {
+        await prisma.bookInventory.create({
+          data: {
+            orgId: org.id,
+            grade,
+            editionId: edition.id,
+            count: 10 + Math.floor(Math.random() * 50),
+          },
+        });
+      }
     }
   }
 
@@ -97,6 +117,7 @@ async function main() {
 
   console.log("Seeding sales…");
   const inventory = await prisma.organizationInventory.findMany();
+  const bookInventory = await prisma.bookInventory.findMany();
   for (let i = 0; i < 8; i++) {
     const itemCount = 1 + Math.floor(Math.random() * 2);
     const chosen = new Set<string>();
@@ -106,11 +127,14 @@ async function main() {
       const key = `${inv.orgId}-${inv.grade}`;
       if (chosen.has(key)) continue;
       chosen.add(key);
+      const booksCount = Math.floor(Math.random() * 4);
+      const editionForGrade = bookInventory.find((bi) => bi.orgId === inv.orgId && bi.grade === inv.grade);
       items.push({
         orgId: inv.orgId,
         grade: inv.grade,
-        booksCount: Math.floor(Math.random() * 4),
+        booksCount: editionForGrade ? booksCount : 0,
         codesCount: Math.floor(Math.random() * 4),
+        editionId: booksCount > 0 && editionForGrade ? editionForGrade.editionId : undefined,
       });
     }
     await prisma.sale.create({

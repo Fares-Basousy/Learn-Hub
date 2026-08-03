@@ -5,6 +5,7 @@ import { NewsItem } from "@/src/lib/types";
 import { createPost, deletePost, getPosts, updatePost } from "@/src/lib/actions/api/news/news-actions";
 import { uploadImage } from "@/src/lib/actions/api/upload/upload-actions";
 import { useLang } from "@/components/lang-provider";
+import { PageLoader } from "@/components/spinner";
 export type Form = {
   title: string;
   body: string;
@@ -39,6 +40,7 @@ export default function NewsEditPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [pending, setPending] = useState(false)
   const [uploading, setUploading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [refresh, setRefresh] = useState(false)
 
   const handleImageChange = async (file: File | undefined) => {
@@ -48,10 +50,10 @@ export default function NewsEditPage() {
     setUploading(true);
     try {
       const { url } = await toast.promise(uploadImage(formData), {
-        loading: "Uploading image…",
-        success: "Image uploaded",
+        loading: t("uploadingImage"),
+        success: t("imageUploaded"),
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        error: (e: any) => e.message ?? "Failed to upload image",
+        error: (e: any) => e.message ?? t("failedToUploadImage"),
       });
       setForm((f) => ({ ...f, imageUrl: url }));
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -63,13 +65,17 @@ export default function NewsEditPage() {
   };
 useEffect(()=>{
           const Load = async ()=>{
+              setLoading(true)
               try{
                 const  data  = await getPosts()
                 setNews(data?.items ?? [])
               }
               // eslint-disable-next-line @typescript-eslint/no-explicit-any
               catch(e : any){
-                toast.error(e.message ?? "Failed to load news")
+                toast.error(e.message ?? t("failedToLoadNews"))
+              }
+              finally {
+                setLoading(false)
               }
               }
               Load()
@@ -82,10 +88,10 @@ useEffect(()=>{
         });
       try{
           await toast.promise(createPost(formData), {
-            loading: "Adding news…",
-            success: "News added",
+            loading: t("addingNews"),
+            success: t("newsAdded"),
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            error: (e: any) => e.message ?? "Failed to add news",
+            error: (e: any) => e.message ?? t("failedToAddNews"),
           })
           setForm(emptyForm)
           setRefresh(!refresh)
@@ -107,10 +113,10 @@ useEffect(()=>{
         });
       try{
           await toast.promise(updatePost(formData, id), {
-            loading: "Saving…",
-            success: "News updated",
+            loading: t("saving"),
+            success: t("newsUpdated"),
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            error: (e: any) => e.message ?? "Failed to update news",
+            error: (e: any) => e.message ?? t("failedToUpdateNews"),
           })
           setForm(emptyForm)
           setRefresh(!refresh)
@@ -128,10 +134,10 @@ useEffect(()=>{
       setPending(true)
       try{
           await toast.promise(deletePost(id), {
-            loading: "Deleting news…",
-            success: "News deleted",
+            loading: t("deletingNews"),
+            success: t("newsDeleted"),
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            error: (e: any) => e.message ?? "Failed to delete news",
+            error: (e: any) => e.message ?? t("failedToDeleteNews"),
           })
           setRefresh(!refresh)
         }
@@ -251,7 +257,8 @@ useEffect(()=>{
       </form>
 
       <div className="mt-6 space-y-3">
-        {(news ?? []).map((n) => (
+        {loading && <PageLoader />}
+        {!loading && (news ?? []).map((n) => (
           <div key={n.id} className="flex gap-3 rounded-lg border bg-card p-3">
             {n.imageUrl && (
               <img
@@ -289,7 +296,7 @@ useEffect(()=>{
              </div>
            </div>
          ))}
-        {news && news?.length === 0 && (
+        {!loading && news && news?.length === 0 && (
           <div className="rounded-lg border bg-card p-6 text-center text-sm text-muted-foreground">
             {t("noNewsYet")}
           </div>

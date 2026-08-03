@@ -1,14 +1,31 @@
 "use client"
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { createSale } from "@/src/lib/actions/api/sales/sales-actions";
 import { createStudent } from "@/src/lib/actions/api/students/student-actions";
-import { Gender, Grades, Organization } from "@/src/lib/types";
+import { getBookEditions } from "@/src/lib/actions/api/books/book-actions";
+import { BookEdition, Gender, Grades, Organization } from "@/src/lib/types";
 import { useLang } from "@/components/lang-provider";
 
-type SaleItemInput = { codesCount: string; booksCount: string; orgId: string; grade: string };
+const OTHER_EDITION = "__other__";
 
-const emptyItem = (): SaleItemInput => ({ codesCount: "0", booksCount: "0", orgId: "", grade: "" });
+type SaleItemInput = {
+  codesCount: string;
+  booksCount: string;
+  orgId: string;
+  grade: string;
+  editionId: string;
+  newEditionName: string;
+};
+
+const emptyItem = (): SaleItemInput => ({
+  codesCount: "0",
+  booksCount: "0",
+  orgId: "",
+  grade: "",
+  editionId: "",
+  newEditionName: "",
+});
 
 export default function SaleModal({
   organizations,
@@ -21,6 +38,7 @@ export default function SaleModal({
 }) {
   const { t } = useLang();
   const [items, setItems] = useState<SaleItemInput[]>([emptyItem()]);
+  const [editions, setEditions] = useState<BookEdition[]>([]);
   const [addStudent, setAddStudent] = useState(false);
   const [student, setStudent] = useState({
     orgId: "",
@@ -32,12 +50,30 @@ export default function SaleModal({
   });
   const [pending, setPending] = useState(false);
 
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const data = await getBookEditions();
+        setEditions(data.editions ?? []);
+      }
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      catch (e: any) {
+        console.log(e);
+      }
+    };
+    load();
+  }, []);
+
   const updateItem = (idx: number, patch: Partial<SaleItemInput>) => {
     setItems((xs) => xs.map((x, i) => (i === idx ? { ...x, ...patch } : x)));
   };
 
+  const itemHasEdition = (i: SaleItemInput) =>
+    Number(i.booksCount) <= 0 ||
+    (i.editionId === OTHER_EDITION ? Boolean(i.newEditionName.trim()) : Boolean(i.editionId));
+
   const validItems = items.every(
-    (i) => i.orgId && Number(i.grade) > 0 && (Number(i.codesCount) > 0 || Number(i.booksCount) > 0),
+    (i) => i.orgId && Number(i.grade) > 0 && (Number(i.codesCount) > 0 || Number(i.booksCount) > 0) && itemHasEdition(i),
   );
   const validStudent = !addStudent || (student.orgId && student.name && student.number && student.grade && student.school);
 
@@ -47,12 +83,18 @@ export default function SaleModal({
     formData.append(
       "items",
       JSON.stringify(
-        items.map((i) => ({
-          orgId: i.orgId,
-          grade: Number(i.grade),
-          booksCount: Number(i.booksCount) || 0,
-          codesCount: Number(i.codesCount) || 0,
-        })),
+        items.map((i) => {
+          const booksCount = Number(i.booksCount) || 0;
+          const isOther = i.editionId === OTHER_EDITION;
+          return {
+            orgId: i.orgId,
+            grade: Number(i.grade),
+            booksCount,
+            codesCount: Number(i.codesCount) || 0,
+            editionId: booksCount > 0 && !isOther ? i.editionId : undefined,
+            newEditionName: booksCount > 0 && isOther ? i.newEditionName.trim() : undefined,
+          };
+        }),
       ),
     );
 
@@ -73,10 +115,10 @@ export default function SaleModal({
 
     try {
       await toast.promise(run(), {
-        loading: "Recording sale…",
-        success: "Sale recorded",
+        loading: t("recordingSale"),
+        success: t("saleRecorded"),
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        error: (e: any) => e.message ?? "Failed to record sale",
+        error: (e: any) => e.message ?? t("failedToRecordSale"),
       });
       onCreated();
       onClose();
@@ -101,66 +143,108 @@ export default function SaleModal({
         </div>
 
         <div className="mt-4 space-y-2">
-          {items.map((item, idx) => (
-            <div key={idx} className="flex flex-wrap items-center gap-2 rounded-md border p-2">
-              <label className="text-xs text-muted-foreground">
-                {t("codesWord")}
-                <input
-                  type="number"
-                  min={0}
-                  value={item.codesCount}
-                  onChange={(e) => updateItem(idx, { codesCount: e.target.value })}
-                  className="ml-2 h-9 w-20 rounded-full border border-input bg-background px-3 text-sm"
-                />
-              </label>
-              <label className="text-xs text-muted-foreground">
-                {t("booksWord")}
-                <input
-                  type="number"
-                  min={0}
-                  value={item.booksCount}
-                  onChange={(e) => updateItem(idx, { booksCount: e.target.value })}
-                  className="ml-2 h-9 w-20 rounded-full border border-input bg-background px-3 text-sm"
-                />
-              </label>
-              <select
-                value={item.orgId}
-                onChange={(e) => updateItem(idx, { orgId: e.target.value })}
-                className="h-9 min-w-0 max-w-full flex-1 rounded-full border border-input bg-background px-3 text-sm sm:flex-none"
-              >
-                <option value="">{t("orgOptionPlaceholder")}</option>
-                {organizations.map((o) => (
-                  <option key={o.id} value={o.id}>
-                    {o.name}
-                  </option>
-                ))}
-              </select>
-              <label className="text-xs text-muted-foreground">
-                {t("colGrade")}
-                <select
-                  value={item.grade}
-                  onChange={(e) => updateItem(idx, { grade: e.target.value })}
-                  className="ml-2 h-9 rounded-full border border-input bg-background px-3 text-sm"
-                >
-                  <option value="">{t("gradeOptionPlaceholder")}</option>
-                  {Object.entries(Grades).map(([value, label]) => (
-                    <option key={value} value={value}>
-                      {label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              {items.length > 1 && (
-                <button
-                  type="button"
-                  onClick={() => setItems((xs) => xs.filter((_, i) => i !== idx))}
-                  className="ml-auto h-9 rounded-full border px-3 text-sm"
-                >
-                  −
-                </button>
-              )}
-            </div>
-          ))}
+          {items.map((item, idx) => {
+            const bothZero = Number(item.codesCount) <= 0 && Number(item.booksCount) <= 0;
+            const hasBooks = Number(item.booksCount) > 0;
+            const itemIsOther = item.editionId === OTHER_EDITION;
+            const missingEdition = hasBooks && !itemHasEdition(item);
+            return (
+              <div key={idx} className={`rounded-md border p-2 ${bothZero || missingEdition ? "border-destructive/50" : ""}`}>
+                <div className="flex flex-wrap items-center gap-2">
+                  <label className="text-xs text-muted-foreground">
+                    {t("codesWord")}
+                    <input
+                      type="number"
+                      min={0}
+                      value={item.codesCount}
+                      onChange={(e) => updateItem(idx, { codesCount: e.target.value })}
+                      className="ms-2 h-9 w-20 rounded-full border border-input bg-background px-3 text-sm"
+                    />
+                  </label>
+                  <label className="text-xs text-muted-foreground">
+                    {t("booksWord")}
+                    <input
+                      type="number"
+                      min={0}
+                      value={item.booksCount}
+                      onChange={(e) => updateItem(idx, { booksCount: e.target.value })}
+                      className="ms-2 h-9 w-20 rounded-full border border-input bg-background px-3 text-sm"
+                    />
+                  </label>
+                  <select
+                    value={item.orgId}
+                    onChange={(e) => updateItem(idx, { orgId: e.target.value })}
+                    className="h-9 min-w-0 max-w-full flex-1 rounded-full border border-input bg-background px-3 text-sm sm:flex-none"
+                  >
+                    <option value="">{t("orgOptionPlaceholder")}</option>
+                    {organizations.map((o) => (
+                      <option key={o.id} value={o.id}>
+                        {o.name}
+                      </option>
+                    ))}
+                  </select>
+                  <label className="text-xs text-muted-foreground">
+                    {t("colGrade")}
+                    <select
+                      value={item.grade}
+                      onChange={(e) => updateItem(idx, { grade: e.target.value })}
+                      className="ms-2 h-9 rounded-full border border-input bg-background px-3 text-sm"
+                    >
+                      <option value="">{t("gradeOptionPlaceholder")}</option>
+                      {Object.entries(Grades).map(([value, label]) => (
+                        <option key={value} value={value}>
+                          {label}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  {items.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => setItems((xs) => xs.filter((_, i) => i !== idx))}
+                      className="ms-auto h-9 rounded-full border px-3 text-sm"
+                    >
+                      −
+                    </button>
+                  )}
+                </div>
+                {hasBooks && (
+                  <div className="mt-2 flex flex-wrap items-center gap-2">
+                    <label className="text-xs text-muted-foreground">
+                      {t("colEdition")}
+                      <select
+                        value={item.editionId}
+                        onChange={(e) => updateItem(idx, { editionId: e.target.value })}
+                        className="ms-2 h-9 rounded-full border border-input bg-background px-3 text-sm"
+                      >
+                        <option value="">{t("editionOptionPlaceholder")}</option>
+                        {editions.map((ed) => (
+                          <option key={ed.id} value={ed.id}>
+                            {ed.name}
+                          </option>
+                        ))}
+                        <option value={OTHER_EDITION}>{t("otherEditionOption")}</option>
+                      </select>
+                    </label>
+                    {itemIsOther && (
+                      <input
+                        placeholder={t("newEditionPlaceholder")}
+                        value={item.newEditionName}
+                        onChange={(e) => updateItem(idx, { newEditionName: e.target.value })}
+                        className="h-9 rounded-full border border-input bg-background px-3 text-sm"
+                      />
+                    )}
+                  </div>
+                )}
+                {bothZero && (
+                  <p className="mt-1 text-xs text-destructive">{t("atLeastOneBookOrCode")}</p>
+                )}
+                {!bothZero && missingEdition && (
+                  <p className="mt-1 text-xs text-destructive">{t("editionRequired")}</p>
+                )}
+              </div>
+            );
+          })}
           <button
             type="button"
             onClick={() => setItems((xs) => [...xs, emptyItem()])}

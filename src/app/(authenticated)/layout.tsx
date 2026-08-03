@@ -3,20 +3,24 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "next-auth/react";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Moon, Sun, Languages } from "lucide-react";
+import { useTheme } from "@/components/theme-provider";
+import { useLang } from "@/components/lang-provider";
 
 const NAV = [
-  { href: "/authenticated/dashboard", label: "Dashboard" },
-  { href: "/authenticated/organizations", label: "Organizations" },
-  { href: "/authenticated/sales-index", label: "Sales" },
-  { href: "/authenticated/students", label: "Students" },
-  { href: "/authenticated/timetable-edit", label: "Timetable" },
-  { href: "/authenticated/news-edit", label: "News" },
+  { href: "/dashboard", label: "Dashboard" },
+  { href: "/organizations", label: "Organizations" },
+  { href: "/sales-index", label: "Sales" },
+  { href: "/students", label: "Students" },
+  { href: "/timetable-edit", label: "Timetable" },
+  { href: "/news-edit", label: "News" },
 ] as const;
 
 export default function AuthedLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
+  const { theme, toggle: toggleTheme } = useTheme();
+  const { lang, toggle: toggleLang, t } = useLang();
 
   return (
     <div className="flex min-h-screen flex-col bg-muted/30">
@@ -32,12 +36,31 @@ export default function AuthedLayout({ children }: { children: React.ReactNode }
             ))}
           </nav>
 
-          <button
-            onClick={() => signOut({ callbackUrl: "/login" })}
-            className="ml-auto hidden shrink-0 rounded-full px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-foreground md:block"
-          >
-            Sign out
-          </button>
+          <div className="ml-auto hidden shrink-0 items-center gap-2 md:flex">
+            <button
+              type="button"
+              onClick={toggleLang}
+              aria-label={t("language")}
+              className="inline-flex h-9 items-center gap-1 rounded-full border border-input px-3 text-xs font-medium hover:bg-accent"
+            >
+              <Languages className="h-4 w-4" />
+              {lang === "en" ? "ع" : "EN"}
+            </button>
+            <button
+              type="button"
+              onClick={toggleTheme}
+              aria-label={t("theme")}
+              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-input hover:bg-accent"
+            >
+              {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </button>
+            <button
+              onClick={() => signOut({ callbackUrl: "/login" })}
+              className="rounded-full px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
+            >
+              Sign out
+            </button>
+          </div>
 
           <button
             onClick={() => setMenuOpen((v) => !v)}
@@ -61,6 +84,25 @@ export default function AuthedLayout({ children }: { children: React.ReactNode }
                 onClick={() => setMenuOpen(false)}
               />
             ))}
+            <div className="flex items-center gap-2 px-3 py-2">
+              <button
+                type="button"
+                onClick={toggleLang}
+                aria-label={t("language")}
+                className="inline-flex h-9 items-center gap-1 rounded-full border border-input px-3 text-xs font-medium hover:bg-accent"
+              >
+                <Languages className="h-4 w-4" />
+                {lang === "en" ? "ع" : "EN"}
+              </button>
+              <button
+                type="button"
+                onClick={toggleTheme}
+                aria-label={t("theme")}
+                className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-input hover:bg-accent"
+              >
+                {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              </button>
+            </div>
             <button
               onClick={() => signOut({ callbackUrl: "/login" })}
               className="rounded-md px-3 py-2 text-left text-sm text-muted-foreground hover:bg-accent hover:text-foreground"

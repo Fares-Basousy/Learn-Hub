@@ -8,10 +8,11 @@ import { getOrganizationsAdmin } from "@/src/lib/actions/api/organizations/organ
 import { Gender, Grades, Organization, Student } from "@/src/lib/types";
 import StudentRow from "@/src/components/student-row";
 import { useLang } from "@/components/lang-provider";
+import { PageLoader, Spinner } from "@/components/spinner";
 
 export default function StudentsPage() {
   return (
-    <Suspense fallback={<p className="text-sm text-muted-foreground">Loading…</p>}>
+    <Suspense fallback={<PageLoader />}>
       <StudentsPageWithFilters />
     </Suspense>
   );
@@ -51,6 +52,7 @@ function StudentsPageInner({
   const [hasMore, setHasMore] = useState(false)
   const [organizations, setOrganizations] = useState<Organization[]>([])
   const [pending, setPending] = useState(false)
+  const [tableLoading, setTableLoading] = useState(true)
   const [refreshKey, setRefreshKey] = useState(0)
   const [form, setForm] = useState({
     orgId: "",
@@ -70,7 +72,7 @@ function StudentsPageInner({
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       catch (e: any) {
-        toast.error(e.message ?? "Failed to load organizations")
+        toast.error(e.message ?? t("failedToLoadOrganizations"))
       }
     }
     load()
@@ -78,6 +80,7 @@ function StudentsPageInner({
 
   useEffect(() => {
     const load = async () => {
+      setTableLoading(true)
       try {
         const studentsData = await getStudents(pageIndex, { orgId: filterOrgId, grade: filterGrade })
         setStudents(studentsData.students)
@@ -85,7 +88,10 @@ function StudentsPageInner({
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       catch (e: any) {
-        toast.error(e.message ?? "Failed to load students")
+        toast.error(e.message ?? t("failedToLoadStudents"))
+      }
+      finally {
+        setTableLoading(false)
       }
     }
     load()
@@ -107,10 +113,10 @@ function StudentsPageInner({
     });
     try {
       await toast.promise(createStudent(formData), {
-        loading: "Adding student…",
-        success: "Student added",
+        loading: t("addingStudent"),
+        success: t("studentAdded"),
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        error: (e: any) => e.message ?? "Failed to add student",
+        error: (e: any) => e.message ?? t("failedToAddStudent"),
       })
       setForm({ orgId: "", name: "", number: "", grade: "", school: "", gender: "MALE", type: "" })
       if (pageIndex !== 0) router.push(hrefForPage(0))
@@ -141,7 +147,7 @@ function StudentsPageInner({
             {filterOrg && filterGrade !== undefined && " · "}
             {filterGrade !== undefined && <>{t("gradeWordLower")} <strong>{Grades[filterGrade as keyof typeof Grades] ?? filterGrade}</strong></>}
           </span>
-          <Link href="/authenticated/students" className="text-xs text-primary hover:underline">
+          <Link href="/students" className="text-xs text-primary hover:underline">
             {t("clearFilter")}
           </Link>
         </div>
@@ -226,7 +232,7 @@ function StudentsPageInner({
       <div className="mt-6 overflow-hidden rounded-lg border bg-card">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-muted/50 text-left text-xs text-muted-foreground">
+            <thead className="bg-muted/50 text-start text-xs text-muted-foreground">
               <tr>
                 <th className="p-2">{t("namePlaceholder")}</th>
                 <th className="p-2">{t("colNumber")}</th>
@@ -236,7 +242,17 @@ function StudentsPageInner({
               </tr>
             </thead>
             <tbody>
-              {(students ?? []).map((s) => (
+              {tableLoading && (
+                <tr>
+                  <td colSpan={5} className="p-4 text-center text-muted-foreground">
+                    <div className="flex items-center justify-center gap-2">
+                      <Spinner />
+                      {t("loading")}
+                    </div>
+                  </td>
+                </tr>
+              )}
+              {!tableLoading && (students ?? []).map((s) => (
                 <StudentRow
                   key={s.id}
                   student={s}
@@ -246,7 +262,7 @@ function StudentsPageInner({
                   }
                 />
               ))}
-              {students && students?.length === 0 && (
+              {!tableLoading && students && students?.length === 0 && (
                 <tr>
                   <td colSpan={5} className="p-4 text-center text-muted-foreground">
                     {t("noStudentsYet")}

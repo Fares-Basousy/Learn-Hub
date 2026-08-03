@@ -401,6 +401,8 @@ export const ModelName = {
   Student: 'Student',
   Organization: 'Organization',
   OrganizationInventory: 'OrganizationInventory',
+  BookEdition: 'BookEdition',
+  BookInventory: 'BookInventory',
   TimetableEntry: 'TimetableEntry',
   Action: 'Action',
   Sale: 'Sale',
@@ -421,7 +423,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "student" | "organization" | "organizationInventory" | "timetableEntry" | "action" | "sale" | "saleItem" | "news"
+    modelProps: "user" | "student" | "organization" | "organizationInventory" | "bookEdition" | "bookInventory" | "timetableEntry" | "action" | "sale" | "saleItem" | "news"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -718,6 +720,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.OrganizationInventoryCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.OrganizationInventoryCountAggregateOutputType> | number
+        }
+      }
+    }
+    BookEdition: {
+      payload: Prisma.$BookEditionPayload<ExtArgs>
+      fields: Prisma.BookEditionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.BookEditionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BookEditionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.BookEditionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BookEditionPayload>
+        }
+        findFirst: {
+          args: Prisma.BookEditionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BookEditionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.BookEditionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BookEditionPayload>
+        }
+        findMany: {
+          args: Prisma.BookEditionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BookEditionPayload>[]
+        }
+        create: {
+          args: Prisma.BookEditionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BookEditionPayload>
+        }
+        createMany: {
+          args: Prisma.BookEditionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.BookEditionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BookEditionPayload>[]
+        }
+        delete: {
+          args: Prisma.BookEditionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BookEditionPayload>
+        }
+        update: {
+          args: Prisma.BookEditionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BookEditionPayload>
+        }
+        deleteMany: {
+          args: Prisma.BookEditionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.BookEditionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.BookEditionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BookEditionPayload>[]
+        }
+        upsert: {
+          args: Prisma.BookEditionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BookEditionPayload>
+        }
+        aggregate: {
+          args: Prisma.BookEditionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateBookEdition>
+        }
+        groupBy: {
+          args: Prisma.BookEditionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BookEditionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.BookEditionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BookEditionCountAggregateOutputType> | number
+        }
+      }
+    }
+    BookInventory: {
+      payload: Prisma.$BookInventoryPayload<ExtArgs>
+      fields: Prisma.BookInventoryFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.BookInventoryFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BookInventoryPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.BookInventoryFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BookInventoryPayload>
+        }
+        findFirst: {
+          args: Prisma.BookInventoryFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BookInventoryPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.BookInventoryFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BookInventoryPayload>
+        }
+        findMany: {
+          args: Prisma.BookInventoryFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BookInventoryPayload>[]
+        }
+        create: {
+          args: Prisma.BookInventoryCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BookInventoryPayload>
+        }
+        createMany: {
+          args: Prisma.BookInventoryCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.BookInventoryCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BookInventoryPayload>[]
+        }
+        delete: {
+          args: Prisma.BookInventoryDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BookInventoryPayload>
+        }
+        update: {
+          args: Prisma.BookInventoryUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BookInventoryPayload>
+        }
+        deleteMany: {
+          args: Prisma.BookInventoryDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.BookInventoryUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.BookInventoryUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BookInventoryPayload>[]
+        }
+        upsert: {
+          args: Prisma.BookInventoryUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BookInventoryPayload>
+        }
+        aggregate: {
+          args: Prisma.BookInventoryAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateBookInventory>
+        }
+        groupBy: {
+          args: Prisma.BookInventoryGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BookInventoryGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.BookInventoryCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BookInventoryCountAggregateOutputType> | number
         }
       }
     }
@@ -1172,11 +1322,30 @@ export const OrganizationInventoryScalarFieldEnum = {
   id: 'id',
   orgId: 'orgId',
   grade: 'grade',
-  booksCount: 'booksCount',
   codesCount: 'codesCount'
 } as const
 
 export type OrganizationInventoryScalarFieldEnum = (typeof OrganizationInventoryScalarFieldEnum)[keyof typeof OrganizationInventoryScalarFieldEnum]
+
+
+export const BookEditionScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  createdAt: 'createdAt'
+} as const
+
+export type BookEditionScalarFieldEnum = (typeof BookEditionScalarFieldEnum)[keyof typeof BookEditionScalarFieldEnum]
+
+
+export const BookInventoryScalarFieldEnum = {
+  id: 'id',
+  orgId: 'orgId',
+  grade: 'grade',
+  editionId: 'editionId',
+  count: 'count'
+} as const
+
+export type BookInventoryScalarFieldEnum = (typeof BookInventoryScalarFieldEnum)[keyof typeof BookInventoryScalarFieldEnum]
 
 
 export const TimetableEntryScalarFieldEnum = {
@@ -1222,6 +1391,7 @@ export const SaleItemScalarFieldEnum = {
   saleId: 'saleId',
   orgId: 'orgId',
   grade: 'grade',
+  editionId: 'editionId',
   booksCount: 'booksCount',
   codesCount: 'codesCount'
 } as const
@@ -1541,6 +1711,8 @@ export type GlobalOmitConfig = {
   student?: Prisma.StudentOmit
   organization?: Prisma.OrganizationOmit
   organizationInventory?: Prisma.OrganizationInventoryOmit
+  bookEdition?: Prisma.BookEditionOmit
+  bookInventory?: Prisma.BookInventoryOmit
   timetableEntry?: Prisma.TimetableEntryOmit
   action?: Prisma.ActionOmit
   sale?: Prisma.SaleOmit

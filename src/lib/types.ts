@@ -43,8 +43,21 @@ export type OrganizationInventory = {
   id: string;
   orgId: string;
   grade: number;
-  booksCount: number;
   codesCount: number;
+};
+
+export type BookEdition = {
+  id: string;
+  name: string;
+};
+
+export type BookInventory = {
+  id: string;
+  orgId: string;
+  grade: number;
+  editionId: string;
+  edition?: BookEdition;
+  count: number;
 };
 
 export type Organization = {
@@ -53,6 +66,7 @@ export type Organization = {
   subject: string;
   picUrl: string;
   inventory?: OrganizationInventory[];
+  bookInventory?: BookInventory[];
   createdAt?: Date;
 };
 
@@ -97,6 +111,8 @@ export type SaleItem = {
   orgId: string;
   org?: Organization;
   grade: number;
+  editionId?: string | null;
+  edition?: BookEdition | null;
   booksCount: number;
   codesCount: number;
 };
@@ -104,6 +120,7 @@ export type SaleItem = {
 export type Sale = {
   id: string;
   userId: string;
+  user?: { id: string; name: string };
   items: SaleItem[];
   soldAt: Date;
 };

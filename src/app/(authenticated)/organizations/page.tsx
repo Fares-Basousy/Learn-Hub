@@ -7,10 +7,11 @@ import { createOrganization, deleteOrganization, getOrganizations } from "@/src/
 import { uploadImage } from "@/src/lib/actions/api/upload/upload-actions";
 import { Organization } from "@/src/lib/types";
 import { useLang } from "@/components/lang-provider";
+import { PageLoader, Spinner } from "@/components/spinner";
 
 export default function OrganizationsPage() {
   return (
-    <Suspense fallback={<p className="text-sm text-muted-foreground">Loading…</p>}>
+    <Suspense fallback={<PageLoader />}>
       <OrganizationsPageInner />
     </Suspense>
   );
@@ -46,10 +47,10 @@ function OrganizationsPageInner() {
     setUploading(true)
     try {
       const { url } = await toast.promise(uploadImage(formData), {
-        loading: "Uploading image…",
-        success: "Image uploaded",
+        loading: t("uploadingImage"),
+        success: t("imageUploaded"),
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        error: (e: any) => e.message ?? "Failed to upload image",
+        error: (e: any) => e.message ?? t("failedToUploadImage"),
       })
       setForm((f) => ({ ...f, picUrl: url }))
     }
@@ -73,7 +74,7 @@ function OrganizationsPageInner() {
       }
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       catch (e: any) {
-        toast.error(e.message ?? "Failed to load organizations")
+        toast.error(e.message ?? t("failedToLoadOrganizations"))
         setLoading(false)
       }
     }
@@ -96,10 +97,10 @@ function OrganizationsPageInner() {
     });
     try {
       await toast.promise(createOrganization(formData), {
-        loading: "Adding organization…",
-        success: "Organization added",
+        loading: t("addingOrganization"),
+        success: t("organizationAdded"),
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        error: (e: any) => e.message ?? "Failed to add organization",
+        error: (e: any) => e.message ?? t("failedToAddOrganization"),
       })
       setForm({ name: '', subject: '', picUrl: '' })
       setFileInputKey((k) => k + 1)
@@ -118,10 +119,10 @@ function OrganizationsPageInner() {
   const remove = async (id: string) => {
     try {
       await toast.promise(deleteOrganization(id), {
-        loading: "Deleting organization…",
-        success: "Organization deleted",
+        loading: t("deletingOrganization"),
+        success: t("organizationDeleted"),
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        error: (e: any) => e.message ?? "Failed to delete organization",
+        error: (e: any) => e.message ?? t("failedToDeleteOrganization"),
       })
       setOrganizations((prev) => prev.filter((o) => o.id !== id))
     }
@@ -177,7 +178,7 @@ function OrganizationsPageInner() {
       <div className="mt-6 overflow-hidden rounded-lg border bg-card">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-muted/50 text-left text-xs text-muted-foreground">
+            <thead className="bg-muted/50 text-start text-xs text-muted-foreground">
               <tr>
                 <th className="p-2">{t("namePlaceholder")}</th>
                 <th className="p-2">{t("colSubject")}</th>
@@ -188,24 +189,27 @@ function OrganizationsPageInner() {
               {loading && (
                 <tr>
                   <td colSpan={3} className="p-4 text-center text-muted-foreground">
-                    {t("loading")}
+                    <div className="flex items-center justify-center gap-2">
+                      <Spinner />
+                      {t("loading")}
+                    </div>
                   </td>
                 </tr>
               )}
-              {organizations.map((o) => (
+              {!loading && organizations.map((o) => (
                 <tr key={o.id} className="border-t">
                   <td className="p-2 font-medium">{o.name}</td>
                   <td className="p-2 text-muted-foreground">{o.subject}</td>
-                  <td className="p-2 text-right whitespace-nowrap">
+                  <td className="p-2 text-end whitespace-nowrap">
                     <Link
-                      href={`/authenticated/organizations/${o.id}`}
+                      href={`/organizations/${o.id}`}
                       className="text-xs text-primary hover:underline"
                     >
                       {t("detailsLink")}
                     </Link>
                     <button
                       onClick={() => remove(o.id)}
-                      className="ml-3 text-xs text-destructive hover:underline"
+                      className="ms-3 text-xs text-destructive hover:underline"
                     >
                       {t("delete")}
                     </button>

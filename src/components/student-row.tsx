@@ -3,6 +3,7 @@ import { useState } from "react";
 import toast from "react-hot-toast";
 import { deleteStudent, updateStudent } from "@/src/lib/actions/api/students/student-actions";
 import { useLang } from "@/components/lang-provider";
+import { Spinner } from "@/components/spinner";
 
 type StudentRowProps = {
   student: Student;
@@ -25,10 +26,10 @@ export default function StudentRow({ student, onDelete, onUpdate }: StudentRowPr
     setPending(true)
     try{
       await toast.promise(deleteStudent(id), {
-        loading: "Deleting student…",
-        success: "Student deleted",
+        loading: t("deletingStudent"),
+        success: t("studentDeleted"),
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        error: (e: any) => e.message ?? "Failed to delete student",
+        error: (e: any) => e.message ?? t("failedToDeleteStudent"),
       })
       onDelete(id)
     }
@@ -48,10 +49,10 @@ export default function StudentRow({ student, onDelete, onUpdate }: StudentRowPr
     });
     try{
       const { student: updated } = await toast.promise(updateStudent(id, formData), {
-        loading: "Saving…",
-        success: "Student updated",
+        loading: t("saving"),
+        success: t("studentUpdated"),
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        error: (e: any) => e.message ?? "Failed to update student",
+        error: (e: any) => e.message ?? t("failedToUpdateStudent"),
       })
       setIsEditing(false)
       onUpdate(updated)
@@ -123,20 +124,21 @@ export default function StudentRow({ student, onDelete, onUpdate }: StudentRowPr
                     <td className="p-2">{student.school}</td>
                   </>
                 )}
-                <td className="p-2 text-right whitespace-nowrap">
+                <td className="p-2 text-end whitespace-nowrap">
                   {isEditing ? (
                     <>
                       <button
                         disabled={pending}
                         onClick={() => update(student.id)}
-                        className="text-xs text-primary hover:underline disabled:opacity-50"
+                        className="inline-flex items-center gap-1 text-xs text-primary hover:underline disabled:opacity-50"
                       >
+                        {pending && <Spinner className="h-3 w-3" />}
                         {t("save")}
                       </button>
                       <button
                         disabled={pending}
                         onClick={cancel}
-                        className="ml-2 text-xs text-muted-foreground hover:underline disabled:opacity-50"
+                        className="ms-2 text-xs text-muted-foreground hover:underline disabled:opacity-50"
                       >
                         {t("cancel")}
                       </button>
@@ -152,8 +154,9 @@ export default function StudentRow({ student, onDelete, onUpdate }: StudentRowPr
                       <button
                        disabled={pending}
                        onClick={() => remove(student.id)}
-                        className="ml-2 text-xs text-destructive hover:underline disabled:opacity-50"
+                        className="ms-2 inline-flex items-center gap-1 text-xs text-destructive hover:underline disabled:opacity-50"
                       >
+                        {pending && <Spinner className="h-3 w-3" />}
                         {t("delete")}
                       </button>
                     </>

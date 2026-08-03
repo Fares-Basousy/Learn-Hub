@@ -1,5 +1,5 @@
 // Placeholder news items shown if the news table is empty or unreachable.
-// The `/authenticated/news-edit` page (behind login) creates/updates/deletes real items.
+// The `/news-edit` page (behind login) creates/updates/deletes real items.
 
 import { NewsItem } from "../lib/types";
 

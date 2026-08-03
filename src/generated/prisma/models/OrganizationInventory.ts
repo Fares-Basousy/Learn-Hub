@@ -28,13 +28,11 @@ export type AggregateOrganizationInventory = {
 
 export type OrganizationInventoryAvgAggregateOutputType = {
   grade: number | null
-  booksCount: number | null
   codesCount: number | null
 }
 
 export type OrganizationInventorySumAggregateOutputType = {
   grade: number | null
-  booksCount: number | null
   codesCount: number | null
 }
 
@@ -42,7 +40,6 @@ export type OrganizationInventoryMinAggregateOutputType = {
   id: string | null
   orgId: string | null
   grade: number | null
-  booksCount: number | null
   codesCount: number | null
 }
 
@@ -50,7 +47,6 @@ export type OrganizationInventoryMaxAggregateOutputType = {
   id: string | null
   orgId: string | null
   grade: number | null
-  booksCount: number | null
   codesCount: number | null
 }
 
@@ -58,7 +54,6 @@ export type OrganizationInventoryCountAggregateOutputType = {
   id: number
   orgId: number
   grade: number
-  booksCount: number
   codesCount: number
   _all: number
 }
@@ -66,13 +61,11 @@ export type OrganizationInventoryCountAggregateOutputType = {
 
 export type OrganizationInventoryAvgAggregateInputType = {
   grade?: true
-  booksCount?: true
   codesCount?: true
 }
 
 export type OrganizationInventorySumAggregateInputType = {
   grade?: true
-  booksCount?: true
   codesCount?: true
 }
 
@@ -80,7 +73,6 @@ export type OrganizationInventoryMinAggregateInputType = {
   id?: true
   orgId?: true
   grade?: true
-  booksCount?: true
   codesCount?: true
 }
 
@@ -88,7 +80,6 @@ export type OrganizationInventoryMaxAggregateInputType = {
   id?: true
   orgId?: true
   grade?: true
-  booksCount?: true
   codesCount?: true
 }
 
@@ -96,7 +87,6 @@ export type OrganizationInventoryCountAggregateInputType = {
   id?: true
   orgId?: true
   grade?: true
-  booksCount?: true
   codesCount?: true
   _all?: true
 }
@@ -191,7 +181,6 @@ export type OrganizationInventoryGroupByOutputType = {
   id: string
   orgId: string
   grade: number
-  booksCount: number
   codesCount: number
   _count: OrganizationInventoryCountAggregateOutputType | null
   _avg: OrganizationInventoryAvgAggregateOutputType | null
@@ -222,7 +211,6 @@ export type OrganizationInventoryWhereInput = {
   id?: Prisma.StringFilter<"OrganizationInventory"> | string
   orgId?: Prisma.StringFilter<"OrganizationInventory"> | string
   grade?: Prisma.IntFilter<"OrganizationInventory"> | number
-  booksCount?: Prisma.IntFilter<"OrganizationInventory"> | number
   codesCount?: Prisma.IntFilter<"OrganizationInventory"> | number
   org?: Prisma.XOR<Prisma.OrganizationScalarRelationFilter, Prisma.OrganizationWhereInput>
 }
@@ -231,7 +219,6 @@ export type OrganizationInventoryOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   orgId?: Prisma.SortOrder
   grade?: Prisma.SortOrder
-  booksCount?: Prisma.SortOrder
   codesCount?: Prisma.SortOrder
   org?: Prisma.OrganizationOrderByWithRelationInput
 }
@@ -244,7 +231,6 @@ export type OrganizationInventoryWhereUniqueInput = Prisma.AtLeast<{
   NOT?: Prisma.OrganizationInventoryWhereInput | Prisma.OrganizationInventoryWhereInput[]
   orgId?: Prisma.StringFilter<"OrganizationInventory"> | string
   grade?: Prisma.IntFilter<"OrganizationInventory"> | number
-  booksCount?: Prisma.IntFilter<"OrganizationInventory"> | number
   codesCount?: Prisma.IntFilter<"OrganizationInventory"> | number
   org?: Prisma.XOR<Prisma.OrganizationScalarRelationFilter, Prisma.OrganizationWhereInput>
 }, "id" | "orgId_grade">
@@ -253,7 +239,6 @@ export type OrganizationInventoryOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   orgId?: Prisma.SortOrder
   grade?: Prisma.SortOrder
-  booksCount?: Prisma.SortOrder
   codesCount?: Prisma.SortOrder
   _count?: Prisma.OrganizationInventoryCountOrderByAggregateInput
   _avg?: Prisma.OrganizationInventoryAvgOrderByAggregateInput
@@ -269,14 +254,12 @@ export type OrganizationInventoryScalarWhereWithAggregatesInput = {
   id?: Prisma.StringWithAggregatesFilter<"OrganizationInventory"> | string
   orgId?: Prisma.StringWithAggregatesFilter<"OrganizationInventory"> | string
   grade?: Prisma.IntWithAggregatesFilter<"OrganizationInventory"> | number
-  booksCount?: Prisma.IntWithAggregatesFilter<"OrganizationInventory"> | number
   codesCount?: Prisma.IntWithAggregatesFilter<"OrganizationInventory"> | number
 }
 
 export type OrganizationInventoryCreateInput = {
   id?: string
   grade: number
-  booksCount?: number
   codesCount?: number
   org: Prisma.OrganizationCreateNestedOneWithoutInventoryInput
 }
@@ -285,14 +268,12 @@ export type OrganizationInventoryUncheckedCreateInput = {
   id?: string
   orgId: string
   grade: number
-  booksCount?: number
   codesCount?: number
 }
 
 export type OrganizationInventoryUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   grade?: Prisma.IntFieldUpdateOperationsInput | number
-  booksCount?: Prisma.IntFieldUpdateOperationsInput | number
   codesCount?: Prisma.IntFieldUpdateOperationsInput | number
   org?: Prisma.OrganizationUpdateOneRequiredWithoutInventoryNestedInput
 }
@@ -301,7 +282,6 @@ export type OrganizationInventoryUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   orgId?: Prisma.StringFieldUpdateOperationsInput | string
   grade?: Prisma.IntFieldUpdateOperationsInput | number
-  booksCount?: Prisma.IntFieldUpdateOperationsInput | number
   codesCount?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
@@ -309,14 +289,12 @@ export type OrganizationInventoryCreateManyInput = {
   id?: string
   orgId: string
   grade: number
-  booksCount?: number
   codesCount?: number
 }
 
 export type OrganizationInventoryUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   grade?: Prisma.IntFieldUpdateOperationsInput | number
-  booksCount?: Prisma.IntFieldUpdateOperationsInput | number
   codesCount?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
@@ -324,7 +302,6 @@ export type OrganizationInventoryUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   orgId?: Prisma.StringFieldUpdateOperationsInput | string
   grade?: Prisma.IntFieldUpdateOperationsInput | number
-  booksCount?: Prisma.IntFieldUpdateOperationsInput | number
   codesCount?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
@@ -347,13 +324,11 @@ export type OrganizationInventoryCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   orgId?: Prisma.SortOrder
   grade?: Prisma.SortOrder
-  booksCount?: Prisma.SortOrder
   codesCount?: Prisma.SortOrder
 }
 
 export type OrganizationInventoryAvgOrderByAggregateInput = {
   grade?: Prisma.SortOrder
-  booksCount?: Prisma.SortOrder
   codesCount?: Prisma.SortOrder
 }
 
@@ -361,7 +336,6 @@ export type OrganizationInventoryMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   orgId?: Prisma.SortOrder
   grade?: Prisma.SortOrder
-  booksCount?: Prisma.SortOrder
   codesCount?: Prisma.SortOrder
 }
 
@@ -369,13 +343,11 @@ export type OrganizationInventoryMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   orgId?: Prisma.SortOrder
   grade?: Prisma.SortOrder
-  booksCount?: Prisma.SortOrder
   codesCount?: Prisma.SortOrder
 }
 
 export type OrganizationInventorySumOrderByAggregateInput = {
   grade?: Prisma.SortOrder
-  booksCount?: Prisma.SortOrder
   codesCount?: Prisma.SortOrder
 }
 
@@ -424,14 +396,12 @@ export type OrganizationInventoryUncheckedUpdateManyWithoutOrgNestedInput = {
 export type OrganizationInventoryCreateWithoutOrgInput = {
   id?: string
   grade: number
-  booksCount?: number
   codesCount?: number
 }
 
 export type OrganizationInventoryUncheckedCreateWithoutOrgInput = {
   id?: string
   grade: number
-  booksCount?: number
   codesCount?: number
 }
 
@@ -468,35 +438,30 @@ export type OrganizationInventoryScalarWhereInput = {
   id?: Prisma.StringFilter<"OrganizationInventory"> | string
   orgId?: Prisma.StringFilter<"OrganizationInventory"> | string
   grade?: Prisma.IntFilter<"OrganizationInventory"> | number
-  booksCount?: Prisma.IntFilter<"OrganizationInventory"> | number
   codesCount?: Prisma.IntFilter<"OrganizationInventory"> | number
 }
 
 export type OrganizationInventoryCreateManyOrgInput = {
   id?: string
   grade: number
-  booksCount?: number
   codesCount?: number
 }
 
 export type OrganizationInventoryUpdateWithoutOrgInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   grade?: Prisma.IntFieldUpdateOperationsInput | number
-  booksCount?: Prisma.IntFieldUpdateOperationsInput | number
   codesCount?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type OrganizationInventoryUncheckedUpdateWithoutOrgInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   grade?: Prisma.IntFieldUpdateOperationsInput | number
-  booksCount?: Prisma.IntFieldUpdateOperationsInput | number
   codesCount?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
 export type OrganizationInventoryUncheckedUpdateManyWithoutOrgInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   grade?: Prisma.IntFieldUpdateOperationsInput | number
-  booksCount?: Prisma.IntFieldUpdateOperationsInput | number
   codesCount?: Prisma.IntFieldUpdateOperationsInput | number
 }
 
@@ -506,7 +471,6 @@ export type OrganizationInventorySelect<ExtArgs extends runtime.Types.Extensions
   id?: boolean
   orgId?: boolean
   grade?: boolean
-  booksCount?: boolean
   codesCount?: boolean
   org?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["organizationInventory"]>
@@ -515,7 +479,6 @@ export type OrganizationInventorySelectCreateManyAndReturn<ExtArgs extends runti
   id?: boolean
   orgId?: boolean
   grade?: boolean
-  booksCount?: boolean
   codesCount?: boolean
   org?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["organizationInventory"]>
@@ -524,7 +487,6 @@ export type OrganizationInventorySelectUpdateManyAndReturn<ExtArgs extends runti
   id?: boolean
   orgId?: boolean
   grade?: boolean
-  booksCount?: boolean
   codesCount?: boolean
   org?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["organizationInventory"]>
@@ -533,11 +495,10 @@ export type OrganizationInventorySelectScalar = {
   id?: boolean
   orgId?: boolean
   grade?: boolean
-  booksCount?: boolean
   codesCount?: boolean
 }
 
-export type OrganizationInventoryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "orgId" | "grade" | "booksCount" | "codesCount", ExtArgs["result"]["organizationInventory"]>
+export type OrganizationInventoryOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "orgId" | "grade" | "codesCount", ExtArgs["result"]["organizationInventory"]>
 export type OrganizationInventoryInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   org?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
 }
@@ -557,7 +518,6 @@ export type $OrganizationInventoryPayload<ExtArgs extends runtime.Types.Extensio
     id: string
     orgId: string
     grade: number
-    booksCount: number
     codesCount: number
   }, ExtArgs["result"]["organizationInventory"]>
   composites: {}
@@ -986,7 +946,6 @@ export interface OrganizationInventoryFieldRefs {
   readonly id: Prisma.FieldRef<"OrganizationInventory", 'String'>
   readonly orgId: Prisma.FieldRef<"OrganizationInventory", 'String'>
   readonly grade: Prisma.FieldRef<"OrganizationInventory", 'Int'>
-  readonly booksCount: Prisma.FieldRef<"OrganizationInventory", 'Int'>
   readonly codesCount: Prisma.FieldRef<"OrganizationInventory", 'Int'>
 }
     

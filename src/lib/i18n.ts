@@ -58,6 +58,11 @@ export const translations = {
     hourAbbrev: "h",
     minuteAbbrev: "m",
 
+    // Shared async messages
+    uploadingImage: "Uploading image…",
+    imageUploaded: "Image uploaded",
+    failedToUploadImage: "Failed to upload image",
+
     // Organizations
     orgsSubtitle: "Partner schools you distribute to.",
     colSubject: "Subject",
@@ -65,6 +70,25 @@ export const translations = {
     orgNotFound: "Organization not found.",
     inventoryByGrade: "Inventory by grade",
     noInventoryYet: "No inventory recorded yet.",
+    addingOrganization: "Adding organization…",
+    organizationAdded: "Organization added",
+    failedToAddOrganization: "Failed to add organization",
+    deletingOrganization: "Deleting organization…",
+    organizationDeleted: "Organization deleted",
+    failedToDeleteOrganization: "Failed to delete organization",
+    failedToLoadOrganizations: "Failed to load organizations",
+    organizationUpdated: "Organization updated",
+    failedToUpdateOrganization: "Failed to update organization",
+    restock: "Restock",
+    restocking: "Restocking…",
+    inventoryRestocked: "Inventory restocked",
+    failedToRestock: "Failed to restock inventory",
+    colEdition: "Edition",
+    editionOptionPlaceholder: "Edition…",
+    otherEditionOption: "Other…",
+    newEditionNameLabel: "New edition name",
+    newEditionPlaceholder: "e.g. Chapter 3",
+    editionRequired: "Select or enter a book edition.",
 
     // Students
     studentsSubtitle: "Students associated with organizations.",
@@ -77,11 +101,20 @@ export const translations = {
     colNumber: "Number",
     colSchool: "School",
     noStudentsYet: "No students yet.",
+    addingStudent: "Adding student…",
+    studentAdded: "Student added",
+    failedToAddStudent: "Failed to add student",
+    failedToLoadStudents: "Failed to load students",
+    deletingStudent: "Deleting student…",
+    studentDeleted: "Student deleted",
+    failedToDeleteStudent: "Failed to delete student",
+    studentUpdated: "Student updated",
+    failedToUpdateStudent: "Failed to update student",
 
     // Sales
     salesSubtitle: "History of book and code sales.",
     newSale: "New sale",
-    colId: "ID",
+    colSoldBy: "Sold by",
     colItems: "Items",
     colDate: "Date",
     booksWord: "books",
@@ -91,6 +124,14 @@ export const translations = {
     alsoRegisterStudent: "Also register a new student for this sale (optional)",
     studentNumberPlaceholder: "Student #",
     recordSale: "Record sale",
+    atLeastOneBookOrCode: "Enter at least one book or code.",
+    saleDetails: "Sale details",
+    colSaleId: "Sale ID",
+    colUserId: "User ID",
+    colSoldAt: "Sold at",
+    recordingSale: "Recording sale…",
+    saleRecorded: "Sale recorded",
+    failedToRecordSale: "Failed to record sale",
 
     // Dashboard
     dashboardSubtitle: "Overview of inventory and activity.",
@@ -106,6 +147,8 @@ export const translations = {
     emailLabel: "Email",
     passwordLabel: "Password",
     signingIn: "Signing in…",
+    signedIn: "Signed in",
+    invalidCredentials: "Invalid email or password.",
 
     // Timetable admin
     timetableAdminSubtitle: "Sessions shown on the public landing page.",
@@ -115,6 +158,16 @@ export const translations = {
     teacherPlaceholder: "Teacher",
     teacherSchoolPlaceholder: "Teacher's school",
     noEntriesYet: "No entries yet.",
+    failedToLoadTimetable: "Failed to load timetable",
+    savingEntry: "Saving entry…",
+    entryUpdated: "Timetable entry updated",
+    failedToUpdateEntry: "Failed to update timetable entry",
+    addingEntry: "Adding entry…",
+    entryAdded: "Timetable entry added",
+    failedToAddEntry: "Failed to add timetable entry",
+    deletingEntry: "Deleting entry…",
+    entryDeleted: "Timetable entry deleted",
+    failedToDeleteEntry: "Failed to delete timetable entry",
 
     // News admin
     newsAdminSubtitle: "Editable news hero shown at the top of the landing page.",
@@ -126,6 +179,15 @@ export const translations = {
     learnMorePlaceholder: "Learn more",
     saveChanges: "Save changes",
     addNews: "Add news",
+    addingNews: "Adding news…",
+    newsAdded: "News added",
+    failedToAddNews: "Failed to add news",
+    newsUpdated: "News updated",
+    failedToUpdateNews: "Failed to update news",
+    deletingNews: "Deleting news…",
+    newsDeleted: "News deleted",
+    failedToDeleteNews: "Failed to delete news",
+    failedToLoadNews: "Failed to load news",
 
     days: {
       "0": "Sun",
@@ -230,6 +292,11 @@ export const translations = {
     hourAbbrev: "س",
     minuteAbbrev: "د",
 
+    // Shared async messages
+    uploadingImage: "جارٍ رفع الصورة…",
+    imageUploaded: "تم رفع الصورة",
+    failedToUploadImage: "فشل رفع الصورة",
+
     // Organizations
     orgsSubtitle: "المدارس الشريكة التي توزع لها.",
     colSubject: "الموضوع",
@@ -237,6 +304,25 @@ export const translations = {
     orgNotFound: "المؤسسة غير موجودة.",
     inventoryByGrade: "المخزون حسب الصف",
     noInventoryYet: "لا يوجد مخزون مسجل بعد.",
+    addingOrganization: "جارٍ إضافة المؤسسة…",
+    organizationAdded: "تمت إضافة المؤسسة",
+    failedToAddOrganization: "فشل إضافة المؤسسة",
+    deletingOrganization: "جارٍ حذف المؤسسة…",
+    organizationDeleted: "تم حذف المؤسسة",
+    failedToDeleteOrganization: "فشل حذف المؤسسة",
+    failedToLoadOrganizations: "فشل تحميل المؤسسات",
+    organizationUpdated: "تم تحديث المؤسسة",
+    failedToUpdateOrganization: "فشل تحديث المؤسسة",
+    restock: "إعادة تخزين",
+    restocking: "جارٍ إعادة التخزين…",
+    inventoryRestocked: "تم إعادة تخزين المخزون",
+    failedToRestock: "فشل إعادة تخزين المخزون",
+    colEdition: "الإصدار",
+    editionOptionPlaceholder: "الإصدار…",
+    otherEditionOption: "أخرى…",
+    newEditionNameLabel: "اسم الإصدار الجديد",
+    newEditionPlaceholder: "مثال: الفصل 3",
+    editionRequired: "اختر إصدارًا أو أدخل إصدارًا جديدًا.",
 
     // Students
     studentsSubtitle: "الطلاب المرتبطون بالمؤسسات.",
@@ -249,11 +335,20 @@ export const translations = {
     colNumber: "الرقم",
     colSchool: "المدرسة",
     noStudentsYet: "لا يوجد طلاب بعد.",
+    addingStudent: "جارٍ إضافة الطالب…",
+    studentAdded: "تمت إضافة الطالب",
+    failedToAddStudent: "فشل إضافة الطالب",
+    failedToLoadStudents: "فشل تحميل الطلاب",
+    deletingStudent: "جارٍ حذف الطالب…",
+    studentDeleted: "تم حذف الطالب",
+    failedToDeleteStudent: "فشل حذف الطالب",
+    studentUpdated: "تم تحديث الطالب",
+    failedToUpdateStudent: "فشل تحديث الطالب",
 
     // Sales
     salesSubtitle: "سجل مبيعات الكتب والأكواد.",
     newSale: "عملية بيع جديدة",
-    colId: "المعرف",
+    colSoldBy: "باع بواسطة",
     colItems: "العناصر",
     colDate: "التاريخ",
     booksWord: "كتب",
@@ -263,6 +358,14 @@ export const translations = {
     alsoRegisterStudent: "سجّل أيضًا طالبًا جديدًا لهذه العملية (اختياري)",
     studentNumberPlaceholder: "رقم الطالب",
     recordSale: "تسجيل البيع",
+    atLeastOneBookOrCode: "أدخل كتابًا واحدًا أو كودًا واحدًا على الأقل.",
+    saleDetails: "تفاصيل البيع",
+    colSaleId: "معرف البيع",
+    colUserId: "معرف المستخدم",
+    colSoldAt: "تاريخ البيع",
+    recordingSale: "جارٍ تسجيل البيع…",
+    saleRecorded: "تم تسجيل البيع",
+    failedToRecordSale: "فشل تسجيل البيع",
 
     // Dashboard
     dashboardSubtitle: "نظرة عامة على المخزون والنشاط.",
@@ -278,6 +381,8 @@ export const translations = {
     emailLabel: "البريد الإلكتروني",
     passwordLabel: "كلمة المرور",
     signingIn: "جارٍ تسجيل الدخول…",
+    signedIn: "تم تسجيل الدخول",
+    invalidCredentials: "البريد الإلكتروني أو كلمة المرور غير صحيحة.",
 
     // Timetable admin
     timetableAdminSubtitle: "الحصص المعروضة في الصفحة الرئيسية العامة.",
@@ -287,6 +392,16 @@ export const translations = {
     teacherPlaceholder: "المعلم",
     teacherSchoolPlaceholder: "مدرسة المعلم",
     noEntriesYet: "لا توجد حصص بعد.",
+    failedToLoadTimetable: "فشل تحميل الجدول الزمني",
+    savingEntry: "جارٍ حفظ الحصة…",
+    entryUpdated: "تم تحديث الحصة",
+    failedToUpdateEntry: "فشل تحديث الحصة",
+    addingEntry: "جارٍ إضافة الحصة…",
+    entryAdded: "تمت إضافة الحصة",
+    failedToAddEntry: "فشل إضافة الحصة",
+    deletingEntry: "جارٍ حذف الحصة…",
+    entryDeleted: "تم حذف الحصة",
+    failedToDeleteEntry: "فشل حذف الحصة",
 
     // News admin
     newsAdminSubtitle: "خبر رئيسي قابل للتعديل يظهر أعلى الصفحة الرئيسية.",
@@ -298,6 +413,15 @@ export const translations = {
     learnMorePlaceholder: "اعرف المزيد",
     saveChanges: "حفظ التغييرات",
     addNews: "إضافة خبر",
+    addingNews: "جارٍ إضافة الخبر…",
+    newsAdded: "تمت إضافة الخبر",
+    failedToAddNews: "فشل إضافة الخبر",
+    newsUpdated: "تم تحديث الخبر",
+    failedToUpdateNews: "فشل تحديث الخبر",
+    deletingNews: "جارٍ حذف الخبر…",
+    newsDeleted: "تم حذف الخبر",
+    failedToDeleteNews: "فشل حذف الخبر",
+    failedToLoadNews: "فشل تحميل الأخبار",
 
     days: {
       "0": "الأحد",

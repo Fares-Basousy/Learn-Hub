@@ -38,6 +38,16 @@ export type Organization = Prisma.OrganizationModel
  */
 export type OrganizationInventory = Prisma.OrganizationInventoryModel
 /**
+ * Model BookEdition
+ * 
+ */
+export type BookEdition = Prisma.BookEditionModel
+/**
+ * Model BookInventory
+ * 
+ */
+export type BookInventory = Prisma.BookInventoryModel
+/**
  * Model TimetableEntry
  * 
  */

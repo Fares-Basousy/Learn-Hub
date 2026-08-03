@@ -22,16 +22,16 @@ export default function LoginPage() {
     try {
       await toast.promise(
         signIn("credentials", { email, password, redirect: false }).then((result) => {
-          if (result?.error) throw new Error("Invalid email or password.");
+          if (result?.error) throw new Error(t("invalidCredentials"));
           return result;
         }),
         {
-          loading: "Signing in…",
-          success: "Signed in",
+          loading: t("signingIn"),
+          success: t("signedIn"),
           error: (e) => e.message,
         },
       );
-      router.push("/authenticated/dashboard");
+      router.push("/dashboard");
       router.refresh();
     } catch (e) {
       setErr((e as Error).message);

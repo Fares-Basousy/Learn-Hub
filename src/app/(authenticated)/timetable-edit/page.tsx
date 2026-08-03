@@ -17,6 +17,7 @@ import {
   startTimeOptions,
 } from "@/lib/timetable";
 import { useLang } from "@/components/lang-provider";
+import { PageLoader } from "@/components/spinner";
 
 const DAY_INDICES = [0, 1, 2, 3, 4, 5, 6];
 const OTHER_COURSE = "__other__";
@@ -56,15 +57,19 @@ export default function TimetableEditPage() {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>(emptyForm(CLASSROOMS[0], new Date().getDay()));
   const [courseIsOther, setCourseIsOther] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const load = async () => {
+      setLoading(true);
       try {
         const data = await getTimetableEntries();
         const entries = data?.entries?.length ? data.entries : [];
         setTimetables(entries);
       } catch (e: any) {
-        toast.error(e.message ?? "Failed to load timetable");
+        toast.error(e.message ?? t("failedToLoadTimetable"));
+      } finally {
+        setLoading(false);
       }
     };
     load();
@@ -105,15 +110,15 @@ export default function TimetableEditPage() {
     try {
       if (editingId) {
         await toast.promise(updateTimeTable(formData, editingId), {
-          loading: "Saving entry…",
-          success: "Timetable entry updated",
-          error: (e: any) => e.message ?? "Failed to update timetable entry",
+          loading: t("savingEntry"),
+          success: t("entryUpdated"),
+          error: (e: any) => e.message ?? t("failedToUpdateEntry"),
         });
       } else {
         await toast.promise(createTimeTable(formData), {
-          loading: "Adding entry…",
-          success: "Timetable entry added",
-          error: (e: any) => e.message ?? "Failed to add timetable entry",
+          loading: t("addingEntry"),
+          success: t("entryAdded"),
+          error: (e: any) => e.message ?? t("failedToAddEntry"),
         });
       }
       setFormOpen(false);
@@ -127,9 +132,9 @@ export default function TimetableEditPage() {
   const remove = async (id: string) => {
     try {
       await toast.promise(deleteTimeTable(id), {
-        loading: "Deleting entry…",
-        success: "Timetable entry deleted",
-        error: (e: any) => e.message ?? "Failed to delete timetable entry",
+        loading: t("deletingEntry"),
+        success: t("entryDeleted"),
+        error: (e: any) => e.message ?? t("failedToDeleteEntry"),
       });
       setRefreshKey(Math.random());
     } catch (error: unknown) {
@@ -304,12 +309,13 @@ export default function TimetableEditPage() {
       )}
 
       <div className="mt-4 space-y-2">
-        {dayEntries.length === 0 && (
+        {loading && <PageLoader />}
+        {!loading && dayEntries.length === 0 && (
           <div className="rounded-lg border bg-card p-4 text-center text-sm text-muted-foreground">
             {t("noEntriesYet")}
           </div>
         )}
-        {dayEntries.map((e) => (
+        {!loading && dayEntries.map((e) => (
           <div key={e.id} className="rounded-lg border bg-card p-3">
             <div className="flex items-start justify-between gap-2">
               <div>

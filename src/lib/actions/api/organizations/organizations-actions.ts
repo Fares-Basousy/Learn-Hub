@@ -17,6 +17,23 @@ const PatchSchema = z.object({
   picUrl: z.string().trim().url().max(2000).optional(),
 });
 
+const emptyToUndefined = (v: unknown) => (v === "" ? undefined : v);
+
+const RestockSchema = z
+  .object({
+    grade: z.coerce.number().int().min(1).max(12),
+    booksCount: z.coerce.number().int().nonnegative().default(0),
+    codesCount: z.coerce.number().int().nonnegative().default(0),
+    editionId: z.preprocess(emptyToUndefined, z.string().uuid().optional()),
+    newEditionName: z.preprocess(emptyToUndefined, z.string().trim().min(1).max(100).optional()),
+  })
+  .refine((i) => i.booksCount > 0 || i.codesCount > 0, {
+    message: "Enter at least one book or code.",
+  })
+  .refine((i) => i.booksCount === 0 || Boolean(i.editionId || i.newEditionName), {
+    message: "Select or enter a book edition.",
+  });
+
 export async function createOrganization(formData: FormData) {
   await requireUser();
   const entries = Object.fromEntries(formData.entries());
@@ -78,6 +95,7 @@ export async function getOrganizationById(id: string) {
     where: { id },
     include: {
       inventory: { orderBy: { grade: "asc" } },
+      bookInventory: { orderBy: [{ grade: "asc" }], include: { edition: true } },
     },
   });
   return { organization };
@@ -102,4 +120,45 @@ export async function deleteOrganization(id: string) {
   await requireUser();
   await prisma.organization.delete({ where: { id } });
   return { ok: true };
+}
+
+export async function restockInventory(orgId: string, formData: FormData) {
+  await requireUser();
+  const entries = Object.fromEntries(formData.entries());
+  const data = RestockSchema.parse(entries);
+
+  await prisma.$transaction(async (tx) => {
+    if (data.codesCount > 0) {
+      await tx.organizationInventory.upsert({
+        where: { orgId_grade: { orgId, grade: data.grade } },
+        create: { orgId, grade: data.grade, codesCount: data.codesCount },
+        update: { codesCount: { increment: data.codesCount } },
+      });
+    }
+
+    if (data.booksCount > 0) {
+      const edition = data.editionId
+        ? { id: data.editionId }
+        : await tx.bookEdition.upsert({
+            where: { name: data.newEditionName! },
+            create: { name: data.newEditionName! },
+            update: {},
+          });
+
+      await tx.bookInventory.upsert({
+        where: { orgId_grade_editionId: { orgId, grade: data.grade, editionId: edition.id } },
+        create: { orgId, grade: data.grade, editionId: edition.id, count: data.booksCount },
+        update: { count: { increment: data.booksCount } },
+      });
+    }
+  });
+
+  const organization = await prisma.organization.findUnique({
+    where: { id: orgId },
+    include: {
+      inventory: { orderBy: { grade: "asc" } },
+      bookInventory: { orderBy: [{ grade: "asc" }], include: { edition: true } },
+    },
+  });
+  return { organization };
 }

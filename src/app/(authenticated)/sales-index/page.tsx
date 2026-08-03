@@ -7,11 +7,13 @@ import { getSales } from "@/src/lib/actions/api/sales/sales-actions";
 import { getOrganizationsAdmin } from "@/src/lib/actions/api/organizations/organizations-actions";
 import { Grades, Organization, Sale } from "@/src/lib/types";
 import SaleModal from "@/src/components/sale-modal";
+import SaleDetailsDrawer from "@/components/sale-details-drawer";
 import { useLang } from "@/components/lang-provider";
+import { PageLoader, Spinner } from "@/components/spinner";
 
 export default function SalesPage() {
   return (
-    <Suspense fallback={<p className="text-sm text-muted-foreground">Loading…</p>}>
+    <Suspense fallback={<PageLoader />}>
       <SalesPageInner />
     </Suspense>
   );
@@ -33,6 +35,7 @@ function SalesPageInner() {
   const [pending, setPending] = useState(true)
   const [showModal, setShowModal] = useState(false)
   const [refreshKey, setRefreshKey] = useState(0)
+  const [selectedSale, setSelectedSale] = useState<Sale | null>(null)
 
   useEffect(() => {
     const load = async () => {
@@ -94,31 +97,51 @@ function SalesPageInner() {
       <div className="mt-6 overflow-hidden rounded-lg border bg-card">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-muted/50 text-left text-xs text-muted-foreground">
+            <thead className="bg-muted/50 text-start text-xs text-muted-foreground">
               <tr>
-                <th className="p-2">{t("colId")}</th>
+                <th className="p-2">{t("colSoldBy")}</th>
                 <th className="p-2">{t("colItems")}</th>
                 <th className="p-2">{t("colDate")}</th>
+                <th className="p-2" />
               </tr>
             </thead>
             <tbody>
-              {(sales ?? []).map((s: Sale) => (
+              {pending && (
+                <tr>
+                  <td colSpan={4} className="p-4 text-center text-muted-foreground">
+                    <div className="flex items-center justify-center gap-2">
+                      <Spinner />
+                      {t("loading")}
+                    </div>
+                  </td>
+                </tr>
+              )}
+              {!pending && (sales ?? []).map((s: Sale) => (
                 <tr key={s.id} className="border-t">
-                  <td className="p-2 font-mono text-xs whitespace-nowrap">{s.id.slice(0, 8)}</td>
+                  <td className="p-2 text-xs whitespace-nowrap">{s.user?.name ?? s.userId.slice(0, 8)}</td>
                   <td className="min-w-[220px] p-2 text-xs">
                     {s.items
                       .map(
                         (i) =>
-                          `${i.booksCount} ${t("booksWord")} / ${i.codesCount} ${t("codesWord")} — ${i.org?.name ?? i.orgId.slice(0, 8)} (${Grades[i.grade as keyof typeof Grades] ?? `${t("gradeWordLower")} ${i.grade}`})`,
+                          `${i.booksCount} ${t("booksWord")}${i.booksCount > 0 && i.edition?.name ? ` (${i.edition.name})` : ""} / ${i.codesCount} ${t("codesWord")} — ${i.org?.name ?? i.orgId.slice(0, 8)} (${Grades[i.grade as keyof typeof Grades] ?? `${t("gradeWordLower")} ${i.grade}`})`,
                       )
                       .join(", ")}
                   </td>
                   <td className="p-2 whitespace-nowrap">{new Date(s.soldAt).toLocaleString()}</td>
+                  <td className="p-2 text-end whitespace-nowrap">
+                    <button
+                      type="button"
+                      onClick={() => setSelectedSale(s)}
+                      className="rounded-full border border-input px-3 py-1 text-xs font-medium hover:bg-accent"
+                    >
+                      {t("detailsLink")}
+                    </button>
+                  </td>
                 </tr>
               ))}
-              {(sales?.length === 0) && (
+              {!pending && (sales?.length === 0) && (
                 <tr>
-                  <td colSpan={3} className="p-4 text-center text-muted-foreground">
+                  <td colSpan={4} className="p-4 text-center text-muted-foreground">
                     {t("noSalesYet")}
                   </td>
                 </tr>
@@ -166,6 +189,8 @@ function SalesPageInner() {
           }}
         />
       )}
+
+      {selectedSale && <SaleDetailsDrawer sale={selectedSale} onClose={() => setSelectedSale(null)} />}
     </div>
   );
 }
