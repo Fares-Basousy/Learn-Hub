@@ -13,7 +13,7 @@ import { PageLoader } from "@/components/spinner";
 const OTHER_EDITION = "__other__";
 
 export default function OrganizationDetailPage() {
-  const { t } = useLang();
+  const { t, tm } = useLang();
   const params = useParams<{ orgId: string }>();
   const orgId = params.orgId;
 
@@ -290,9 +290,9 @@ export default function OrganizationDetailPage() {
               className="mt-1 block h-9 rounded-full border border-input bg-background px-3 text-sm"
             >
               <option value="">{t("gradeOptionPlaceholder")}</option>
-              {Object.entries(Grades).map(([value, label]) => (
+              {Object.keys(Grades).map((value) => (
                 <option key={value} value={value}>
-                  {label}
+                  {tm("grades", value)}
                 </option>
               ))}
             </select>
@@ -366,7 +366,7 @@ export default function OrganizationDetailPage() {
               <tbody>
                 {grades.map((grade) => (
                   <tr key={grade} className="border-t align-top">
-                    <td className="p-2 font-medium whitespace-nowrap">{Grades[grade as keyof typeof Grades] ?? `Grade ${grade}`}</td>
+                    <td className="p-2 font-medium whitespace-nowrap">{tm("grades", grade)}</td>
                     <td className="p-2 text-end">{codesByGrade.get(grade) ?? 0}</td>
                     <td className="p-2">
                       {(booksByGrade.get(grade) ?? []).length > 0 ? (

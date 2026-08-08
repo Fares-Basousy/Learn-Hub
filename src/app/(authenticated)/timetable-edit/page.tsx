@@ -166,7 +166,7 @@ export default function TimetableEditPage() {
       </div>
 
       <div className="mt-2 flex gap-1">
-        {CLASSROOMS.map((c) => (
+        {CLASSROOMS.map((c, i) => (
           <button
             key={c}
             onClick={() => setSelectedClassroom(c)}
@@ -176,7 +176,7 @@ export default function TimetableEditPage() {
                 : "bg-muted text-muted-foreground hover:bg-muted/70"
             }`}
           >
-            {c}
+            {t("classroom")} {i + 1}
           </button>
         ))}
       </div>
@@ -201,8 +201,8 @@ export default function TimetableEditPage() {
             onChange={(e) => setForm({ ...form, classroom: e.target.value })}
             className="h-9 rounded-full border border-input bg-background px-3 text-sm"
           >
-            {CLASSROOMS.map((c) => (
-              <option key={c}>{c}</option>
+            {CLASSROOMS.map((c, i) => (
+              <option key={c} value={c}>{t("classroom")} {i + 1}</option>
             ))}
           </select>
           <select
@@ -253,9 +253,9 @@ export default function TimetableEditPage() {
             onChange={(e) => setForm({ ...form, grade: Number(e.target.value) })}
             className="h-9 rounded-full border border-input bg-background px-3 text-sm"
           >
-            {Object.entries(Grades).map(([value, label]) => (
+            {Object.keys(Grades).map((value) => (
               <option key={value} value={value}>
-                {label}
+                {tm("grades", value)}
               </option>
             ))}
           </select>
@@ -327,7 +327,7 @@ export default function TimetableEditPage() {
                   {e.teacherName} · {e.teacherSchool}
                 </div>
                 <div className="text-xs uppercase tracking-wider text-muted-foreground">
-                  {Grades[e.grade as keyof typeof Grades] ?? e.grade}
+                  {tm("grades", e.grade)}
                 </div>
               </div>
               <div className="flex shrink-0 gap-2">

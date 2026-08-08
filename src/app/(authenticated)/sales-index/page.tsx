@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { getSales } from "@/src/lib/actions/api/sales/sales-actions";
 import { getOrganizationsAdmin } from "@/src/lib/actions/api/organizations/organizations-actions";
-import { Grades, Organization, Sale } from "@/src/lib/types";
+import { Organization, Sale } from "@/src/lib/types";
 import SaleModal from "@/src/components/sale-modal";
 import SaleDetailsDrawer from "@/components/sale-details-drawer";
 import { useLang } from "@/components/lang-provider";
@@ -20,7 +20,7 @@ export default function SalesPage() {
 }
 
 function SalesPageInner() {
-  const { t } = useLang();
+  const { t, tm } = useLang();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -123,7 +123,7 @@ function SalesPageInner() {
                     {s.items
                       .map(
                         (i) =>
-                          `${i.booksCount} ${t("booksWord")}${i.booksCount > 0 && i.edition?.name ? ` (${i.edition.name})` : ""} / ${i.codesCount} ${t("codesWord")} — ${i.org?.name ?? i.orgId.slice(0, 8)} (${Grades[i.grade as keyof typeof Grades] ?? `${t("gradeWordLower")} ${i.grade}`})`,
+                          `${i.booksCount} ${t("booksWord")}${i.booksCount > 0 && i.edition?.name ? ` (${i.edition.name})` : ""} / ${i.codesCount} ${t("codesWord")} — ${i.org?.name ?? i.orgId.slice(0, 8)} (${tm("grades", i.grade)})`,
                       )
                       .join(", ")}
                   </td>

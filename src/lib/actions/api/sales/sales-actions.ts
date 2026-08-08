@@ -70,12 +70,24 @@ export async function createSale(formData: FormData) {
 
     for (const item of itemsWithEdition) {
       if (item.codesCount > 0) {
+        const inv = await tx.organizationInventory.findUnique({
+          where: { orgId_grade: { orgId: item.orgId, grade: item.grade } },
+        });
+        if (!inv || inv.codesCount < item.codesCount) {
+          throw new Error("NOT_ENOUGH_CODES");
+        }
         await tx.organizationInventory.update({
           where: { orgId_grade: { orgId: item.orgId, grade: item.grade } },
           data: { codesCount: { decrement: item.codesCount } },
         });
       }
       if (item.booksCount > 0 && item.editionId) {
+        const bookInv = await tx.bookInventory.findUnique({
+          where: { orgId_grade_editionId: { orgId: item.orgId, grade: item.grade, editionId: item.editionId } },
+        });
+        if (!bookInv || bookInv.count < item.booksCount) {
+          throw new Error("NOT_ENOUGH_BOOKS");
+        }
         await tx.bookInventory.update({
           where: { orgId_grade_editionId: { orgId: item.orgId, grade: item.grade, editionId: item.editionId } },
           data: { count: { decrement: item.booksCount } },

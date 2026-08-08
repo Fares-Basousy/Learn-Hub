@@ -6,14 +6,14 @@ import { getOrganizationsAdmin } from "@/src/lib/actions/api/organizations/organ
 import { getSales } from "@/src/lib/actions/api/sales/sales-actions";
 import { getGradeCounts } from "@/src/lib/actions/api/students/student-actions";
 import { getPosts } from "@/src/lib/actions/api/news/news-actions";
-import { Grades, NewsItem, Organization, Sale } from "@/src/lib/types";
+import { NewsItem, Organization, Sale } from "@/src/lib/types";
 import { useLang } from "@/components/lang-provider";
 import { PageLoader } from "@/components/spinner";
 
 type GradeCount = { grade: number; count: number };
 
 export default function DashboardPage() {
-  const { t } = useLang();
+  const { t, tm } = useLang();
   const [orgs, setOrgs] = useState<Organization[]>([]);
   const [sales, setSales] = useState<Sale[]>([]);
   const [news, setNews] = useState<NewsItem[]>([]);
@@ -115,7 +115,7 @@ export default function DashboardPage() {
                   href={`/students?grade=${g.grade}`}
                   className="font-medium hover:underline"
                 >
-                  {Grades[g.grade as keyof typeof Grades] ?? `${t("colGrade")} ${g.grade}`}
+                  {tm("grades", g.grade)}
                 </Link>
                 <span className="text-muted-foreground">{g.count} {t("studentsWord")}</span>
               </li>

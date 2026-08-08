@@ -132,6 +132,8 @@ export const translations = {
     recordingSale: "Recording sale…",
     saleRecorded: "Sale recorded",
     failedToRecordSale: "Failed to record sale",
+    notEnoughCodes: "Not enough codes in stock for this organization/grade.",
+    notEnoughBooks: "Not enough books in stock for this organization/grade/edition.",
 
     // Dashboard
     dashboardSubtitle: "Overview of inventory and activity.",
@@ -366,6 +368,8 @@ export const translations = {
     recordingSale: "جارٍ تسجيل البيع…",
     saleRecorded: "تم تسجيل البيع",
     failedToRecordSale: "فشل تسجيل البيع",
+    notEnoughCodes: "لا يوجد رصيد كافٍ من الأكواد لهذه المؤسسة/الصف.",
+    notEnoughBooks: "لا يوجد رصيد كافٍ من الكتب لهذه المؤسسة/الصف/الإصدار.",
 
     // Dashboard
     dashboardSubtitle: "نظرة عامة على المخزون والنشاط.",

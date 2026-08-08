@@ -36,7 +36,7 @@ export default function SaleModal({
   onClose: () => void;
   onCreated: () => void;
 }) {
-  const { t } = useLang();
+  const { t, tm } = useLang();
   const [items, setItems] = useState<SaleItemInput[]>([emptyItem()]);
   const [editions, setEditions] = useState<BookEdition[]>([]);
   const [addStudent, setAddStudent] = useState(false);
@@ -118,7 +118,11 @@ export default function SaleModal({
         loading: t("recordingSale"),
         success: t("saleRecorded"),
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        error: (e: any) => e.message ?? t("failedToRecordSale"),
+        error: (e: any) => {
+          if (e?.message === "NOT_ENOUGH_CODES") return t("notEnoughCodes");
+          if (e?.message === "NOT_ENOUGH_BOOKS") return t("notEnoughBooks");
+          return t("failedToRecordSale");
+        },
       });
       onCreated();
       onClose();
@@ -299,9 +303,9 @@ export default function SaleModal({
                 className="h-9 rounded-full border border-input bg-background px-3 text-sm"
               >
                 <option value="">{t("gradeOptionPlaceholder")}</option>
-                {Object.entries(Grades).map(([value, label]) => (
+                {Object.keys(Grades).map((value) => (
                   <option key={value} value={value}>
-                    {label}
+                    {tm("grades", value)}
                   </option>
                 ))}
               </select>

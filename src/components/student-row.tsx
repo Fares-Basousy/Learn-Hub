@@ -12,7 +12,7 @@ type StudentRowProps = {
 };
 
 export default function StudentRow({ student, onDelete, onUpdate }: StudentRowProps) {
-  const { t } = useLang();
+  const { t, tm } = useLang();
   const [pending, setPending] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
   const [form, setForm] = useState({
@@ -101,9 +101,9 @@ export default function StudentRow({ student, onDelete, onUpdate }: StudentRowPr
                         onChange={(e) => setForm({ ...form, grade: Number(e.target.value) })}
                         className="h-8 w-full rounded-full border border-input bg-background px-3 text-sm"
                       >
-                        {Object.entries(Grades).map(([value, label]) => (
+                        {Object.keys(Grades).map((value) => (
                           <option key={value} value={value}>
-                            {label}
+                            {tm("grades", value)}
                           </option>
                         ))}
                       </select>
@@ -120,7 +120,7 @@ export default function StudentRow({ student, onDelete, onUpdate }: StudentRowPr
                   <>
                     <td className="p-2 font-medium">{student.name}</td>
                     <td className="p-2">{student.number}</td>
-                    <td className="p-2">{Grades[student.grade as keyof typeof Grades] ?? student.grade}</td>
+                    <td className="p-2">{tm("grades", student.grade)}</td>
                     <td className="p-2">{student.school}</td>
                   </>
                 )}

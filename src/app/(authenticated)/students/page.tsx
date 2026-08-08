@@ -40,7 +40,7 @@ function StudentsPageInner({
   filterOrgId?: string;
   filterGrade?: number;
 }) {
-  const { t } = useLang();
+  const { t, tm } = useLang();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -145,7 +145,7 @@ function StudentsPageInner({
             {t("filteredBy")}
             {filterOrg && <> {t("organizationWord")} <strong>{filterOrg.name}</strong></>}
             {filterOrg && filterGrade !== undefined && " · "}
-            {filterGrade !== undefined && <>{t("gradeWordLower")} <strong>{Grades[filterGrade as keyof typeof Grades] ?? filterGrade}</strong></>}
+            {filterGrade !== undefined && <>{t("gradeWordLower")} <strong>{tm("grades", filterGrade)}</strong></>}
           </span>
           <Link href="/students" className="text-xs text-primary hover:underline">
             {t("clearFilter")}
@@ -194,9 +194,9 @@ function StudentsPageInner({
           className="h-9 rounded-full border border-input bg-background px-3 text-sm"
         >
           <option value="">{t("gradeOptionPlaceholder")}</option>
-          {Object.entries(Grades).map(([value, label]) => (
+          {Object.keys(Grades).map((value) => (
             <option key={value} value={value}>
-              {label}
+              {tm("grades", value)}
             </option>
           ))}
         </select>

@@ -1,9 +1,9 @@
 "use client"
-import { Grades, Sale } from "@/src/lib/types";
+import { Sale } from "@/src/lib/types";
 import { useLang } from "@/components/lang-provider";
 
 export default function SaleDetailsDrawer({ sale, onClose }: { sale: Sale; onClose: () => void }) {
-  const { t } = useLang();
+  const { t, tm } = useLang();
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end bg-black/50">
@@ -40,7 +40,7 @@ export default function SaleDetailsDrawer({ sale, onClose }: { sale: Sale; onClo
               <div className="flex items-center justify-between">
                 <span className="font-medium">{i.org?.name ?? i.orgId.slice(0, 8)}</span>
                 <span className="text-xs text-muted-foreground">
-                  {Grades[i.grade as keyof typeof Grades] ?? `${t("gradeWordLower")} ${i.grade}`}
+                  {tm("grades", i.grade)}
                 </span>
               </div>
               <div className="mt-2 flex flex-wrap gap-4 text-xs text-muted-foreground">

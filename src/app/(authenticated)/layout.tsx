@@ -8,12 +8,12 @@ import { useTheme } from "@/components/theme-provider";
 import { useLang } from "@/components/lang-provider";
 
 const NAV = [
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/organizations", label: "Organizations" },
-  { href: "/sales-index", label: "Sales" },
-  { href: "/students", label: "Students" },
-  { href: "/timetable-edit", label: "Timetable" },
-  { href: "/news-edit", label: "News" },
+  { href: "/dashboard", key: "dashboard" },
+  { href: "/organizations", key: "organizations" },
+  { href: "/sales-index", key: "sales" },
+  { href: "/students", key: "students" },
+  { href: "/timetable-edit", key: "timetable" },
+  { href: "/news-edit", key: "news" },
 ] as const;
 
 export default function AuthedLayout({ children }: { children: React.ReactNode }) {
@@ -27,12 +27,12 @@ export default function AuthedLayout({ children }: { children: React.ReactNode }
       <header className="sticky top-0 z-40 border-b bg-card">
         <div className="flex h-14 items-center gap-3 px-4">
           <Link href="/" className="shrink-0 text-lg font-semibold">
-            School Hub
+            {t("brand")}
           </Link>
 
           <nav className="ml-4 hidden flex-1 items-center gap-1 overflow-x-auto md:flex">
             {NAV.map((n) => (
-              <NavLink key={n.href} href={n.href} label={n.label} active={pathname?.startsWith(n.href)} />
+              <NavLink key={n.href} href={n.href} label={t(n.key)} active={pathname?.startsWith(n.href)} />
             ))}
           </nav>
 
@@ -58,7 +58,7 @@ export default function AuthedLayout({ children }: { children: React.ReactNode }
               onClick={() => signOut({ callbackUrl: "/login" })}
               className="rounded-full px-3 py-2 text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
             >
-              Sign out
+              {t("signOut")}
             </button>
           </div>
 
@@ -78,7 +78,7 @@ export default function AuthedLayout({ children }: { children: React.ReactNode }
               <NavLink
                 key={n.href}
                 href={n.href}
-                label={n.label}
+                label={t(n.key)}
                 active={pathname?.startsWith(n.href)}
                 block
                 onClick={() => setMenuOpen(false)}
@@ -107,7 +107,7 @@ export default function AuthedLayout({ children }: { children: React.ReactNode }
               onClick={() => signOut({ callbackUrl: "/login" })}
               className="rounded-md px-3 py-2 text-left text-sm text-muted-foreground hover:bg-accent hover:text-foreground"
             >
-              Sign out
+              {t("signOut")}
             </button>
           </nav>
         )}
