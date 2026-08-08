@@ -22,12 +22,12 @@ export const links = () => [
   { rel: "stylesheet", href: appCSS },
 ]; 
 export const metadata: Metadata = {
-  title: "School Hub",
+  title: "Learn Hub",
   description:
     "Public timetables and inventory management for our school network.",
-  authors: [{ name: "School Hub" }],
+  authors: [{ name: "Learn Hub" }],
   openGraph: {
-    title: "School Hub",
+    title: "Learn Hub",
     description:  
       "Public timetables and inventory management for our school network.",
     type: "website",
@@ -39,7 +39,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "School Hub",
+    title: "Learn Hub",
     description:
       "Public timetables and inventory management for our school network.",
     images: [

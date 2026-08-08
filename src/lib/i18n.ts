@@ -2,7 +2,7 @@ export type Lang = "en" | "ar";
 
 export const translations = {
   en: {
-    brand: "School Hub",
+    brand: "Learn Hub",
     home: "Home",
     contact: "Contact",
     signIn: "Sign in",
@@ -239,7 +239,7 @@ export const translations = {
     } as Record<string, string>,
   },
   ar: {
-    brand: "سنتر الفردوس",
+    brand: "مركز التعلم",
     home: "الرئيسية",
     contact: "اتصل بنا",
     signIn: "تسجيل الدخول",

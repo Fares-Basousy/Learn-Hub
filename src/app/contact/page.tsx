@@ -12,16 +12,16 @@ export default function ContactPage() {
   return (
     <>
       <Head>
-        <title>Contact — School Hub</title>
+        <title>Contact — Learn Hub</title>
         <meta name="description" content="Get in touch with our team." />
 
-        <meta property="og:title" content="Contact — School Hub" />
+        <meta property="og:title" content="Contact — Learn Hub" />
         <meta
           property="og:description"
           content="Get in touch with our team."
         />
 
-        <meta name="twitter:title" content="Contact — School Hub" />
+        <meta name="twitter:title" content="Contact — Learn Hub" />
         <meta
           name="twitter:description"
           content="Get in touch with our team."
