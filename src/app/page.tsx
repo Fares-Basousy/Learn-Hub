@@ -15,12 +15,11 @@ import {
 } from "@/components/ui/select";
 import { getTimetableEntries } from "../lib/actions/api/timetable/timetable-actions";
 import { getPublicOrganizations } from "../lib/actions/api/organizations/organizations-actions";
-import { Courses, TimetableEntry } from "../lib/types";
+import { Courses, Grades, TimetableEntry } from "../lib/types";
 import { CLASSROOMS, formatMinutes } from "../lib/timetable";
 
 type PublicOrganization = { id: string; name: string; subject: string; picUrl: string };
 
-const DAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 const SESSIONS = [0, 1, 2, 3];
 
 // Placeholder entries used when the DB isn't wired yet.
@@ -43,7 +42,7 @@ const PLACEHOLDER: TimetableEntry[] = CLASSROOMS.flatMap((c, ci) =>
   ),
 );
 export default function Home() {
-  const [selectedDay, setSelectedDay] = useState(1);
+  const [selectedGrade, setSelectedGrade] = useState(1);
   const { lang, t, tm } = useLang();
   const [timetables,setTimetables] = useState<TimetableEntry[]>([])
   const [organizations, setOrganizations] = useState<PublicOrganization[]>([])
@@ -102,22 +101,22 @@ export default function Home() {
               <p className="text-sm text-muted-foreground">{t("timetableSubtitle")}</p>
             </div>
             <Select
-              value={String(selectedDay)}
-              onValueChange={(v) => setSelectedDay(Number(v))}
+              value={String(selectedGrade)}
+              onValueChange={(v) => setSelectedGrade(Number(v))}
             >
               <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder={t("selectDay")} />
+                <SelectValue placeholder={t("gradeOptionPlaceholder")} />
               </SelectTrigger>
               <SelectContent>
-                {DAYS.map((_d, i) => (
-                  <SelectItem key={i} value={String(i)}>
-                    {tm("days", i)}
+                {Object.keys(Grades).map((g) => (
+                  <SelectItem key={g} value={g}>
+                    {tm("grades", g)}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
-          <TimetableGrid day={selectedDay} entries={timetables} />
+          <TimetableGrid grade={selectedGrade} entries={timetables} />
         </section>
 
         <section id="organizations" className="mx-auto max-w-6xl px-4 py-12">
@@ -158,10 +157,10 @@ export default function Home() {
 }
 
 function TimetableGrid({
-  day,
+  grade,
   entries,
 }: {
-  day: number;
+  grade: number;
   entries: TimetableEntry[];
 }) {
   const { t, tm } = useLang();
@@ -170,8 +169,8 @@ function TimetableGrid({
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
       {CLASSROOMS.map((room, i) => {
         const roomEntries = entries
-          .filter((e) => e.classroom === room && e.dayOfWeek === day)
-          .sort((a, b) => a.startMinute - b.startMinute);
+          .filter((e) => e.classroom === room && e.grade === grade)
+          .sort((a, b) => a.dayOfWeek - b.dayOfWeek || a.startMinute - b.startMinute);
 
         return (
           <div key={room} className="overflow-hidden rounded-xl border bg-card">
@@ -185,12 +184,12 @@ function TimetableGrid({
               {roomEntries.map((e) => (
                 <div key={e.id} className="space-y-0.5 p-3">
                   <div className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-                    {formatMinutes(e.startMinute)} – {formatMinutes(e.endMinute)}
+                    {tm("days", e.dayOfWeek)} · {formatMinutes(e.startMinute)} – {formatMinutes(e.endMinute)}
                   </div>
                   <div className="font-semibold">{tm("courses", e.course)}</div>
                   <div className="text-muted-foreground">{e.teacherName}</div>
                   <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                    {tm("grades", e.grade)} · {e.teacherSchool}
+                    {e.teacherSchool}
                   </div>
                 </div>
               ))}
