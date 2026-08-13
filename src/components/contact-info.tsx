@@ -19,6 +19,7 @@ function WhatsAppIcon({ className }: { className?: string }) {
 export function ContactInfoBlock() {
   const { lang, t } = useLang();
   const street = lang === "ar" ? contactInfo.street_ar ?? contactInfo.street : contactInfo.street;
+  const mapEmbedUrl = `https://www.google.com/maps?q=${encodeURIComponent(contactInfo.street)}&output=embed`;
   return (
     <div className="space-y-6">
       <div>
@@ -38,6 +39,17 @@ export function ContactInfoBlock() {
               {t("openInMaps")}
             </a>
           </div>
+        </div>
+        <div className="mt-3 overflow-hidden rounded-lg border">
+          <iframe
+            src={mapEmbedUrl}
+            title={t("address")}
+            width="100%"
+            height="200"
+            style={{ border: 0 }}
+            loading="lazy"
+            referrerPolicy="no-referrer-when-downgrade"
+          />
         </div>
       </div>
 

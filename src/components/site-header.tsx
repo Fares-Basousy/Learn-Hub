@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Moon, Sun, Languages } from "lucide-react";
+import { Moon, Sun, Languages, GraduationCap } from "lucide-react";
 import { useTheme } from "@/components/theme-provider";
 import { useLang } from "@/components/lang-provider";
 
@@ -10,7 +10,8 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 border-b bg-background/80 backdrop-blur">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-3 px-4">
-        <Link href="/" className="text-lg font-semibold tracking-tight">
+        <Link href="/" className="flex items-center gap-2 text-lg font-semibold tracking-tight">
+          <GraduationCap className="h-5 w-5 text-primary" />
           {t("brand")}
         </Link>
         <nav className="flex items-center gap-2 text-sm sm:gap-4">
