@@ -4,12 +4,15 @@ import prisma from "@/lib/prisma";
 import { requireUser } from "@/lib/require-user";
 import { NewsItem } from "@/src/lib/types";
 
+// Update always sends every field, using "" to mean "clear this" for nullable fields.
+const emptyToNull = (v: unknown) => (typeof v === "string" && v.trim() === "" ? null : v);
+
 const PatchSchema = z.object({
   title: z.string().trim().min(1).max(200).optional(),
-  body: z.string().trim().max(2000).nullable().optional(),
-  imageUrl: z.string().trim().url().max(2000).nullable().optional(),
-  linkUrl: z.string().trim().url().max(2000).nullable().optional(),
-  linkLabel: z.string().trim().max(120).nullable().optional(),
+  body: z.preprocess(emptyToNull, z.string().trim().max(2000).nullable().optional()),
+  imageUrl: z.preprocess(emptyToNull, z.string().trim().url().max(2000).nullable().optional()),
+  linkUrl: z.preprocess(emptyToNull, z.string().trim().url().max(2000).nullable().optional()),
+  linkLabel: z.preprocess(emptyToNull, z.string().trim().max(120).nullable().optional()),
   publishedAt: z.string().datetime().optional(),
 });
 const NewsSchema = z.object({

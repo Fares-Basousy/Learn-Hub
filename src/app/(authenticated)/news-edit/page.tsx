@@ -108,8 +108,10 @@ useEffect(()=>{
   const update =  async (id : string) =>{
       setPending(true)
       const formData = new FormData();
+      // Unlike create, every field must be sent even when cleared — omitting a
+      // key means "leave unchanged" to Prisma, not "clear it".
       Object.entries(toBody(form)).forEach(([key, value]) => {
-        if (value !== null) formData.append(key, String(value));
+        formData.append(key, value === null ? "" : String(value));
         });
       try{
           await toast.promise(updatePost(formData, id), {
