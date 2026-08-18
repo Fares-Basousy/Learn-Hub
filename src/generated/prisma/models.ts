@@ -11,6 +11,7 @@
 export type * from './models/User'
 export type * from './models/Student'
 export type * from './models/Organization'
+export type * from './models/StudentOrganization'
 export type * from './models/OrganizationInventory'
 export type * from './models/BookEdition'
 export type * from './models/BookInventory'

@@ -38,7 +38,7 @@ export default function SaleDetailsDrawer({ sale, onClose }: { sale: Sale; onClo
           {sale.items.map((i) => (
             <div key={i.id} className="rounded-md border p-3 text-sm">
               <div className="flex items-center justify-between">
-                <span className="font-medium">{i.org?.name ?? i.orgId.slice(0, 8)}</span>
+                <span className="font-medium">{i.org?.name ?? t("deletedOrganization")}</span>
                 <span className="text-xs text-muted-foreground">
                   {tm("grades", i.grade)}
                 </span>

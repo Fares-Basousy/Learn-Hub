@@ -400,6 +400,7 @@ export const ModelName = {
   User: 'User',
   Student: 'Student',
   Organization: 'Organization',
+  StudentOrganization: 'StudentOrganization',
   OrganizationInventory: 'OrganizationInventory',
   BookEdition: 'BookEdition',
   BookInventory: 'BookInventory',
@@ -423,7 +424,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "student" | "organization" | "organizationInventory" | "bookEdition" | "bookInventory" | "timetableEntry" | "action" | "sale" | "saleItem" | "news"
+    modelProps: "user" | "student" | "organization" | "studentOrganization" | "organizationInventory" | "bookEdition" | "bookInventory" | "timetableEntry" | "action" | "sale" | "saleItem" | "news"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -646,6 +647,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.OrganizationCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.OrganizationCountAggregateOutputType> | number
+        }
+      }
+    }
+    StudentOrganization: {
+      payload: Prisma.$StudentOrganizationPayload<ExtArgs>
+      fields: Prisma.StudentOrganizationFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.StudentOrganizationFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StudentOrganizationPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.StudentOrganizationFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StudentOrganizationPayload>
+        }
+        findFirst: {
+          args: Prisma.StudentOrganizationFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StudentOrganizationPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.StudentOrganizationFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StudentOrganizationPayload>
+        }
+        findMany: {
+          args: Prisma.StudentOrganizationFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StudentOrganizationPayload>[]
+        }
+        create: {
+          args: Prisma.StudentOrganizationCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StudentOrganizationPayload>
+        }
+        createMany: {
+          args: Prisma.StudentOrganizationCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.StudentOrganizationCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StudentOrganizationPayload>[]
+        }
+        delete: {
+          args: Prisma.StudentOrganizationDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StudentOrganizationPayload>
+        }
+        update: {
+          args: Prisma.StudentOrganizationUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StudentOrganizationPayload>
+        }
+        deleteMany: {
+          args: Prisma.StudentOrganizationDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.StudentOrganizationUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.StudentOrganizationUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StudentOrganizationPayload>[]
+        }
+        upsert: {
+          args: Prisma.StudentOrganizationUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StudentOrganizationPayload>
+        }
+        aggregate: {
+          args: Prisma.StudentOrganizationAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateStudentOrganization>
+        }
+        groupBy: {
+          args: Prisma.StudentOrganizationGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.StudentOrganizationGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.StudentOrganizationCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.StudentOrganizationCountAggregateOutputType> | number
         }
       }
     }
@@ -1300,7 +1375,6 @@ export const StudentScalarFieldEnum = {
   school: 'school',
   type: 'type',
   gender: 'gender',
-  orgId: 'orgId',
   createdAt: 'createdAt'
 } as const
 
@@ -1316,6 +1390,16 @@ export const OrganizationScalarFieldEnum = {
 } as const
 
 export type OrganizationScalarFieldEnum = (typeof OrganizationScalarFieldEnum)[keyof typeof OrganizationScalarFieldEnum]
+
+
+export const StudentOrganizationScalarFieldEnum = {
+  id: 'id',
+  studentId: 'studentId',
+  orgId: 'orgId',
+  createdAt: 'createdAt'
+} as const
+
+export type StudentOrganizationScalarFieldEnum = (typeof StudentOrganizationScalarFieldEnum)[keyof typeof StudentOrganizationScalarFieldEnum]
 
 
 export const OrganizationInventoryScalarFieldEnum = {
@@ -1710,6 +1794,7 @@ export type GlobalOmitConfig = {
   user?: Prisma.UserOmit
   student?: Prisma.StudentOmit
   organization?: Prisma.OrganizationOmit
+  studentOrganization?: Prisma.StudentOrganizationOmit
   organizationInventory?: Prisma.OrganizationInventoryOmit
   bookEdition?: Prisma.BookEditionOmit
   bookInventory?: Prisma.BookInventoryOmit

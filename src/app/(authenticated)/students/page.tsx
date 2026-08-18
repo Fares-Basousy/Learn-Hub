@@ -55,7 +55,7 @@ function StudentsPageInner({
   const [tableLoading, setTableLoading] = useState(true)
   const [refreshKey, setRefreshKey] = useState(0)
   const [form, setForm] = useState({
-    orgId: "",
+    orgIds: [] as string[],
     name: "",
     number: "",
     grade: "",
@@ -109,7 +109,11 @@ function StudentsPageInner({
     setPending(true)
     const formData = new FormData();
     Object.entries(form).forEach(([key, value]) => {
-      if (value) formData.append(key, String(value));
+      if (key === "orgIds") {
+        (value as string[]).forEach((orgId) => formData.append("orgIds", orgId));
+      } else if (value) {
+        formData.append(key, String(value));
+      }
     });
     try {
       await toast.promise(createStudent(formData), {
@@ -118,7 +122,7 @@ function StudentsPageInner({
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         error: (e: any) => e.message ?? t("failedToAddStudent"),
       })
-      setForm({ orgId: "", name: "", number: "", grade: "", school: "", gender: "MALE", type: "" })
+      setForm({ orgIds: [], name: "", number: "", grade: "", school: "", gender: "MALE", type: "" })
       if (pageIndex !== 0) router.push(hrefForPage(0))
       else setRefreshKey(Math.random())
     }
@@ -161,12 +165,14 @@ function StudentsPageInner({
         className="mt-6 grid grid-cols-2 gap-2 rounded-lg border bg-card p-3 sm:grid-cols-4"
       >
         <select
-          required
-          value={form.orgId}
-          onChange={(e) => setForm({ ...form, orgId: e.target.value })}
-          className="h-9 rounded-full border border-input bg-background px-3 text-sm"
+          multiple
+          value={form.orgIds}
+          onChange={(e) =>
+            setForm({ ...form, orgIds: Array.from(e.target.selectedOptions, (o) => o.value) })
+          }
+          title={t("orgOptionPlaceholder")}
+          className="h-9 min-w-0 rounded-lg border border-input bg-background px-3 text-sm"
         >
-          <option value="">{t("orgOptionPlaceholder")}</option>
           {organizations?.map((o) => (
             <option key={o.id} value={o.id}>
               {o.name}
@@ -238,13 +244,14 @@ function StudentsPageInner({
                 <th className="p-2">{t("colNumber")}</th>
                 <th className="p-2">{t("colGrade")}</th>
                 <th className="p-2">{t("colSchool")}</th>
+                <th className="p-2">{t("organizationWord")}</th>
                 <th className="p-2" />
               </tr>
             </thead>
             <tbody>
               {tableLoading && (
                 <tr>
-                  <td colSpan={5} className="p-4 text-center text-muted-foreground">
+                  <td colSpan={6} className="p-4 text-center text-muted-foreground">
                     <div className="flex items-center justify-center gap-2">
                       <Spinner />
                       {t("loading")}
@@ -256,6 +263,7 @@ function StudentsPageInner({
                 <StudentRow
                   key={s.id}
                   student={s}
+                  organizations={organizations}
                   onDelete={(id) => setStudents((prev) => prev.filter((student) => student.id !== id))}
                   onUpdate={(updated) =>
                     setStudents((prev) => prev.map((student) => (student.id === updated.id ? updated : student)))
@@ -264,7 +272,7 @@ function StudentsPageInner({
               ))}
               {!tableLoading && students && students?.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="p-4 text-center text-muted-foreground">
+                  <td colSpan={6} className="p-4 text-center text-muted-foreground">
                     {t("noStudentsYet")}
                   </td>
                 </tr>

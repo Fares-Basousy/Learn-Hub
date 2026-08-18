@@ -54,6 +54,7 @@ export const ModelName = {
   User: 'User',
   Student: 'Student',
   Organization: 'Organization',
+  StudentOrganization: 'StudentOrganization',
   OrganizationInventory: 'OrganizationInventory',
   BookEdition: 'BookEdition',
   BookInventory: 'BookInventory',
@@ -100,7 +101,6 @@ export const StudentScalarFieldEnum = {
   school: 'school',
   type: 'type',
   gender: 'gender',
-  orgId: 'orgId',
   createdAt: 'createdAt'
 } as const
 
@@ -116,6 +116,16 @@ export const OrganizationScalarFieldEnum = {
 } as const
 
 export type OrganizationScalarFieldEnum = (typeof OrganizationScalarFieldEnum)[keyof typeof OrganizationScalarFieldEnum]
+
+
+export const StudentOrganizationScalarFieldEnum = {
+  id: 'id',
+  studentId: 'studentId',
+  orgId: 'orgId',
+  createdAt: 'createdAt'
+} as const
+
+export type StudentOrganizationScalarFieldEnum = (typeof StudentOrganizationScalarFieldEnum)[keyof typeof StudentOrganizationScalarFieldEnum]
 
 
 export const OrganizationInventoryScalarFieldEnum = {

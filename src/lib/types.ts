@@ -72,13 +72,13 @@ export type Organization = {
 
 export type Student = {
   id: string;
-  orgId: string;
   name: string;
   number: string;
   grade: number;
   school: string;
   type?: string | null;
   gender: Gender;
+  organizations?: Organization[];
 };
 
 
@@ -108,8 +108,8 @@ export type NewsItem = {
 export type SaleItem = {
   id: string;
   saleId: string;
-  orgId: string;
-  org?: Organization;
+  orgId: string | null;
+  org?: Organization | null;
   grade: number;
   editionId?: string | null;
   edition?: BookEdition | null;

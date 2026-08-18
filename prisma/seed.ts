@@ -109,7 +109,7 @@ async function main() {
         school: pick(SCHOOLS),
         type: Math.random() > 0.7 ? "transfer" : null,
         gender,
-        orgId: org.id,
+        organizations: { create: { orgId: org.id } },
       },
     });
     students.push(student);

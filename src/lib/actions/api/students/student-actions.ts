@@ -2,14 +2,18 @@
 import { z } from "zod";
 import prisma from "@/lib/prisma";
 import { Gender } from "@/src/generated/prisma/enums";
-import { Student } from "@/src/lib/types";
+import { Organization, Student } from "@/src/lib/types";
 import { requireUser } from "@/lib/require-user";
 
 const PAGE_SIZE = 20;
 const MIN_GRADE_COUNT = 10;
 
+// A student may belong to zero or more orgs — orgIds comes in as multiple
+// "orgIds" entries on the FormData, collected separately via formData.getAll.
+const orgIdsField = z.array(z.string().uuid());
+
 const CreateSchema = z.object({
-  orgId: z.string().uuid(),
+  orgIds: orgIdsField,
   name: z.string().min(1).max(200),
   number: z.string().min(1).max(50),
   grade: z.coerce.number().int().min(1).max(12),
@@ -24,7 +28,7 @@ const PatchSchema = z.object({
   school: z.string().min(1).max(200).optional(),
   type: z.string().max(100).optional().or(z.literal("")),
   gender: z.enum(["MALE", "FEMALE"]).optional(),
-  orgId: z.string().uuid().optional(),
+  orgIds: orgIdsField.optional(),
 });
 
 export type StudentFilters = {
@@ -32,22 +36,39 @@ export type StudentFilters = {
   grade?: number;
 };
 
+const withOrganizations = { organizations: { include: { org: true } } } as const;
+
+// Prisma returns membership join rows; flatten to the plain orgs the UI expects.
+function flattenStudent(student: {
+  id: string;
+  name: string;
+  number: string;
+  grade: number;
+  school: string;
+  type: string | null;
+  gender: Gender;
+  organizations: { org: Organization }[];
+}): Student {
+  return { ...student, organizations: student.organizations.map((m) => m.org) };
+}
+
 export async function createStudent(formData: FormData) {
   await requireUser();
   const entries = Object.fromEntries(formData.entries());
-  const data = CreateSchema.parse(entries);
+  const data = CreateSchema.parse({ ...entries, orgIds: formData.getAll("orgIds") });
   const student = await prisma.student.create({
     data: {
-      orgId: data.orgId,
       name: data.name,
       number: data.number,
       grade: data.grade,
       school: data.school,
       type: data.type || null,
       gender: data.gender as Gender,
+      organizations: { create: data.orgIds.map((orgId) => ({ orgId })) },
     },
+    include: withOrganizations,
   });
-  return { student };
+  return { student: flattenStudent(student) };
 }
 
 export async function getStudents(pageIndex: number, filters: StudentFilters = {}) {
@@ -55,15 +76,16 @@ export async function getStudents(pageIndex: number, filters: StudentFilters = {
   try {
     const students = await prisma.student.findMany({
       where: {
-        ...(filters.orgId ? { orgId: filters.orgId } : {}),
+        ...(filters.orgId ? { organizations: { some: { orgId: filters.orgId } } } : {}),
         ...(filters.grade !== undefined ? { grade: filters.grade } : {}),
       },
+      include: withOrganizations,
       orderBy: { name: "asc" },
       skip: pageIndex * PAGE_SIZE,
       take: PAGE_SIZE + 1,
     });
     const hasMore = students.length > PAGE_SIZE;
-    return { students: students.slice(0, PAGE_SIZE), hasMore };
+    return { students: students.slice(0, PAGE_SIZE).map(flattenStudent), hasMore };
   } catch (e) {
     return { students: [] as Student[], hasMore: false, warning: (e as Error).message };
   }
@@ -71,14 +93,16 @@ export async function getStudents(pageIndex: number, filters: StudentFilters = {
 
 export async function getStudentById(id: string) {
   await requireUser();
-  const student = await prisma.student.findUnique({ where: { id } });
-  return { student };
+  const student = await prisma.student.findUnique({ where: { id }, include: withOrganizations });
+  return { student: student ? flattenStudent(student) : null };
 }
 
 export async function updateStudent(id: string, formData: FormData) {
   await requireUser();
   const entries = Object.fromEntries(formData.entries());
-  const data = PatchSchema.parse(entries);
+  const orgIdsTouched = formData.has("orgIdsTouched");
+  const orgIds = formData.getAll("orgIds");
+  const data = PatchSchema.parse({ ...entries, ...(orgIdsTouched ? { orgIds } : {}) });
   const student = await prisma.student.update({
     where: { id },
     data: {
@@ -88,10 +112,13 @@ export async function updateStudent(id: string, formData: FormData) {
       school: data.school,
       ...(data.type !== undefined ? { type: data.type || null } : {}),
       gender: data.gender as Gender | undefined,
-      orgId: data.orgId,
+      ...(data.orgIds !== undefined
+        ? { organizations: { deleteMany: {}, create: data.orgIds.map((orgId) => ({ orgId })) } }
+        : {}),
     },
+    include: withOrganizations,
   });
-  return { student };
+  return { student: flattenStudent(student) };
 }
 
 export async function deleteStudent(id: string) {

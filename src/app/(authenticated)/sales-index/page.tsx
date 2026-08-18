@@ -123,7 +123,7 @@ function SalesPageInner() {
                     {s.items
                       .map(
                         (i) =>
-                          `${i.booksCount} ${t("booksWord")}${i.booksCount > 0 && i.edition?.name ? ` (${i.edition.name})` : ""} / ${i.codesCount} ${t("codesWord")} — ${i.org?.name ?? i.orgId.slice(0, 8)} (${tm("grades", i.grade)})`,
+                          `${i.booksCount} ${t("booksWord")}${i.booksCount > 0 && i.edition?.name ? ` (${i.edition.name})` : ""} / ${i.codesCount} ${t("codesWord")} — ${i.org?.name ?? t("deletedOrganization")} (${tm("grades", i.grade)})`,
                       )
                       .join(", ")}
                   </td>

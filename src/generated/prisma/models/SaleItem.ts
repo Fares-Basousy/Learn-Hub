@@ -202,7 +202,7 @@ export type SaleItemGroupByArgs<ExtArgs extends runtime.Types.Extensions.Interna
 export type SaleItemGroupByOutputType = {
   id: string
   saleId: string
-  orgId: string
+  orgId: string | null
   grade: number
   editionId: string | null
   booksCount: number
@@ -235,20 +235,20 @@ export type SaleItemWhereInput = {
   NOT?: Prisma.SaleItemWhereInput | Prisma.SaleItemWhereInput[]
   id?: Prisma.StringFilter<"SaleItem"> | string
   saleId?: Prisma.StringFilter<"SaleItem"> | string
-  orgId?: Prisma.StringFilter<"SaleItem"> | string
+  orgId?: Prisma.StringNullableFilter<"SaleItem"> | string | null
   grade?: Prisma.IntFilter<"SaleItem"> | number
   editionId?: Prisma.StringNullableFilter<"SaleItem"> | string | null
   booksCount?: Prisma.IntFilter<"SaleItem"> | number
   codesCount?: Prisma.IntFilter<"SaleItem"> | number
   sale?: Prisma.XOR<Prisma.SaleScalarRelationFilter, Prisma.SaleWhereInput>
-  org?: Prisma.XOR<Prisma.OrganizationScalarRelationFilter, Prisma.OrganizationWhereInput>
+  org?: Prisma.XOR<Prisma.OrganizationNullableScalarRelationFilter, Prisma.OrganizationWhereInput> | null
   edition?: Prisma.XOR<Prisma.BookEditionNullableScalarRelationFilter, Prisma.BookEditionWhereInput> | null
 }
 
 export type SaleItemOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   saleId?: Prisma.SortOrder
-  orgId?: Prisma.SortOrder
+  orgId?: Prisma.SortOrderInput | Prisma.SortOrder
   grade?: Prisma.SortOrder
   editionId?: Prisma.SortOrderInput | Prisma.SortOrder
   booksCount?: Prisma.SortOrder
@@ -264,20 +264,20 @@ export type SaleItemWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.SaleItemWhereInput[]
   NOT?: Prisma.SaleItemWhereInput | Prisma.SaleItemWhereInput[]
   saleId?: Prisma.StringFilter<"SaleItem"> | string
-  orgId?: Prisma.StringFilter<"SaleItem"> | string
+  orgId?: Prisma.StringNullableFilter<"SaleItem"> | string | null
   grade?: Prisma.IntFilter<"SaleItem"> | number
   editionId?: Prisma.StringNullableFilter<"SaleItem"> | string | null
   booksCount?: Prisma.IntFilter<"SaleItem"> | number
   codesCount?: Prisma.IntFilter<"SaleItem"> | number
   sale?: Prisma.XOR<Prisma.SaleScalarRelationFilter, Prisma.SaleWhereInput>
-  org?: Prisma.XOR<Prisma.OrganizationScalarRelationFilter, Prisma.OrganizationWhereInput>
+  org?: Prisma.XOR<Prisma.OrganizationNullableScalarRelationFilter, Prisma.OrganizationWhereInput> | null
   edition?: Prisma.XOR<Prisma.BookEditionNullableScalarRelationFilter, Prisma.BookEditionWhereInput> | null
 }, "id">
 
 export type SaleItemOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   saleId?: Prisma.SortOrder
-  orgId?: Prisma.SortOrder
+  orgId?: Prisma.SortOrderInput | Prisma.SortOrder
   grade?: Prisma.SortOrder
   editionId?: Prisma.SortOrderInput | Prisma.SortOrder
   booksCount?: Prisma.SortOrder
@@ -295,7 +295,7 @@ export type SaleItemScalarWhereWithAggregatesInput = {
   NOT?: Prisma.SaleItemScalarWhereWithAggregatesInput | Prisma.SaleItemScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"SaleItem"> | string
   saleId?: Prisma.StringWithAggregatesFilter<"SaleItem"> | string
-  orgId?: Prisma.StringWithAggregatesFilter<"SaleItem"> | string
+  orgId?: Prisma.StringNullableWithAggregatesFilter<"SaleItem"> | string | null
   grade?: Prisma.IntWithAggregatesFilter<"SaleItem"> | number
   editionId?: Prisma.StringNullableWithAggregatesFilter<"SaleItem"> | string | null
   booksCount?: Prisma.IntWithAggregatesFilter<"SaleItem"> | number
@@ -308,14 +308,14 @@ export type SaleItemCreateInput = {
   booksCount?: number
   codesCount?: number
   sale: Prisma.SaleCreateNestedOneWithoutItemsInput
-  org: Prisma.OrganizationCreateNestedOneWithoutSaleItemsInput
+  org?: Prisma.OrganizationCreateNestedOneWithoutSaleItemsInput
   edition?: Prisma.BookEditionCreateNestedOneWithoutSaleItemsInput
 }
 
 export type SaleItemUncheckedCreateInput = {
   id?: string
   saleId: string
-  orgId: string
+  orgId?: string | null
   grade: number
   editionId?: string | null
   booksCount?: number
@@ -328,14 +328,14 @@ export type SaleItemUpdateInput = {
   booksCount?: Prisma.IntFieldUpdateOperationsInput | number
   codesCount?: Prisma.IntFieldUpdateOperationsInput | number
   sale?: Prisma.SaleUpdateOneRequiredWithoutItemsNestedInput
-  org?: Prisma.OrganizationUpdateOneRequiredWithoutSaleItemsNestedInput
+  org?: Prisma.OrganizationUpdateOneWithoutSaleItemsNestedInput
   edition?: Prisma.BookEditionUpdateOneWithoutSaleItemsNestedInput
 }
 
 export type SaleItemUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   saleId?: Prisma.StringFieldUpdateOperationsInput | string
-  orgId?: Prisma.StringFieldUpdateOperationsInput | string
+  orgId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   grade?: Prisma.IntFieldUpdateOperationsInput | number
   editionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   booksCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -345,7 +345,7 @@ export type SaleItemUncheckedUpdateInput = {
 export type SaleItemCreateManyInput = {
   id?: string
   saleId: string
-  orgId: string
+  orgId?: string | null
   grade: number
   editionId?: string | null
   booksCount?: number
@@ -362,7 +362,7 @@ export type SaleItemUpdateManyMutationInput = {
 export type SaleItemUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   saleId?: Prisma.StringFieldUpdateOperationsInput | string
-  orgId?: Prisma.StringFieldUpdateOperationsInput | string
+  orgId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   grade?: Prisma.IntFieldUpdateOperationsInput | number
   editionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   booksCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -597,7 +597,7 @@ export type SaleItemScalarWhereInput = {
   NOT?: Prisma.SaleItemScalarWhereInput | Prisma.SaleItemScalarWhereInput[]
   id?: Prisma.StringFilter<"SaleItem"> | string
   saleId?: Prisma.StringFilter<"SaleItem"> | string
-  orgId?: Prisma.StringFilter<"SaleItem"> | string
+  orgId?: Prisma.StringNullableFilter<"SaleItem"> | string | null
   grade?: Prisma.IntFilter<"SaleItem"> | number
   editionId?: Prisma.StringNullableFilter<"SaleItem"> | string | null
   booksCount?: Prisma.IntFilter<"SaleItem"> | number
@@ -610,13 +610,13 @@ export type SaleItemCreateWithoutEditionInput = {
   booksCount?: number
   codesCount?: number
   sale: Prisma.SaleCreateNestedOneWithoutItemsInput
-  org: Prisma.OrganizationCreateNestedOneWithoutSaleItemsInput
+  org?: Prisma.OrganizationCreateNestedOneWithoutSaleItemsInput
 }
 
 export type SaleItemUncheckedCreateWithoutEditionInput = {
   id?: string
   saleId: string
-  orgId: string
+  orgId?: string | null
   grade: number
   booksCount?: number
   codesCount?: number
@@ -653,13 +653,13 @@ export type SaleItemCreateWithoutSaleInput = {
   grade: number
   booksCount?: number
   codesCount?: number
-  org: Prisma.OrganizationCreateNestedOneWithoutSaleItemsInput
+  org?: Prisma.OrganizationCreateNestedOneWithoutSaleItemsInput
   edition?: Prisma.BookEditionCreateNestedOneWithoutSaleItemsInput
 }
 
 export type SaleItemUncheckedCreateWithoutSaleInput = {
   id?: string
-  orgId: string
+  orgId?: string | null
   grade: number
   editionId?: string | null
   booksCount?: number
@@ -731,7 +731,7 @@ export type SaleItemUncheckedUpdateManyWithoutOrgInput = {
 export type SaleItemCreateManyEditionInput = {
   id?: string
   saleId: string
-  orgId: string
+  orgId?: string | null
   grade: number
   booksCount?: number
   codesCount?: number
@@ -743,13 +743,13 @@ export type SaleItemUpdateWithoutEditionInput = {
   booksCount?: Prisma.IntFieldUpdateOperationsInput | number
   codesCount?: Prisma.IntFieldUpdateOperationsInput | number
   sale?: Prisma.SaleUpdateOneRequiredWithoutItemsNestedInput
-  org?: Prisma.OrganizationUpdateOneRequiredWithoutSaleItemsNestedInput
+  org?: Prisma.OrganizationUpdateOneWithoutSaleItemsNestedInput
 }
 
 export type SaleItemUncheckedUpdateWithoutEditionInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   saleId?: Prisma.StringFieldUpdateOperationsInput | string
-  orgId?: Prisma.StringFieldUpdateOperationsInput | string
+  orgId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   grade?: Prisma.IntFieldUpdateOperationsInput | number
   booksCount?: Prisma.IntFieldUpdateOperationsInput | number
   codesCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -758,7 +758,7 @@ export type SaleItemUncheckedUpdateWithoutEditionInput = {
 export type SaleItemUncheckedUpdateManyWithoutEditionInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   saleId?: Prisma.StringFieldUpdateOperationsInput | string
-  orgId?: Prisma.StringFieldUpdateOperationsInput | string
+  orgId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   grade?: Prisma.IntFieldUpdateOperationsInput | number
   booksCount?: Prisma.IntFieldUpdateOperationsInput | number
   codesCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -766,7 +766,7 @@ export type SaleItemUncheckedUpdateManyWithoutEditionInput = {
 
 export type SaleItemCreateManySaleInput = {
   id?: string
-  orgId: string
+  orgId?: string | null
   grade: number
   editionId?: string | null
   booksCount?: number
@@ -778,13 +778,13 @@ export type SaleItemUpdateWithoutSaleInput = {
   grade?: Prisma.IntFieldUpdateOperationsInput | number
   booksCount?: Prisma.IntFieldUpdateOperationsInput | number
   codesCount?: Prisma.IntFieldUpdateOperationsInput | number
-  org?: Prisma.OrganizationUpdateOneRequiredWithoutSaleItemsNestedInput
+  org?: Prisma.OrganizationUpdateOneWithoutSaleItemsNestedInput
   edition?: Prisma.BookEditionUpdateOneWithoutSaleItemsNestedInput
 }
 
 export type SaleItemUncheckedUpdateWithoutSaleInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  orgId?: Prisma.StringFieldUpdateOperationsInput | string
+  orgId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   grade?: Prisma.IntFieldUpdateOperationsInput | number
   editionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   booksCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -793,7 +793,7 @@ export type SaleItemUncheckedUpdateWithoutSaleInput = {
 
 export type SaleItemUncheckedUpdateManyWithoutSaleInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  orgId?: Prisma.StringFieldUpdateOperationsInput | string
+  orgId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   grade?: Prisma.IntFieldUpdateOperationsInput | number
   editionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   booksCount?: Prisma.IntFieldUpdateOperationsInput | number
@@ -811,7 +811,7 @@ export type SaleItemSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs
   booksCount?: boolean
   codesCount?: boolean
   sale?: boolean | Prisma.SaleDefaultArgs<ExtArgs>
-  org?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
+  org?: boolean | Prisma.SaleItem$orgArgs<ExtArgs>
   edition?: boolean | Prisma.SaleItem$editionArgs<ExtArgs>
 }, ExtArgs["result"]["saleItem"]>
 
@@ -824,7 +824,7 @@ export type SaleItemSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Exte
   booksCount?: boolean
   codesCount?: boolean
   sale?: boolean | Prisma.SaleDefaultArgs<ExtArgs>
-  org?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
+  org?: boolean | Prisma.SaleItem$orgArgs<ExtArgs>
   edition?: boolean | Prisma.SaleItem$editionArgs<ExtArgs>
 }, ExtArgs["result"]["saleItem"]>
 
@@ -837,7 +837,7 @@ export type SaleItemSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Exte
   booksCount?: boolean
   codesCount?: boolean
   sale?: boolean | Prisma.SaleDefaultArgs<ExtArgs>
-  org?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
+  org?: boolean | Prisma.SaleItem$orgArgs<ExtArgs>
   edition?: boolean | Prisma.SaleItem$editionArgs<ExtArgs>
 }, ExtArgs["result"]["saleItem"]>
 
@@ -854,17 +854,17 @@ export type SaleItemSelectScalar = {
 export type SaleItemOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "saleId" | "orgId" | "grade" | "editionId" | "booksCount" | "codesCount", ExtArgs["result"]["saleItem"]>
 export type SaleItemInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   sale?: boolean | Prisma.SaleDefaultArgs<ExtArgs>
-  org?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
+  org?: boolean | Prisma.SaleItem$orgArgs<ExtArgs>
   edition?: boolean | Prisma.SaleItem$editionArgs<ExtArgs>
 }
 export type SaleItemIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   sale?: boolean | Prisma.SaleDefaultArgs<ExtArgs>
-  org?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
+  org?: boolean | Prisma.SaleItem$orgArgs<ExtArgs>
   edition?: boolean | Prisma.SaleItem$editionArgs<ExtArgs>
 }
 export type SaleItemIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   sale?: boolean | Prisma.SaleDefaultArgs<ExtArgs>
-  org?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
+  org?: boolean | Prisma.SaleItem$orgArgs<ExtArgs>
   edition?: boolean | Prisma.SaleItem$editionArgs<ExtArgs>
 }
 
@@ -872,13 +872,13 @@ export type $SaleItemPayload<ExtArgs extends runtime.Types.Extensions.InternalAr
   name: "SaleItem"
   objects: {
     sale: Prisma.$SalePayload<ExtArgs>
-    org: Prisma.$OrganizationPayload<ExtArgs>
+    org: Prisma.$OrganizationPayload<ExtArgs> | null
     edition: Prisma.$BookEditionPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     saleId: string
-    orgId: string
+    orgId: string | null
     grade: number
     editionId: string | null
     booksCount: number
@@ -1278,7 +1278,7 @@ readonly fields: SaleItemFieldRefs;
 export interface Prisma__SaleItemClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   sale<T extends Prisma.SaleDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SaleDefaultArgs<ExtArgs>>): Prisma.Prisma__SaleClient<runtime.Types.Result.GetResult<Prisma.$SalePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  org<T extends Prisma.OrganizationDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.OrganizationDefaultArgs<ExtArgs>>): Prisma.Prisma__OrganizationClient<runtime.Types.Result.GetResult<Prisma.$OrganizationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  org<T extends Prisma.SaleItem$orgArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SaleItem$orgArgs<ExtArgs>>): Prisma.Prisma__OrganizationClient<runtime.Types.Result.GetResult<Prisma.$OrganizationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   edition<T extends Prisma.SaleItem$editionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.SaleItem$editionArgs<ExtArgs>>): Prisma.Prisma__BookEditionClient<runtime.Types.Result.GetResult<Prisma.$BookEditionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -1714,6 +1714,25 @@ export type SaleItemDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Inte
    * Limit how many SaleItems to delete.
    */
   limit?: number
+}
+
+/**
+ * SaleItem.org
+ */
+export type SaleItem$orgArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Organization
+   */
+  select?: Prisma.OrganizationSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Organization
+   */
+  omit?: Prisma.OrganizationOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.OrganizationInclude<ExtArgs> | null
+  where?: Prisma.OrganizationWhereInput
 }
 
 /**

@@ -33,6 +33,11 @@ export type Student = Prisma.StudentModel
  */
 export type Organization = Prisma.OrganizationModel
 /**
+ * Model StudentOrganization
+ * 
+ */
+export type StudentOrganization = Prisma.StudentOrganizationModel
+/**
  * Model OrganizationInventory
  * 
  */

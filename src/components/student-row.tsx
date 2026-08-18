@@ -1,4 +1,4 @@
-import { Grades, Student } from "../lib/types";
+import { Grades, Organization, Student } from "../lib/types";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { deleteStudent, updateStudent } from "@/src/lib/actions/api/students/student-actions";
@@ -7,11 +7,12 @@ import { Spinner } from "@/components/spinner";
 
 type StudentRowProps = {
   student: Student;
+  organizations: Organization[];
   onDelete: (id: string) => void;
   onUpdate: (updated: Student) => void;
 };
 
-export default function StudentRow({ student, onDelete, onUpdate }: StudentRowProps) {
+export default function StudentRow({ student, organizations, onDelete, onUpdate }: StudentRowProps) {
   const { t, tm } = useLang();
   const [pending, setPending] = useState(false)
   const [isEditing, setIsEditing] = useState(false)
@@ -20,6 +21,7 @@ export default function StudentRow({ student, onDelete, onUpdate }: StudentRowPr
     number: student.number,
     grade: student.grade,
     school: student.school,
+    orgIds: (student.organizations ?? []).map((o) => o.id),
   })
 
   const remove = async (id : string)=>{
@@ -44,8 +46,13 @@ export default function StudentRow({ student, onDelete, onUpdate }: StudentRowPr
   const update = async (id : string)=>{
     setPending(true)
     const formData = new FormData();
+    formData.append("orgIdsTouched", "1");
     Object.entries(form).forEach(([key, value]) => {
-      formData.append(key, String(value));
+      if (key === "orgIds") {
+        (value as string[]).forEach((orgId) => formData.append("orgIds", orgId));
+      } else {
+        formData.append(key, String(value));
+      }
     });
     try{
       const { student: updated } = await toast.promise(updateStudent(id, formData), {
@@ -72,6 +79,7 @@ export default function StudentRow({ student, onDelete, onUpdate }: StudentRowPr
       number: student.number,
       grade: student.grade,
       school: student.school,
+      orgIds: (student.organizations ?? []).map((o) => o.id),
     })
     setIsEditing(false)
   }
@@ -115,6 +123,22 @@ export default function StudentRow({ student, onDelete, onUpdate }: StudentRowPr
                         className="h-8 w-full rounded-full border border-input bg-background px-3 text-sm"
                       />
                     </td>
+                    <td className="p-2">
+                      <select
+                        multiple
+                        value={form.orgIds}
+                        onChange={(e) =>
+                          setForm({ ...form, orgIds: Array.from(e.target.selectedOptions, (o) => o.value) })
+                        }
+                        className="h-16 w-full min-w-[8rem] rounded-lg border border-input bg-background px-2 text-sm"
+                      >
+                        {organizations.map((o) => (
+                          <option key={o.id} value={o.id}>
+                            {o.name}
+                          </option>
+                        ))}
+                      </select>
+                    </td>
                   </>
                 ) : (
                   <>
@@ -122,6 +146,9 @@ export default function StudentRow({ student, onDelete, onUpdate }: StudentRowPr
                     <td className="p-2">{student.number}</td>
                     <td className="p-2">{tm("grades", student.grade)}</td>
                     <td className="p-2">{student.school}</td>
+                    <td className="p-2 text-xs text-muted-foreground">
+                      {(student.organizations ?? []).map((o) => o.name).join(", ") || "—"}
+                    </td>
                   </>
                 )}
                 <td className="p-2 text-end whitespace-nowrap">

@@ -103,7 +103,7 @@ export default function SaleModal({
 
       if (addStudent) {
         const studentFormData = new FormData();
-        studentFormData.append("orgId", student.orgId);
+        studentFormData.append("orgIds", student.orgId);
         studentFormData.append("name", student.name);
         studentFormData.append("number", student.number);
         studentFormData.append("grade", student.grade);
