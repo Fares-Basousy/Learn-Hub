@@ -4,9 +4,8 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import toast from "react-hot-toast";
 import { getOrganizationById, updateOrganization, restockInventory } from "@/src/lib/actions/api/organizations/organizations-actions";
-import { getBookEditions } from "@/src/lib/actions/api/books/book-actions";
 import { uploadImage } from "@/src/lib/actions/api/upload/upload-actions";
-import { BookEdition, BookInventory, Grades, Organization } from "@/src/lib/types";
+import { BookInventory, Grades, Organization } from "@/src/lib/types";
 import { useLang } from "@/components/lang-provider";
 import { PageLoader } from "@/components/spinner";
 
@@ -24,7 +23,6 @@ export default function OrganizationDetailPage() {
   const [pending, setPending] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [form, setForm] = useState({ name: "", subject: "", picUrl: "" })
-  const [editions, setEditions] = useState<BookEdition[]>([])
   const [restockPending, setRestockPending] = useState(false)
   const [restockForm, setRestockForm] = useState({
     grade: "",
@@ -82,20 +80,6 @@ export default function OrganizationDetailPage() {
     load()
   }, [orgId])
 
-  useEffect(() => {
-    const loadEditions = async () => {
-      try {
-        const data = await getBookEditions()
-        setEditions(data.editions ?? [])
-      }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      catch (e: any) {
-        console.log(e)
-      }
-    }
-    loadEditions()
-  }, [])
-
   const save = async () => {
     setPending(true)
     const formData = new FormData();
@@ -140,10 +124,6 @@ export default function OrganizationDetailPage() {
       })
       if (updated) setOrganization(updated)
       setRestockForm({ grade: "", booksCount: "0", codesCount: "0", editionId: "", newEditionName: "" })
-      if (editionIsOther && restockForm.newEditionName.trim()) {
-        const data = await getBookEditions()
-        setEditions(data.editions ?? [])
-      }
     }
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     catch (e: any) {
@@ -168,6 +148,14 @@ export default function OrganizationDetailPage() {
       </div>
     )
   }
+
+  const orgEditions = Array.from(
+    new Map(
+      (organization.bookInventory ?? [])
+        .filter((bi) => bi.edition)
+        .map((bi) => [bi.edition!.id, bi.edition!]),
+    ).values(),
+  ).sort((a, b) => a.name.localeCompare(b.name));
 
   const codesByGrade = new Map((organization.inventory ?? []).map((i) => [i.grade, i.codesCount]));
   const booksByGrade = new Map<number, BookInventory[]>();
@@ -325,7 +313,7 @@ export default function OrganizationDetailPage() {
               className="mt-1 block h-9 rounded-full border border-input bg-background px-3 text-sm"
             >
               <option value="">{t("editionOptionPlaceholder")}</option>
-              {editions.map((ed) => (
+              {orgEditions.map((ed) => (
                 <option key={ed.id} value={ed.id}>
                   {ed.name}
                 </option>
