@@ -2,17 +2,13 @@
 
 A bilingual (Arabic/English) operations hub for a tutoring/distribution center: a public landing page with a class timetable, partner-organization directory, and news feed, plus an authenticated back office for managing students, partner organizations, book/code inventory, sales, and news.
 
-> 📸 _Screenshots coming soon._
->
-> | Landing page | Timetable (public) | Dashboard |
-> | :---: | :---: | :---: |
-> | `![Landing page](docs/screenshots/landing.png)` | `![Timetable](docs/screenshots/timetable.png)` | `![Dashboard](docs/screenshots/dashboard.png)` |
->
-> | Organizations | Students | Sales |
-> | :---: | :---: | :---: |
-> | `![Organizations](docs/screenshots/organizations.png)` | `![Students](docs/screenshots/students.png)` | `![Sales](docs/screenshots/sales.png)` |
->
-> Drop image files into `docs/screenshots/` with the names above and the placeholders will render.
+| Landing page | Timetable (public) | Dashboard |
+| :---: | :---: | :---: |
+| ![Landing page](docs/screenshots/landing.png) | ![Timetable](docs/screenshots/timetable.png) | ![Dashboard](docs/screenshots/dashboard.png) |
+
+| Organizations | Students | Sales |
+| :---: | :---: | :---: |
+| ![Organizations](docs/screenshots/organization.png) | ![Students](docs/screenshots/students.png) | ![Sales](docs/screenshots/sales.png) |
 
 ## Features
 
