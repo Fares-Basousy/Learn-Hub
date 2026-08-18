@@ -2,6 +2,8 @@ import "dotenv/config";
 import { hash } from "bcryptjs";
 import prisma from "../src/lib/prisma";
 import { Gender } from "../src/generated/prisma/enums";
+import { Courses } from "../src/lib/types";
+import { CLASSROOMS, MAX_END_MINUTE, MIN_START_MINUTE, TIME_STEP_MINUTES } from "../src/lib/timetable";
 
 const SALT_ROUNDS = 12;
 
@@ -10,6 +12,8 @@ const SCHOOLS = ["Al-Noor Secondary", "Bright Future School", "Unity High", "Hor
 const FIRST_NAMES_M = ["Omar", "Youssef", "Karim", "Ahmed", "Mostafa", "Ziad", "Hassan", "Tarek"];
 const FIRST_NAMES_F = ["Mariam", "Nour", "Salma", "Yara", "Farida", "Layla", "Hana", "Dina"];
 const LAST_NAMES = ["Hassan", "Ibrahim", "El-Sayed", "Fathy", "Mahmoud", "Kamal", "Adel", "Naguib"];
+const TEACHER_NAMES = ["Mr. Ahmed", "Ms. Layla", "Mr. Omar", "Ms. Fatima", "Mr. Tarek", "Ms. Salma"];
+const DURATIONS_MINUTES = [90, 120, 150];
 
 function pick<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
@@ -26,6 +30,7 @@ async function main() {
   await prisma.organizationInventory.deleteMany();
   await prisma.organization.deleteMany();
   await prisma.news.deleteMany();
+  await prisma.timetableEntry.deleteMany();
   await prisma.user.deleteMany();
 
   console.log("Seeding users…");
@@ -162,8 +167,42 @@ async function main() {
     await prisma.news.create({ data: n });
   }
 
+  console.log("Seeding timetable entries…");
+  let timetableCount = 0;
+  for (const classroom of CLASSROOMS) {
+    for (let dayOfWeek = 0; dayOfWeek <= 5; dayOfWeek++) {
+      // Skip some days per classroom so the timetable isn't uniformly packed.
+      if (Math.random() < 0.15) continue;
+
+      let cursor = MIN_START_MINUTE;
+      while (cursor + Math.min(...DURATIONS_MINUTES) <= MAX_END_MINUTE) {
+        const duration = pick(DURATIONS_MINUTES);
+        const endMinute = cursor + duration;
+        if (endMinute > MAX_END_MINUTE) break;
+
+        await prisma.timetableEntry.create({
+          data: {
+            classroom,
+            dayOfWeek,
+            startMinute: cursor,
+            endMinute,
+            grade: pick(GRADES),
+            course: pick(Courses as unknown as string[]),
+            teacherName: pick(TEACHER_NAMES),
+            teacherSchool: pick(SCHOOLS),
+          },
+        });
+        timetableCount++;
+
+        // Leave a gap (or not) before the next session, snapped to the 30-minute grid.
+        const gap = Math.random() < 0.5 ? 0 : TIME_STEP_MINUTES;
+        cursor = endMinute + gap;
+      }
+    }
+  }
+
   console.log(
-    `Done. Seeded ${users.length} users, ${organizations.length} organizations, ${students.length} students, 8 sales, 2 news items.`,
+    `Done. Seeded ${users.length} users, ${organizations.length} organizations, ${students.length} students, 8 sales, 2 news items, ${timetableCount} timetable entries.`,
   );
 }
 
