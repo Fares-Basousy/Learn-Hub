@@ -23,6 +23,7 @@ export function SiteHeader() {
           </Link>
           <button
             type="button"
+            data-testid="lang-toggle-button"
             onClick={toggleLang}
             aria-label={t("language")}
             className="inline-flex h-9 items-center gap-1 rounded-full border border-input px-3 text-xs font-medium hover:bg-accent"

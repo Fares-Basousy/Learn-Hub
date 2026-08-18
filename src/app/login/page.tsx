@@ -53,6 +53,7 @@ export default function LoginPage() {
           <div>
             <label className="block text-sm font-medium">{t("emailLabel")}</label>
             <input
+              data-testid="login-email-input"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -64,6 +65,7 @@ export default function LoginPage() {
           <div>
             <label className="block text-sm font-medium">{t("passwordLabel")}</label>
             <input
+              data-testid="login-password-input"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
@@ -72,8 +74,9 @@ export default function LoginPage() {
               className="mt-1 h-10 w-full rounded-full border border-input bg-background px-3 text-sm"
             />
           </div>
-          {err && <p className="text-sm text-destructive">{err}</p>}
+          {err && <p data-testid="login-error" className="text-sm text-destructive">{err}</p>}
           <button
+            data-testid="login-submit-button"
             type="submit"
             disabled={isPending}
             className="h-10 w-full rounded-full bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-60"

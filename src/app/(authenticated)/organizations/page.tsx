@@ -162,6 +162,7 @@ function OrganizationsPageInner() {
         className="mt-6 flex flex-wrap gap-2 rounded-lg border bg-card p-3"
       >
         <input
+          data-testid="org-name-input"
           value={form.name}
           onChange={(e) => setForm({ ...form, name: e.target.value })}
           placeholder={t("namePlaceholder")}
@@ -169,6 +170,7 @@ function OrganizationsPageInner() {
           className="h-9 flex-1 rounded-full border border-input bg-background px-3 text-sm"
         />
         <input
+          data-testid="org-subject-input"
           value={form.subject}
           onChange={(e) => setForm({ ...form, subject: e.target.value })}
           placeholder={t("subjectPlaceholder")}
@@ -176,6 +178,7 @@ function OrganizationsPageInner() {
           className="h-9 flex-1 rounded-full border border-input bg-background px-3 text-sm"
         />
         <input
+          data-testid="org-image-input"
           key={fileInputKey}
           type="file"
           accept="image/*"
@@ -185,6 +188,7 @@ function OrganizationsPageInner() {
           className="h-9 flex-1 rounded-full border border-input bg-background px-3 text-sm"
         />
         <button
+          data-testid="org-submit-button"
           disabled={pending || uploading || !form.picUrl}
           className="h-9 rounded-full bg-primary px-4 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-60"
         >
@@ -216,7 +220,7 @@ function OrganizationsPageInner() {
                 </tr>
               )}
               {!loading && organizations.map((o, i) => (
-                <tr key={o.id} className="border-t">
+                <tr key={o.id} className="border-t" data-testid="org-row" data-org-name={o.name}>
                   <td className="p-2 font-medium text-muted-foreground">
                     {(o.displayOrder ?? i) + 1}
                   </td>
@@ -224,6 +228,7 @@ function OrganizationsPageInner() {
                     <div className="flex items-center gap-1">
                       <button
                         type="button"
+                        data-testid="org-move-up-button"
                         disabled={(i === 0 && pageIndex === 0) || movingId !== null}
                         onClick={() => move(o.id, "up")}
                         aria-label={t("moveUp")}
@@ -233,6 +238,7 @@ function OrganizationsPageInner() {
                       </button>
                       <button
                         type="button"
+                        data-testid="org-move-down-button"
                         disabled={(i === organizations.length - 1 && !hasMore) || movingId !== null}
                         onClick={() => move(o.id, "down")}
                         aria-label={t("moveDown")}
@@ -252,6 +258,7 @@ function OrganizationsPageInner() {
                       {t("detailsLink")}
                     </Link>
                     <button
+                      data-testid="org-delete-button"
                       onClick={() => remove(o.id)}
                       className="ms-3 text-xs text-destructive hover:underline"
                     >

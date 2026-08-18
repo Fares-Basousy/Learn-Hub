@@ -184,6 +184,7 @@ useEffect(()=>{
         <label className="text-xs font-medium sm:col-span-2">
           {t("titleLabel")}
           <input
+            data-testid="news-title-input"
             required
             value={form.title}
             onChange={(e) => setForm({ ...form, title: e.target.value })}
@@ -218,6 +219,7 @@ useEffect(()=>{
         <label className="text-xs font-medium sm:col-span-2">
           {t("linkUrlLabel")}
           <input
+            data-testid="news-link-input"
             type="url"
             value={form.linkUrl}
             onChange={(e) => setForm({ ...form, linkUrl: e.target.value })}
@@ -237,6 +239,7 @@ useEffect(()=>{
 
         <div className="flex items-center gap-2 sm:col-span-2">
           <button
+            data-testid="news-submit-button"
             disabled={pending || uploading}
             className="h-9 rounded-full bg-primary px-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 disabled:opacity-50"
           >
@@ -261,7 +264,7 @@ useEffect(()=>{
       <div className="mt-6 space-y-3">
         {loading && <PageLoader />}
         {!loading && (news ?? []).map((n) => (
-          <div key={n.id} className="flex gap-3 rounded-lg border bg-card p-3">
+          <div key={n.id} className="flex gap-3 rounded-lg border bg-card p-3" data-testid="news-row" data-news-title={n.title}>
             {n.imageUrl && (
               <img
                 src={n.imageUrl}
@@ -276,6 +279,7 @@ useEffect(()=>{
                   href={n.linkUrl}
                   target="_blank"
                   rel="noreferrer"
+                  data-testid="news-link"
                   className="truncate text-xs text-primary hover:underline"
                 >
                   {n.linkUrl}
@@ -284,12 +288,14 @@ useEffect(()=>{
              </div>
              <div className="flex shrink-0 items-start gap-2">
                <button
+                 data-testid="news-edit-button"
                  onClick={() => startEdit(n)}
                  className="text-xs text-primary hover:underline"
                >
                  {t("edit")}
                </button>
                <button
+                 data-testid="news-delete-button"
                  onClick={() => remove(n.id)}
                  className="text-xs text-destructive hover:underline"
                >

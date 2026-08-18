@@ -104,6 +104,22 @@ pnpm create-user "Full Name" email@example.com "01000000000" "a-strong-password"
 3. Run `npx prisma migrate deploy` against the production database (locally with production `DATABASE_URL`/`postgresql`, or as a Vercel deploy step) before or after the first deploy — migrations are not run automatically on build.
 4. Deploy. Vercel builds with `next build` and serves via `next start` automatically.
 
+## Testing
+
+**Unit tests** ([Jest](https://jestjs.io/)) cover server-action business logic — inventory math, org reordering, student↔org membership handling, sale stock deduction, and the news "clear a field" bug fixed this session — against a fully mocked Prisma Client, so no database is needed:
+
+```bash
+pnpm test
+```
+
+**End-to-end tests** ([Playwright](https://playwright.dev/)) drive a real browser against a running app: auth/route protection, the public landing page, and admin CRUD flows for organizations and news. These need a real (disposable!) database — see [`e2e/README.md`](./e2e/README.md) for setup and **do not point them at production**.
+
+```bash
+npx playwright install chromium   # one-time
+pnpm seed                          # creates the admin login the tests use
+pnpm test:e2e
+```
+
 ## Project structure
 
 ```
