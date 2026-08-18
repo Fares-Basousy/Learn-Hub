@@ -13,6 +13,7 @@
     "@prisma/adapter-pg": "^7.9.1",
     "@prisma/client": "^7.9.1",
     "@radix-ui/react-select": "^2.2.6",
+    "@vercel/analytics": "^2.0.1",
     "@vercel/blob": "^2.6.1",
     "bcryptjs": "^3.0.3",
     "clsx": "^2.1.1",

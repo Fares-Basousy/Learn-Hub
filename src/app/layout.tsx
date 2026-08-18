@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Cairo } from "next/font/google";
 import { Toaster } from "react-hot-toast";
+import { Analytics } from "@vercel/analytics/next";
 import './globals.css'
 import appCSS from './globals.css'
 import { ThemeProvider } from "../components/theme-provider";
@@ -68,7 +69,7 @@ export default function RootLayout({
       </ThemeProvider>
       </AuthSessionProvider>
     {/* </QueryClientProvider> */}
-
+     <Analytics />
      </body>
     </html>
   
