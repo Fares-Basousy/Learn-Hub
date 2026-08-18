@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Caprasimo, Figtree } from "next/font/google";
+import { Cairo } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import './globals.css'
 import appCSS from './globals.css'
@@ -7,15 +7,9 @@ import { ThemeProvider } from "../components/theme-provider";
 import { LangProvider } from "../components/lang-provider";
 import { AuthSessionProvider } from "../components/session-provider";
 
-const figtree = Figtree({
-  variable: "--font-figtree",
-  subsets: ["latin"],
-});
-
-const caprasimo = Caprasimo({
-  variable: "--font-caprasimo",
-  subsets: ["latin"],
-  weight: "400",
+const cairo = Cairo({
+  variable: "--font-cairo",
+  subsets: ["arabic", "latin"],
 });
 
 export const links = () => [
@@ -62,7 +56,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`min-h-full flex flex-col ${figtree.variable} ${caprasimo.variable} h-full antialiased`}>
+    <html lang="ar" dir="rtl" className={`min-h-full flex flex-col ${cairo.variable} h-full antialiased`}>
       <body>
     {/* <QueryClientProvider client={queryClient}> */}
       <AuthSessionProvider>
