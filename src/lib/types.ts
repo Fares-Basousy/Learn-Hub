@@ -65,6 +65,7 @@ export type Organization = {
   name: string;
   subject: string;
   picUrl: string;
+  displayOrder?: number;
   inventory?: OrganizationInventory[];
   bookInventory?: BookInventory[];
   createdAt?: Date;

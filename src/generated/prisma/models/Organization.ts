@@ -20,8 +20,18 @@ export type OrganizationModel = runtime.Types.Result.DefaultSelection<Prisma.$Or
 
 export type AggregateOrganization = {
   _count: OrganizationCountAggregateOutputType | null
+  _avg: OrganizationAvgAggregateOutputType | null
+  _sum: OrganizationSumAggregateOutputType | null
   _min: OrganizationMinAggregateOutputType | null
   _max: OrganizationMaxAggregateOutputType | null
+}
+
+export type OrganizationAvgAggregateOutputType = {
+  displayOrder: number | null
+}
+
+export type OrganizationSumAggregateOutputType = {
+  displayOrder: number | null
 }
 
 export type OrganizationMinAggregateOutputType = {
@@ -29,6 +39,7 @@ export type OrganizationMinAggregateOutputType = {
   name: string | null
   subject: string | null
   picUrl: string | null
+  displayOrder: number | null
   createdAt: Date | null
 }
 
@@ -37,6 +48,7 @@ export type OrganizationMaxAggregateOutputType = {
   name: string | null
   subject: string | null
   picUrl: string | null
+  displayOrder: number | null
   createdAt: Date | null
 }
 
@@ -45,16 +57,26 @@ export type OrganizationCountAggregateOutputType = {
   name: number
   subject: number
   picUrl: number
+  displayOrder: number
   createdAt: number
   _all: number
 }
 
+
+export type OrganizationAvgAggregateInputType = {
+  displayOrder?: true
+}
+
+export type OrganizationSumAggregateInputType = {
+  displayOrder?: true
+}
 
 export type OrganizationMinAggregateInputType = {
   id?: true
   name?: true
   subject?: true
   picUrl?: true
+  displayOrder?: true
   createdAt?: true
 }
 
@@ -63,6 +85,7 @@ export type OrganizationMaxAggregateInputType = {
   name?: true
   subject?: true
   picUrl?: true
+  displayOrder?: true
   createdAt?: true
 }
 
@@ -71,6 +94,7 @@ export type OrganizationCountAggregateInputType = {
   name?: true
   subject?: true
   picUrl?: true
+  displayOrder?: true
   createdAt?: true
   _all?: true
 }
@@ -113,6 +137,18 @@ export type OrganizationAggregateArgs<ExtArgs extends runtime.Types.Extensions.I
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: OrganizationAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: OrganizationSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: OrganizationMinAggregateInputType
@@ -143,6 +179,8 @@ export type OrganizationGroupByArgs<ExtArgs extends runtime.Types.Extensions.Int
   take?: number
   skip?: number
   _count?: OrganizationCountAggregateInputType | true
+  _avg?: OrganizationAvgAggregateInputType
+  _sum?: OrganizationSumAggregateInputType
   _min?: OrganizationMinAggregateInputType
   _max?: OrganizationMaxAggregateInputType
 }
@@ -152,8 +190,11 @@ export type OrganizationGroupByOutputType = {
   name: string
   subject: string
   picUrl: string
+  displayOrder: number
   createdAt: Date
   _count: OrganizationCountAggregateOutputType | null
+  _avg: OrganizationAvgAggregateOutputType | null
+  _sum: OrganizationSumAggregateOutputType | null
   _min: OrganizationMinAggregateOutputType | null
   _max: OrganizationMaxAggregateOutputType | null
 }
@@ -181,6 +222,7 @@ export type OrganizationWhereInput = {
   name?: Prisma.StringFilter<"Organization"> | string
   subject?: Prisma.StringFilter<"Organization"> | string
   picUrl?: Prisma.StringFilter<"Organization"> | string
+  displayOrder?: Prisma.IntFilter<"Organization"> | number
   createdAt?: Prisma.DateTimeFilter<"Organization"> | Date | string
   students?: Prisma.StudentOrganizationListRelationFilter
   inventory?: Prisma.OrganizationInventoryListRelationFilter
@@ -193,6 +235,7 @@ export type OrganizationOrderByWithRelationInput = {
   name?: Prisma.SortOrder
   subject?: Prisma.SortOrder
   picUrl?: Prisma.SortOrder
+  displayOrder?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   students?: Prisma.StudentOrganizationOrderByRelationAggregateInput
   inventory?: Prisma.OrganizationInventoryOrderByRelationAggregateInput
@@ -208,6 +251,7 @@ export type OrganizationWhereUniqueInput = Prisma.AtLeast<{
   name?: Prisma.StringFilter<"Organization"> | string
   subject?: Prisma.StringFilter<"Organization"> | string
   picUrl?: Prisma.StringFilter<"Organization"> | string
+  displayOrder?: Prisma.IntFilter<"Organization"> | number
   createdAt?: Prisma.DateTimeFilter<"Organization"> | Date | string
   students?: Prisma.StudentOrganizationListRelationFilter
   inventory?: Prisma.OrganizationInventoryListRelationFilter
@@ -220,10 +264,13 @@ export type OrganizationOrderByWithAggregationInput = {
   name?: Prisma.SortOrder
   subject?: Prisma.SortOrder
   picUrl?: Prisma.SortOrder
+  displayOrder?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.OrganizationCountOrderByAggregateInput
+  _avg?: Prisma.OrganizationAvgOrderByAggregateInput
   _max?: Prisma.OrganizationMaxOrderByAggregateInput
   _min?: Prisma.OrganizationMinOrderByAggregateInput
+  _sum?: Prisma.OrganizationSumOrderByAggregateInput
 }
 
 export type OrganizationScalarWhereWithAggregatesInput = {
@@ -234,6 +281,7 @@ export type OrganizationScalarWhereWithAggregatesInput = {
   name?: Prisma.StringWithAggregatesFilter<"Organization"> | string
   subject?: Prisma.StringWithAggregatesFilter<"Organization"> | string
   picUrl?: Prisma.StringWithAggregatesFilter<"Organization"> | string
+  displayOrder?: Prisma.IntWithAggregatesFilter<"Organization"> | number
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Organization"> | Date | string
 }
 
@@ -242,6 +290,7 @@ export type OrganizationCreateInput = {
   name: string
   subject: string
   picUrl: string
+  displayOrder?: number
   createdAt?: Date | string
   students?: Prisma.StudentOrganizationCreateNestedManyWithoutOrgInput
   inventory?: Prisma.OrganizationInventoryCreateNestedManyWithoutOrgInput
@@ -254,6 +303,7 @@ export type OrganizationUncheckedCreateInput = {
   name: string
   subject: string
   picUrl: string
+  displayOrder?: number
   createdAt?: Date | string
   students?: Prisma.StudentOrganizationUncheckedCreateNestedManyWithoutOrgInput
   inventory?: Prisma.OrganizationInventoryUncheckedCreateNestedManyWithoutOrgInput
@@ -266,6 +316,7 @@ export type OrganizationUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   subject?: Prisma.StringFieldUpdateOperationsInput | string
   picUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  displayOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   students?: Prisma.StudentOrganizationUpdateManyWithoutOrgNestedInput
   inventory?: Prisma.OrganizationInventoryUpdateManyWithoutOrgNestedInput
@@ -278,6 +329,7 @@ export type OrganizationUncheckedUpdateInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   subject?: Prisma.StringFieldUpdateOperationsInput | string
   picUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  displayOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   students?: Prisma.StudentOrganizationUncheckedUpdateManyWithoutOrgNestedInput
   inventory?: Prisma.OrganizationInventoryUncheckedUpdateManyWithoutOrgNestedInput
@@ -290,6 +342,7 @@ export type OrganizationCreateManyInput = {
   name: string
   subject: string
   picUrl: string
+  displayOrder?: number
   createdAt?: Date | string
 }
 
@@ -298,6 +351,7 @@ export type OrganizationUpdateManyMutationInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   subject?: Prisma.StringFieldUpdateOperationsInput | string
   picUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  displayOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -306,6 +360,7 @@ export type OrganizationUncheckedUpdateManyInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   subject?: Prisma.StringFieldUpdateOperationsInput | string
   picUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  displayOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
@@ -314,7 +369,12 @@ export type OrganizationCountOrderByAggregateInput = {
   name?: Prisma.SortOrder
   subject?: Prisma.SortOrder
   picUrl?: Prisma.SortOrder
+  displayOrder?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+}
+
+export type OrganizationAvgOrderByAggregateInput = {
+  displayOrder?: Prisma.SortOrder
 }
 
 export type OrganizationMaxOrderByAggregateInput = {
@@ -322,6 +382,7 @@ export type OrganizationMaxOrderByAggregateInput = {
   name?: Prisma.SortOrder
   subject?: Prisma.SortOrder
   picUrl?: Prisma.SortOrder
+  displayOrder?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
 
@@ -330,7 +391,12 @@ export type OrganizationMinOrderByAggregateInput = {
   name?: Prisma.SortOrder
   subject?: Prisma.SortOrder
   picUrl?: Prisma.SortOrder
+  displayOrder?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
+}
+
+export type OrganizationSumOrderByAggregateInput = {
+  displayOrder?: Prisma.SortOrder
 }
 
 export type OrganizationScalarRelationFilter = {
@@ -406,6 +472,7 @@ export type OrganizationCreateWithoutStudentsInput = {
   name: string
   subject: string
   picUrl: string
+  displayOrder?: number
   createdAt?: Date | string
   inventory?: Prisma.OrganizationInventoryCreateNestedManyWithoutOrgInput
   bookInventory?: Prisma.BookInventoryCreateNestedManyWithoutOrgInput
@@ -417,6 +484,7 @@ export type OrganizationUncheckedCreateWithoutStudentsInput = {
   name: string
   subject: string
   picUrl: string
+  displayOrder?: number
   createdAt?: Date | string
   inventory?: Prisma.OrganizationInventoryUncheckedCreateNestedManyWithoutOrgInput
   bookInventory?: Prisma.BookInventoryUncheckedCreateNestedManyWithoutOrgInput
@@ -444,6 +512,7 @@ export type OrganizationUpdateWithoutStudentsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   subject?: Prisma.StringFieldUpdateOperationsInput | string
   picUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  displayOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   inventory?: Prisma.OrganizationInventoryUpdateManyWithoutOrgNestedInput
   bookInventory?: Prisma.BookInventoryUpdateManyWithoutOrgNestedInput
@@ -455,6 +524,7 @@ export type OrganizationUncheckedUpdateWithoutStudentsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   subject?: Prisma.StringFieldUpdateOperationsInput | string
   picUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  displayOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   inventory?: Prisma.OrganizationInventoryUncheckedUpdateManyWithoutOrgNestedInput
   bookInventory?: Prisma.BookInventoryUncheckedUpdateManyWithoutOrgNestedInput
@@ -466,6 +536,7 @@ export type OrganizationCreateWithoutInventoryInput = {
   name: string
   subject: string
   picUrl: string
+  displayOrder?: number
   createdAt?: Date | string
   students?: Prisma.StudentOrganizationCreateNestedManyWithoutOrgInput
   bookInventory?: Prisma.BookInventoryCreateNestedManyWithoutOrgInput
@@ -477,6 +548,7 @@ export type OrganizationUncheckedCreateWithoutInventoryInput = {
   name: string
   subject: string
   picUrl: string
+  displayOrder?: number
   createdAt?: Date | string
   students?: Prisma.StudentOrganizationUncheckedCreateNestedManyWithoutOrgInput
   bookInventory?: Prisma.BookInventoryUncheckedCreateNestedManyWithoutOrgInput
@@ -504,6 +576,7 @@ export type OrganizationUpdateWithoutInventoryInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   subject?: Prisma.StringFieldUpdateOperationsInput | string
   picUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  displayOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   students?: Prisma.StudentOrganizationUpdateManyWithoutOrgNestedInput
   bookInventory?: Prisma.BookInventoryUpdateManyWithoutOrgNestedInput
@@ -515,6 +588,7 @@ export type OrganizationUncheckedUpdateWithoutInventoryInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   subject?: Prisma.StringFieldUpdateOperationsInput | string
   picUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  displayOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   students?: Prisma.StudentOrganizationUncheckedUpdateManyWithoutOrgNestedInput
   bookInventory?: Prisma.BookInventoryUncheckedUpdateManyWithoutOrgNestedInput
@@ -526,6 +600,7 @@ export type OrganizationCreateWithoutBookInventoryInput = {
   name: string
   subject: string
   picUrl: string
+  displayOrder?: number
   createdAt?: Date | string
   students?: Prisma.StudentOrganizationCreateNestedManyWithoutOrgInput
   inventory?: Prisma.OrganizationInventoryCreateNestedManyWithoutOrgInput
@@ -537,6 +612,7 @@ export type OrganizationUncheckedCreateWithoutBookInventoryInput = {
   name: string
   subject: string
   picUrl: string
+  displayOrder?: number
   createdAt?: Date | string
   students?: Prisma.StudentOrganizationUncheckedCreateNestedManyWithoutOrgInput
   inventory?: Prisma.OrganizationInventoryUncheckedCreateNestedManyWithoutOrgInput
@@ -564,6 +640,7 @@ export type OrganizationUpdateWithoutBookInventoryInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   subject?: Prisma.StringFieldUpdateOperationsInput | string
   picUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  displayOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   students?: Prisma.StudentOrganizationUpdateManyWithoutOrgNestedInput
   inventory?: Prisma.OrganizationInventoryUpdateManyWithoutOrgNestedInput
@@ -575,6 +652,7 @@ export type OrganizationUncheckedUpdateWithoutBookInventoryInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   subject?: Prisma.StringFieldUpdateOperationsInput | string
   picUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  displayOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   students?: Prisma.StudentOrganizationUncheckedUpdateManyWithoutOrgNestedInput
   inventory?: Prisma.OrganizationInventoryUncheckedUpdateManyWithoutOrgNestedInput
@@ -586,6 +664,7 @@ export type OrganizationCreateWithoutSaleItemsInput = {
   name: string
   subject: string
   picUrl: string
+  displayOrder?: number
   createdAt?: Date | string
   students?: Prisma.StudentOrganizationCreateNestedManyWithoutOrgInput
   inventory?: Prisma.OrganizationInventoryCreateNestedManyWithoutOrgInput
@@ -597,6 +676,7 @@ export type OrganizationUncheckedCreateWithoutSaleItemsInput = {
   name: string
   subject: string
   picUrl: string
+  displayOrder?: number
   createdAt?: Date | string
   students?: Prisma.StudentOrganizationUncheckedCreateNestedManyWithoutOrgInput
   inventory?: Prisma.OrganizationInventoryUncheckedCreateNestedManyWithoutOrgInput
@@ -624,6 +704,7 @@ export type OrganizationUpdateWithoutSaleItemsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   subject?: Prisma.StringFieldUpdateOperationsInput | string
   picUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  displayOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   students?: Prisma.StudentOrganizationUpdateManyWithoutOrgNestedInput
   inventory?: Prisma.OrganizationInventoryUpdateManyWithoutOrgNestedInput
@@ -635,6 +716,7 @@ export type OrganizationUncheckedUpdateWithoutSaleItemsInput = {
   name?: Prisma.StringFieldUpdateOperationsInput | string
   subject?: Prisma.StringFieldUpdateOperationsInput | string
   picUrl?: Prisma.StringFieldUpdateOperationsInput | string
+  displayOrder?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   students?: Prisma.StudentOrganizationUncheckedUpdateManyWithoutOrgNestedInput
   inventory?: Prisma.OrganizationInventoryUncheckedUpdateManyWithoutOrgNestedInput
@@ -704,6 +786,7 @@ export type OrganizationSelect<ExtArgs extends runtime.Types.Extensions.Internal
   name?: boolean
   subject?: boolean
   picUrl?: boolean
+  displayOrder?: boolean
   createdAt?: boolean
   students?: boolean | Prisma.Organization$studentsArgs<ExtArgs>
   inventory?: boolean | Prisma.Organization$inventoryArgs<ExtArgs>
@@ -717,6 +800,7 @@ export type OrganizationSelectCreateManyAndReturn<ExtArgs extends runtime.Types.
   name?: boolean
   subject?: boolean
   picUrl?: boolean
+  displayOrder?: boolean
   createdAt?: boolean
 }, ExtArgs["result"]["organization"]>
 
@@ -725,6 +809,7 @@ export type OrganizationSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.
   name?: boolean
   subject?: boolean
   picUrl?: boolean
+  displayOrder?: boolean
   createdAt?: boolean
 }, ExtArgs["result"]["organization"]>
 
@@ -733,10 +818,11 @@ export type OrganizationSelectScalar = {
   name?: boolean
   subject?: boolean
   picUrl?: boolean
+  displayOrder?: boolean
   createdAt?: boolean
 }
 
-export type OrganizationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "subject" | "picUrl" | "createdAt", ExtArgs["result"]["organization"]>
+export type OrganizationOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "name" | "subject" | "picUrl" | "displayOrder" | "createdAt", ExtArgs["result"]["organization"]>
 export type OrganizationInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   students?: boolean | Prisma.Organization$studentsArgs<ExtArgs>
   inventory?: boolean | Prisma.Organization$inventoryArgs<ExtArgs>
@@ -760,6 +846,7 @@ export type $OrganizationPayload<ExtArgs extends runtime.Types.Extensions.Intern
     name: string
     subject: string
     picUrl: string
+    displayOrder: number
     createdAt: Date
   }, ExtArgs["result"]["organization"]>
   composites: {}
@@ -1192,6 +1279,7 @@ export interface OrganizationFieldRefs {
   readonly name: Prisma.FieldRef<"Organization", 'String'>
   readonly subject: Prisma.FieldRef<"Organization", 'String'>
   readonly picUrl: Prisma.FieldRef<"Organization", 'String'>
+  readonly displayOrder: Prisma.FieldRef<"Organization", 'Int'>
   readonly createdAt: Prisma.FieldRef<"Organization", 'DateTime'>
 }
     

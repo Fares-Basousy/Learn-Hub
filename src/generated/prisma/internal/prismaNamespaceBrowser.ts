@@ -112,6 +112,7 @@ export const OrganizationScalarFieldEnum = {
   name: 'name',
   subject: 'subject',
   picUrl: 'picUrl',
+  displayOrder: 'displayOrder',
   createdAt: 'createdAt'
 } as const
 

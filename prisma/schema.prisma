@@ -55,6 +55,8 @@ model Organization {
   name          String
   subject       String
   picUrl        String
+  // Controls listing order on the public landing page (and admin list) — lower shows first.
+  displayOrder  Int                     @default(0)
   students      StudentOrganization[]
   inventory     OrganizationInventory[]
   bookInventory BookInventory[]

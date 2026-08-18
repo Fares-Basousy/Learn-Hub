@@ -3,7 +3,8 @@ import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import toast from "react-hot-toast";
-import { createOrganization, deleteOrganization, getOrganizations } from "@/src/lib/actions/api/organizations/organizations-actions";
+import { createOrganization, deleteOrganization, getOrganizations, moveOrganizationOrder } from "@/src/lib/actions/api/organizations/organizations-actions";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { uploadImage } from "@/src/lib/actions/api/upload/upload-actions";
 import { Organization } from "@/src/lib/types";
 import { useLang } from "@/components/lang-provider";
@@ -33,6 +34,7 @@ function OrganizationsPageInner() {
   const [loading, setLoading] = useState(true)
   const [refreshKey, setRefreshKey] = useState(0)
   const [fileInputKey, setFileInputKey] = useState(0)
+  const [movingId, setMovingId] = useState<string | null>(null)
   const [form, setForm] = useState({
     name: '',
     subject: '',
@@ -116,6 +118,21 @@ function OrganizationsPageInner() {
     }
   }
 
+  const move = async (id: string, direction: "up" | "down") => {
+    setMovingId(id)
+    try {
+      await moveOrganizationOrder(id, direction)
+      setRefreshKey((k) => k + 1)
+    }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    catch (error: any) {
+      toast.error(error.message ?? t("failedToReorderOrganization"))
+    }
+    finally {
+      setMovingId(null)
+    }
+  }
+
   const remove = async (id: string) => {
     try {
       await toast.promise(deleteOrganization(id), {
@@ -180,6 +197,8 @@ function OrganizationsPageInner() {
           <table className="w-full text-sm">
             <thead className="bg-muted/50 text-start text-xs text-muted-foreground">
               <tr>
+                <th className="p-2">{t("colOrder")}</th>
+                <th className="p-2" />
                 <th className="p-2">{t("namePlaceholder")}</th>
                 <th className="p-2">{t("colSubject")}</th>
                 <th className="p-2" />
@@ -188,7 +207,7 @@ function OrganizationsPageInner() {
             <tbody>
               {loading && (
                 <tr>
-                  <td colSpan={3} className="p-4 text-center text-muted-foreground">
+                  <td colSpan={5} className="p-4 text-center text-muted-foreground">
                     <div className="flex items-center justify-center gap-2">
                       <Spinner />
                       {t("loading")}
@@ -196,8 +215,33 @@ function OrganizationsPageInner() {
                   </td>
                 </tr>
               )}
-              {!loading && organizations.map((o) => (
+              {!loading && organizations.map((o, i) => (
                 <tr key={o.id} className="border-t">
+                  <td className="p-2 font-medium text-muted-foreground">
+                    {(o.displayOrder ?? i) + 1}
+                  </td>
+                  <td className="p-2">
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        disabled={(i === 0 && pageIndex === 0) || movingId !== null}
+                        onClick={() => move(o.id, "up")}
+                        aria-label={t("moveUp")}
+                        className="rounded-full p-1 text-muted-foreground hover:bg-accent hover:text-foreground disabled:pointer-events-none disabled:opacity-30"
+                      >
+                        <ChevronUp className="h-4 w-4" />
+                      </button>
+                      <button
+                        type="button"
+                        disabled={(i === organizations.length - 1 && !hasMore) || movingId !== null}
+                        onClick={() => move(o.id, "down")}
+                        aria-label={t("moveDown")}
+                        className="rounded-full p-1 text-muted-foreground hover:bg-accent hover:text-foreground disabled:pointer-events-none disabled:opacity-30"
+                      >
+                        <ChevronDown className="h-4 w-4" />
+                      </button>
+                    </div>
+                  </td>
                   <td className="p-2 font-medium">{o.name}</td>
                   <td className="p-2 text-muted-foreground">{o.subject}</td>
                   <td className="p-2 text-end whitespace-nowrap">
@@ -218,7 +262,7 @@ function OrganizationsPageInner() {
               ))}
               {organizations.length === 0 && !loading && (
                 <tr>
-                  <td colSpan={3} className="p-4 text-center text-muted-foreground">
+                  <td colSpan={5} className="p-4 text-center text-muted-foreground">
                     {t("noOrganizationsYet")}
                   </td>
                 </tr>

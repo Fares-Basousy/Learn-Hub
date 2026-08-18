@@ -38,11 +38,13 @@ export async function createOrganization(formData: FormData) {
   await requireUser();
   const entries = Object.fromEntries(formData.entries());
   const data = CreateSchema.parse(entries);
+  const { _max } = await prisma.organization.aggregate({ _max: { displayOrder: true } });
   const organization = await prisma.organization.create({
     data: {
       name: data.name,
       subject: data.subject,
       picUrl: data.picUrl,
+      displayOrder: (_max.displayOrder ?? -1) + 1,
     },
   });
   return { organization };
@@ -52,7 +54,7 @@ export async function getOrganizations(pageIndex: number) {
   await requireUser();
   try {
     const organizations = await prisma.organization.findMany({
-      orderBy: { name: "asc" },
+      orderBy: { displayOrder: "asc" },
       skip: pageIndex * PAGE_SIZE,
       take: PAGE_SIZE + 1,
     });
@@ -64,10 +66,11 @@ export async function getOrganizations(pageIndex: number) {
 }
 
 // Public, unauthenticated list for the landing page — no inventory/business data included.
+// Ordered by the admin-controlled displayOrder, so it matches the organizations page.
 export async function getPublicOrganizations() {
   try {
     const organizations = await prisma.organization.findMany({
-      orderBy: { name: "asc" },
+      orderBy: { displayOrder: "asc" },
       select: { id: true, name: true, subject: true, picUrl: true },
     });
     return { organizations };
@@ -81,12 +84,33 @@ export async function getOrganizationsAdmin() {
   await requireUser();
   try {
     const organizations = await prisma.organization.findMany({
-      orderBy: { name: "asc" },
+      orderBy: { displayOrder: "asc" },
     });
     return { organizations };
   } catch (e) {
     return { organizations: [] as Organization[], warning: (e as Error).message };
   }
+}
+
+// Swaps displayOrder with the immediate neighbor so the org moves one slot up/down
+// in the landing-page listing.
+export async function moveOrganizationOrder(id: string, direction: "up" | "down") {
+  await requireUser();
+  const current = await prisma.organization.findUniqueOrThrow({ where: { id } });
+  const neighbor = await prisma.organization.findFirst({
+    where:
+      direction === "up"
+        ? { displayOrder: { lt: current.displayOrder } }
+        : { displayOrder: { gt: current.displayOrder } },
+    orderBy: { displayOrder: direction === "up" ? "desc" : "asc" },
+  });
+  if (!neighbor) return { ok: true };
+
+  await prisma.$transaction([
+    prisma.organization.update({ where: { id: current.id }, data: { displayOrder: neighbor.displayOrder } }),
+    prisma.organization.update({ where: { id: neighbor.id }, data: { displayOrder: current.displayOrder } }),
+  ]);
+  return { ok: true };
 }
 
 export async function getOrganizationById(id: string) {
