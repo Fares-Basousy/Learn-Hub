@@ -184,7 +184,10 @@ function TimetableGrid({
               {roomEntries.map((e) => (
                 <div key={e.id} className="space-y-0.5 p-3">
                   <div className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-                    {tm("days", e.dayOfWeek)} · {formatMinutes(e.startMinute)} – {formatMinutes(e.endMinute)}
+                    {tm("days", e.dayOfWeek)} ·{" "}
+                    <span dir="ltr" className="inline-block">
+                      {formatMinutes(e.startMinute)} – {formatMinutes(e.endMinute)}
+                    </span>
                   </div>
                   <div className="font-semibold">{tm("courses", e.course)}</div>
                   <div className="text-muted-foreground">{e.teacherName}</div>

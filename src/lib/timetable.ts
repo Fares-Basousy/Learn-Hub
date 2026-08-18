@@ -2,7 +2,7 @@ export const CLASSROOMS = ["Classroom 1", "Classroom 2", "Classroom 3"];
 
 export const MIN_START_MINUTE = 8 * 60; // 8:00 AM
 export const MAX_END_MINUTE = 22 * 60; // 10:00 PM
-export const MIN_DURATION_MINUTES = 120;
+export const MIN_DURATION_MINUTES = 90;
 export const TIME_STEP_MINUTES = 30;
 
 export function formatMinutes(min: number): string {

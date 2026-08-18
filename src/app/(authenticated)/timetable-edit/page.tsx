@@ -244,7 +244,7 @@ export default function TimetableEditPage() {
           >
             {durationOptions(form.startMinute).map((d) => (
               <option key={d} value={d}>
-                {d / 60}{t("hourAbbrev")}{d % 60 ? ` ${d % 60}${t("minuteAbbrev")}` : ""}
+                {Math.floor(d / 60)}{t("hourAbbrev")}{d % 60 ? ` ${d % 60}${t("minuteAbbrev")}` : ""}
               </option>
             ))}
           </select>
@@ -319,7 +319,7 @@ export default function TimetableEditPage() {
           <div key={e.id} className="rounded-lg border bg-card p-3">
             <div className="flex items-start justify-between gap-2">
               <div>
-                <div className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                <div dir="ltr" className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
                   {formatMinutes(e.startMinute)} – {formatMinutes(e.endMinute)}
                 </div>
                 <div className="font-semibold">{tm("courses", e.course)}</div>
